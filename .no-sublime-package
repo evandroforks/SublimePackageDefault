@@ -1,0 +1,6 @@
+
+Created a .no-sublime-package as it cannot be installed as .sublime-package
+otherwise it will replace all default files from de default packages.
+
+# https://packagecontrol.io/docs/submitting_a_package
+
