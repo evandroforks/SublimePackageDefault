@@ -5,14 +5,35 @@
 // example, in Packages/User/Python.sublime-settings for python files.
 {
     // Sets the colors used within the text area
-    "color_scheme": "Monokai.sublime-color-scheme",
+    "color_scheme": "Packages/Notepad++ Color Scheme/Default Stylers.tmTheme",
+
+    // A list of valid spell checker words added by the user.
+    "added_words": [],
+
+    // List of extensions that should be opened with a corresponding syntax.
+    // Only makes sense in syntax-specific settings.
+    "extensions": [],
+
+    // A list of words ignored by spell checker.
+    "ignored_words": [],
+
+    // UI scaling factor (hidden setting)
+    // Common values are: "1.0", "1.25", "1.5", "1.75", "2.0"
+    "dpi_scale": 1.0,
+
+    // Draw UI shadows (hidden setting)
+    "draw_shadows": true,
+
+    // Check for updates on startup (hidden setting)
+    // Only available to registered users.
+    "update_check": true,
 
     // Note that the font_face and font_size are overridden in the platform
     // specific settings file, for example, "Preferences (Linux).sublime-settings".
     // Because of this, setting them here will have no effect: you must set them
     // in your User File Preferences.
     "font_face": "",
-    "font_size": 10,
+    "font_size": 14,
 
     // Valid options on all platforms are:
     //  - "no_bold": Disables bold text
@@ -60,13 +81,13 @@
     "fold_buttons": true,
 
     // Hides the fold buttons unless the mouse is over the gutter
-    "fade_fold_buttons": true,
+    "fade_fold_buttons": false,
 
     // Columns in which to display vertical rulers
-    "rulers": [],
+    "rulers": [100],
 
     // Set to true to turn spell checking on by default
-    "spell_check": false,
+    "spell_check": true,
 
     // The number of spaces a tab is considered equal to
     "tab_size": 4,
@@ -90,7 +111,7 @@
 
     // Adds whitespace up to the first open bracket when indenting. Requires
     // auto_indent to be enabled.
-    "indent_to_bracket": false,
+    "indent_to_bracket": true,
 
     // Trims white space added by auto_indent when moving the caret off the
     // line.
@@ -99,7 +120,7 @@
     // Disables horizontal scrolling if enabled.
     // May be set to true, false, or "auto", where it will be disabled for
     // source code, and otherwise enabled.
-    "word_wrap": "auto",
+    "word_wrap": true,
 
     // Set to a value other than 0 to force wrapping at that column rather than the
     // window width
@@ -113,25 +134,26 @@
     "draw_centered": false,
 
     // Controls auto pairing of quotes, brackets etc
-    "auto_match_enabled": true,
+    "auto_match_enabled": false,
 
-    // Word list to use for spell checking
-    "dictionary": "Packages/Language - English/en_US.dic",
+    // Word list to use for spell checking.
+    // Default: "Packages/Language - English/en_US.dic"
+    "dictionary": "Packages/Language - English and Portuguese/EN_PT.dic",
 
     // Sets which scopes are checked for spelling errors
-    "spelling_selector": "markup.raw, source string.quoted - punctuation - meta.preprocessor.include, source comment - source comment.block.preprocessor, -(source, constant, keyword, storage, support, variable, markup.underline.link, meta.tag)",
+    "spelling_selector": "text, markup.raw, source string.quoted - punctuation - meta.preprocessor.include - meta.structure.dictionary.value, source comment - source comment.block.preprocessor, -(source, constant, keyword, storage, support, variable, markup.underline.link, meta.tag), source doccomment.block",
 
     // Set to true to draw a border around the visible rectangle on the minimap.
     // The color of the border will be determined by the "minimapBorder" key in
     // the color scheme
-    "draw_minimap_border": false,
+    "draw_minimap_border": true,
 
     // Always visualise the viewport on the minimap, as opposed to only
     // showing it on mouse over
-    "always_show_minimap_viewport": false,
+    "always_show_minimap_viewport": true,
 
     // If enabled, will highlight any line with a caret
-    "highlight_line": false,
+    "highlight_line": true,
 
     // Valid values are "smooth", "phase", "blink" and "solid".
     "caret_style": "smooth",
@@ -167,10 +189,10 @@
     "match_selection": true,
 
     // Additional spacing at the top of each line, in pixels
-    "line_padding_top": 0,
+    "line_padding_top": 1,
 
     // Additional spacing at the bottom of each line, in pixels
-    "line_padding_bottom": 0,
+    "line_padding_bottom": 1,
 
     // Set to false to disable scrolling past the end of the buffer.
     // On Mac, this value is overridden in the platform specific settings, so
@@ -196,14 +218,14 @@
     // Controls how the indent guides are drawn, valid options are
     // "draw_normal" and "draw_active". draw_active will draw the indent
     // guides containing the caret in a different color.
-    "indent_guide_options": ["draw_normal"],
+    "indent_guide_options": ["draw_normal", "draw_active"],
 
     // Set to true to removing trailing white space on save
-    "trim_trailing_white_space_on_save": false,
+    "trim_trailing_white_space_on_save": true,
 
     // Set to true to ensure the last line of the file ends in a newline
     // character when saving
-    "ensure_newline_at_eof_on_save": false,
+    "ensure_newline_at_eof_on_save": true,
 
     // Set to true to automatically save files when switching to a different file
     // or application
@@ -225,7 +247,7 @@
     "default_encoding": "UTF-8",
 
     // Files containing null bytes are opened as hexadecimal by default
-    "enable_hexadecimal_encoding": true,
+    "enable_hexadecimal_encoding": false,
 
     // Determines what character(s) are used to terminate each line in new files.
     // Valid values are 'system' (whatever the OS uses), 'windows' (CRLF) and
@@ -240,7 +262,7 @@
     // When disabled, tab will only trigger snippets or insert a tab.
     // Shift+tab can be used to insert an explicit tab when tab_completion is
     // enabled.
-    "tab_completion": true,
+    "tab_completion": false,
 
     // Enable auto complete to be triggered automatically when typing.
     "auto_complete": true,
@@ -249,29 +271,33 @@
     "auto_complete_size_limit": 4194304,
 
     // The delay, in ms, before the auto complete window is shown after typing
-    "auto_complete_delay": 50,
+    "auto_complete_delay": 0,
 
     // Controls what scopes auto complete will be triggered in
-    "auto_complete_selector": "meta.tag - punctuation.definition.tag.begin, source - comment - string.quoted.double.block - string.quoted.single.block - string.unquoted.heredoc",
+    "auto_complete_selector": "source, text",
 
     // Additional situations to trigger auto complete
-    "auto_complete_triggers": [ {"selector": "text.html", "characters": "<"} ],
+    "auto_complete_triggers":
+    [
+        {"selector": "text.html", "characters": "<"},
+        {"characters": "\\", "selector": "text.tex.latex"},
+    ],
 
     // By default, auto complete will commit the current completion on enter.
     // This setting can be used to make it complete on tab instead.
     // Completing on tab is generally a superior option, as it removes
     // ambiguity between committing the completion and inserting a newline.
-    "auto_complete_commit_on_tab": false,
+    "auto_complete_commit_on_tab": true,
 
     // Controls if auto complete is shown when snippet fields are active.
     // Only relevant if auto_complete_commit_on_tab is true.
-    "auto_complete_with_fields": false,
+    "auto_complete_with_fields": true,
 
     // Controls what happens when pressing the up key while the first item in
     // the auto complete window is selected: if false, the window is hidden,
     // otherwise the last item in the window is selected. Likewise for the
     // down key when the last item is selected.
-    "auto_complete_cycle": false,
+    "auto_complete_cycle": true,
 
     // Automatically close HTML and XML tags when </ is entered.
     "auto_close_tags": true,
@@ -281,7 +307,7 @@
     // tab character - this allows tabs to be inserted when tab_completion is
     // enabled. Set this to true to make shift+tab always unindent, instead of
     // inserting tabs.
-    "shift_tab_unindent": false,
+    "shift_tab_unindent": true,
 
     // If true, the copy and cut commands will operate on the current line
     // when the selection is empty, rather than doing nothing.
@@ -299,7 +325,7 @@
 
     // When drag_text is enabled, clicking on selected text will begin a
     // drag-drop operation. This is not currently implemented under Linux.
-    "drag_text": true,
+    "drag_text": false,
 
     //
     // User Interface Settings
@@ -313,18 +339,18 @@
     "scroll_speed": 1.0,
 
     // Controls side bar animation when expanding or collapsing folders
-    "tree_animation_enabled": true,
+    "tree_animation_enabled": false,
 
     // Controls animation throughout the application
     "animation_enabled": true,
 
     // Makes tabs with modified files more visible
-    "highlight_modified_tabs": false,
+    "highlight_modified_tabs": true,
 
     "show_tab_close_buttons": true,
 
     // Show folders in the side bar in bold
-    "bold_folder_labels": false,
+    "bold_folder_labels": true,
 
     // Draw divider lines between sections of the UI when using the Adaptive theme
     "adaptive_dividers": true,
@@ -343,10 +369,10 @@
     "enable_tab_scrolling": true,
 
     // Display file encoding in the status bar
-    "show_encoding": false,
+    "show_encoding": true,
 
     // Display line endings in the status bar
-    "show_line_endings": false,
+    "show_line_endings": true,
 
     // Magnifies the entire user interface. Sublime Text must be restarted for
     // this to take effect.
@@ -406,18 +432,18 @@
     // Show the full path to files in the title bar.
     // On Mac, this value is overridden in the platform specific settings, so
     // you'll need to place this line in your user settings to override it.
-    "show_full_path": true,
+    "show_full_path": false,
 
     // Shows the Build Results panel when building. If set to false, the Build
     // Results can be shown via the Tools/Build Results menu.
     "show_panel_on_build": true,
 
     // Shows build errors just under the line on which they occur.
-    "show_errors_inline": true,
+    "show_errors_inline": false,
 
     // Preview file contents when clicking on a file in the side bar. Double
     // clicking or editing the preview will open the file and assign it a tab.
-    "preview_on_click": true,
+    "preview_on_click": false,
 
     // folder_exclude_patterns and file_exclude_patterns control which files
     // are listed in folders on the side bar. These can also be set on a per-
@@ -442,5 +468,46 @@
 
     // List any packages to ignore here. When removing entries from this list,
     // a restart may be required if the package contains plugins.
-    "ignored_packages": ["Vintage"]
+    //
+    // As these packages presents bugs, before enabled any of these packages:
+    // "Anaconda",
+    // "GotoLastEditEnhanced",
+    // "SublimeCodeIntel"
+    //
+    // See the issue `https://github.com/evandrocoan/SublimeTextStudio/issues/50`
+    // for more information on how to deal or fix them.
+    "ignored_packages":
+    [
+        "All Autocomplete",
+        "Anaconda",
+        "ApplySyntax",
+        "BracketHighlighter",
+        "C++ Completions",
+        "C++ Snippets",
+        "C++ Starting Kit",
+        "ColorHelper",
+        "DictionaryAutoComplete",
+        "FileManager",
+        "Find++",
+        "FuzzyFilePath",
+        "Gist",
+        "Git",
+        "GitGutter",
+        "GotoLastEditEnhanced",
+        "Javatar",
+        "Jedi - Python autocompletion",
+        "Local History",
+        "Matlab Completions",
+        "MatlabFilenameAutoComplete",
+        "MySQL Snippets",
+        "Project Specific Syntax Settings",
+        "Qt Completions for C++",
+        "ScopeAlways",
+        "sublime-text-2-buildview",
+        "SublimeCodeIntel",
+        "SyncedSideBar",
+        "TypeScript",
+        "Vintage",
+        "WordHighlight"
+    ],
 }
