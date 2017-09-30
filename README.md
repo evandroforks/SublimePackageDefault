@@ -26,6 +26,10 @@ Related topics about Sublime Text Default Packages:
 1. [SublimeForum$22111](https://forum.sublimetext.com/t/reuse-code-of-the-default-packages/22111) Reuse code of the Default packages
 1. [SublimeForum$14278](https://forum.sublimetext.com/t/looking-for-a-strategy-to-open-source-the-default-packages/14278) ★ Looking for a strategy to Open-Source the Default Packages
 
+Related repositories:
+
+1. https://github.com/twolfson/sublime-files
+
 
 
 # License
