@@ -34,7 +34,7 @@ Related repositories:
 
 # License
 
-All the files on this repository are Copyrighted for Jon Skinner @ SUBLIME HQ PTY LTD, and were
+Almost all files on this repository are Copyrighted for Jon Skinner @ SUBLIME HQ PTY LTD, and were
 downloaded from https://www.sublimetext.com/3dev and with the following
 https://www.sublimetext.com/eula `End User License Agreement`:
 
