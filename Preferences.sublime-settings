@@ -478,36 +478,6 @@
     // for more information on how to deal or fix them.
     "ignored_packages":
     [
-        "All Autocomplete",
-        "Anaconda",
-        "ApplySyntax",
-        "BracketHighlighter",
-        "C++ Completions",
-        "C++ Snippets",
-        "C++ Starting Kit",
-        "ColorHelper",
-        "DictionaryAutoComplete",
-        "FileManager",
-        "Find++",
-        "FuzzyFilePath",
-        "Gist",
-        "Git",
-        "GitGutter",
-        "GotoLastEditEnhanced",
-        "Javatar",
-        "Jedi - Python autocompletion",
-        "Local History",
-        "Matlab Completions",
-        "MatlabFilenameAutoComplete",
-        "MySQL Snippets",
-        "Project Specific Syntax Settings",
-        "Qt Completions for C++",
-        "ScopeAlways",
-        "sublime-text-2-buildview",
-        "SublimeCodeIntel",
-        "SyncedSideBar",
-        "TypeScript",
-        "Vintage",
-        "WordHighlight"
+        "Vintage"
     ],
 }
