@@ -33,7 +33,7 @@
     // Because of this, setting them here will have no effect: you must set them
     // in your User File Preferences.
     "font_face": "",
-    "font_size": 14,
+    "font_size": 13.5,
 
     // Valid options on all platforms are:
     //  - "no_bold": Disables bold text
