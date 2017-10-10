@@ -14,8 +14,8 @@
     "font_face": "",
     "font_size": 10,
 
-    // Valid options are "no_bold", "no_italic", "no_antialias", "gray_antialias",
-    // "subpixel_antialias", "no_round" (OS X only), "gdi" (Windows only) and
+    // Valid options are "no_bold", "no_italic", "no_antialias",
+    // "gray_antialias", "subpixel_antialias", "gdi" (Windows only) and
     // "directwrite" (Windows only)
     "font_options": [],
     // Font options for theme text. Valid options are: "no_antialias",
