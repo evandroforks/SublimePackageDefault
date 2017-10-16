@@ -9,6 +9,7 @@
 
 # Only accept the unchanged files, need to add new files here manually
 !.gitignore
+!.no-sublime-package
 !Context.sublime-menu
 !Default (Linux).sublime-keymap
 !Default (Linux).sublime-mousemap
