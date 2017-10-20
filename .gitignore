@@ -3,5 +3,30 @@
 # To change this file contents, edit the package `ChannelManager/copy_default_package.py`
 
 
-*.png
+# Ignore everything
+# *
+# **
+
+# Only accept the unchanged files, need to add new files here manually
+!.gitignore
+!.no-sublime-package
+!Context.sublime-menu
+!Default (Linux).sublime-keymap
+!Default (Linux).sublime-mousemap
+!Default (OSX).sublime-keymap
+!Default (OSX).sublime-mousemap
+!Default (Windows).sublime-keymap
+!Default (Windows).sublime-mousemap
+!Distraction Free.sublime-settings
+!Find Results.hidden-tmLanguage
+!install_package_control.py
+!package-metadata.json
+!Preferences (Linux).sublime-settings
+!Preferences (OSX).sublime-settings
+!Preferences (Windows).sublime-settings
+!Preferences.sublime-settings
+!README.md
+!Sublime Text Settings.sublime-settings
+!Tab Context.sublime-menu
+!transpose.py
 
