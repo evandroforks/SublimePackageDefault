@@ -6,16 +6,16 @@ import sublime_plugin
 
 isNotSyncedSideBarEnabled = True
 
-class SyncedSideBarRevealInSideBarCommand(sublime_plugin.TextCommand):
+class SyncedSideBarRevealInSideBarCommand(sublime_plugin.WindowCommand):
 
-    def run(self, edit):
+    def run(self, args):
 
         self.view.window().run_command ("reveal_in_side_bar")
 
     def is_visible(self):
 
         # print( 'isNotSyncedSideBarEnabled: ' + str( isNotSyncedSideBarEnabled ) )
-        return isNotSyncedSideBarEnabled
+        return isNotSyncedSideBarEnabled and not not self.window.project_file_name()
 
 
 
