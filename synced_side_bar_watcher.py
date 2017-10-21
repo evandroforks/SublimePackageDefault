@@ -8,9 +8,8 @@ isNotSyncedSideBarEnabled = True
 
 class SyncedSideBarRevealInSideBarCommand(sublime_plugin.WindowCommand):
 
-    def run(self, args):
-
-        self.view.window().run_command ("reveal_in_side_bar")
+    def run(self):
+        self.window.run_command ("reveal_in_side_bar")
 
     def is_visible(self):
 
