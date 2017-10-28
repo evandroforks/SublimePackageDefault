@@ -60,7 +60,8 @@
     // Mac-only options:
     //  - "no_round": Don't round glyph widths for monospace fonts when
     //        "font_size" is small.
-    "font_options": [],
+    "font_options": ["gdi"],
+
     // Font options for theme text. Valid options are the same as
     // "font_options", except "no_bold" and "no_italic" are not supported
     "theme_font_options": [],
