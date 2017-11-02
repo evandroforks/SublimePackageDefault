@@ -110,10 +110,6 @@
 	{ "keys": ["ctrl+shift+home"], "command": "move_to", "args": {"to": "bof", "extend": true} },
 	{ "keys": ["ctrl+shift+end"], "command": "move_to", "args": {"to": "eof", "extend": true} },
 
-
-	{ "keys": ["ctrl+up"], "command": "scroll_lines", "args": {"amount": 3.0 } },
-	{ "keys": ["ctrl+down"], "command": "scroll_lines", "args": {"amount": -3.0 } },
-
 	{ "keys": ["ctrl+pagedown"], "command": "next_view" },
 	{ "keys": ["ctrl+pageup"], "command": "prev_view" },
 
