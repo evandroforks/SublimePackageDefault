@@ -792,7 +792,6 @@
             { "command": "prompt_select_workspace", "caption": "Quick Switch Project…", "mnemonic": "S" },
             {
                 "caption": "Open Recent",
-                "mnemonic": "O",
                 "children":
                 [
                     { "command": "open_recent_project_or_workspace", "args": {"index": 0 } },

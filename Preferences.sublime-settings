@@ -5,7 +5,7 @@
 // example, in Packages/User/Python.sublime-settings for python files.
 {
     // Sets the colors used within the text area
-    "color_scheme": "Packages/Color Scheme - Default/Monokai.tmTheme",
+    "color_scheme": "Monokai.sublime-color-scheme",
 
     // Note that the font_face and font_size are overridden in the platform
     // specific settings file, for example, "Preferences (Linux).sublime-settings".
