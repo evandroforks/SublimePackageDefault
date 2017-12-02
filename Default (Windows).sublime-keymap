@@ -193,40 +193,49 @@
 
 	{ "keys": ["ctrl+a"], "command": "select_all" },
 	{ "keys": ["ctrl+shift+l"], "command": "split_selection_into_lines" },
+
+	// Escape key press actions
 	{ "keys": ["escape"], "command": "single_selection", "context":
 		[
-			{ "key": "num_selections", "operator": "not_equal", "operand": 1 }
+			{ "key": "num_selections", "operator": "not_equal", "operand": 1 },
+            { "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
 		]
 	},
 	{ "keys": ["escape"], "command": "clear_fields", "context":
 		[
-			{ "key": "has_next_field", "operator": "equal", "operand": true }
+			{ "key": "has_next_field", "operator": "equal", "operand": true },
+            { "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
 		]
 	},
 	{ "keys": ["escape"], "command": "clear_fields", "context":
 		[
-			{ "key": "has_prev_field", "operator": "equal", "operand": true }
+			{ "key": "has_prev_field", "operator": "equal", "operand": true },
+            { "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
 		]
 	},
 	{ "keys": ["escape"], "command": "hide_panel", "args": {"cancel": true},
 		"context":
 		[
-			{ "key": "panel_visible", "operator": "equal", "operand": true }
+			{ "key": "panel_visible", "operator": "equal", "operand": true },
+            { "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
 		]
 	},
 	{ "keys": ["escape"], "command": "hide_overlay", "context":
 		[
-			{ "key": "overlay_visible", "operator": "equal", "operand": true }
+			{ "key": "overlay_visible", "operator": "equal", "operand": true },
+            { "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
 		]
 	},
 	{ "keys": ["escape"], "command": "hide_popup", "context":
 		[
-			{ "key": "popup_visible", "operator": "equal", "operand": true }
+			{ "key": "popup_visible", "operator": "equal", "operand": true },
+            { "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
 		]
 	},
 	{ "keys": ["escape"], "command": "hide_auto_complete", "context":
 		[
-			{ "key": "auto_complete_visible", "operator": "equal", "operand": true }
+			{ "key": "auto_complete_visible", "operator": "equal", "operand": true },
+            { "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
 		]
 	},
 
