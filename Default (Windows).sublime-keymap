@@ -198,18 +198,21 @@
 	{ "keys": ["escape"], "command": "single_selection", "context":
 		[
 			{ "key": "num_selections", "operator": "not_equal", "operand": 1 },
+			{ "key": "auto_complete_visible", "operator": "equal", "operand": false },
             { "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
 		]
 	},
 	{ "keys": ["escape"], "command": "clear_fields", "context":
 		[
 			{ "key": "has_next_field", "operator": "equal", "operand": true },
+			{ "key": "auto_complete_visible", "operator": "equal", "operand": false },
             { "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
 		]
 	},
 	{ "keys": ["escape"], "command": "clear_fields", "context":
 		[
 			{ "key": "has_prev_field", "operator": "equal", "operand": true },
+			{ "key": "auto_complete_visible", "operator": "equal", "operand": false },
             { "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
 		]
 	},
@@ -217,18 +220,21 @@
 		"context":
 		[
 			{ "key": "panel_visible", "operator": "equal", "operand": true },
+			{ "key": "auto_complete_visible", "operator": "equal", "operand": false },
             { "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
 		]
 	},
 	{ "keys": ["escape"], "command": "hide_overlay", "context":
 		[
 			{ "key": "overlay_visible", "operator": "equal", "operand": true },
+			{ "key": "auto_complete_visible", "operator": "equal", "operand": false },
             { "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
 		]
 	},
 	{ "keys": ["escape"], "command": "hide_popup", "context":
 		[
 			{ "key": "popup_visible", "operator": "equal", "operand": true },
+			{ "key": "auto_complete_visible", "operator": "equal", "operand": false },
             { "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
 		]
 	},
