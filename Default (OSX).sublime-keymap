@@ -4,7 +4,10 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 */
 [
 	{ "keys": ["super+shift+n"], "command": "new_window" },
-	{ "keys": ["super+shift+w"], "command": "close_window" },
+
+	// Disable default Sublime Text dangerous commands
+	{ "keys": ["super+shift+w"], "command": "nope" },
+
 	{ "keys": ["super+o"], "command": "prompt_open" },
 	{ "keys": ["super+shift+t"], "command": "reopen_last_file" },
 	{ "keys": ["super+alt+up"], "command": "switch_file", "args": {"extensions": ["cpp", "cxx", "cc", "c", "hpp", "hxx", "hh", "h", "ipp", "inl", "m", "mm"]} },

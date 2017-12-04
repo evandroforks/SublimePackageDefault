@@ -21,7 +21,8 @@
 	{ "keys": ["ctrl+shift+n"], "command": "new_window" },
 
 	// Disable default Sublime Text dangerous commands
-	// { "keys": ["ctrl+shift+w"], "command": "close_window" },
+	{ "keys": ["ctrl+shift+w"], "command": "noop" },
+
 	{ "keys": ["ctrl+o"], "command": "prompt_open_file" },
 	{ "keys": ["ctrl+shift+t"], "command": "reopen_last_file" },
 	{ "keys": ["alt+o"], "command": "switch_file", "args": {"extensions": ["cpp", "cxx", "cc", "c", "hpp", "hxx", "hh", "h", "ipp", "inl", "m", "mm"]} },
