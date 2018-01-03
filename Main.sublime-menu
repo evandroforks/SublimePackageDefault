@@ -777,7 +777,7 @@
                     { "command": "show_scope_name" },
                 ]
             },
-            { "command": "install_package_control", "caption": "Install Package Control…" },
+            { "command": "install_package_control_extended", "caption": "Install Package Control…" },
             { "caption": "-", "id": "end" }
         ]
     },
