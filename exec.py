@@ -220,6 +220,10 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
         if not hasattr(self, 'output_view'):
             # Try not to call get_output_panel until the regexes are assigned
             self.output_view = self.window.create_output_panel("exec")
+            self.output_view.last_scroll_region = None
+
+        else:
+            self.saveViewPositions()
 
         # Default the to the current files directory if no working directory was given
         if working_dir == "" and self.window.active_view() and self.window.active_view().file_name():
@@ -293,6 +297,34 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
             self.append_string(None, self.debug_text + "\n")
             if not self.quiet:
                 self.append_string(None, "[Finished]")
+
+    def saveViewPositions(self):
+        output_view = self.output_view
+        output_view.last_scroll_region = output_view.viewport_position()
+        output_view.last_caret_region = [(selection.begin(), selection.end()) for selection in output_view.sel()]
+
+        # print('Before output_view:        ', output_view)
+        # print('Before last_scroll_region: ', output_view.last_scroll_region)
+        # print('Before last_caret_region:  ', output_view.last_caret_region)
+        # print('Before substr:             ', output_view.substr(sublime.Region(0, 10)))
+
+    def restoreViewPositions(self):
+        output_view = self.output_view
+
+        if output_view.last_scroll_region:
+            # print('After  output_view:        ', output_view)
+            # print('After  last_scroll_region: ', output_view.last_scroll_region)
+            # print('After  last_caret_region:  ', output_view.last_caret_region)
+            # print('After  substr:             ', output_view.substr(sublime.Region(0, 10)))
+
+            def delayed_restore():
+                output_view.set_viewport_position(output_view.last_scroll_region)
+                output_view.sel().clear()
+
+                for selection in output_view.last_caret_region:
+                    output_view.sel().add(sublime.Region(selection[0], selection[1]))
+
+            sublime.set_timeout(delayed_restore, 500)
 
     def is_enabled(self, kill=False, **kwargs):
         if kill:
@@ -371,6 +403,8 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
             sublime.status_message("Build finished")
         else:
             sublime.status_message("Build finished with %d errors" % len(errs))
+
+        self.restoreViewPositions()
 
     def on_data(self, proc, data):
         # Normalize newlines, Sublime Text always uses a single \n separator
