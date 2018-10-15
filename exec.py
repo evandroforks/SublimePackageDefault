@@ -196,6 +196,7 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
             syntax="Packages/Text/Plain text.tmLanguage",
             # Catches "path" and "shell"
             **kwargs):
+        view_settings = self.window.active_view().settings()
 
         if update_phantoms_only:
             if self.show_errors_inline:
@@ -223,7 +224,7 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
             self.output_view.last_scroll_region = None
 
         else:
-            self.saveViewPositions()
+            self.saveViewPositions(view_settings)
 
         # Default the to the current files directory if no working directory was given
         if working_dir == "" and self.window.active_view() and self.window.active_view().file_name():
@@ -256,7 +257,7 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
                 print("Running " + cmd_string)
             sublime.status_message("Building")
 
-        show_panel_on_build = self.window.active_view().settings().get("show_panel_on_build", True)
+        show_panel_on_build = view_settings.get("show_panel_on_build", True)
         if show_panel_on_build:
             self.window.run_command("show_panel", {"panel": "output.exec"})
 
@@ -298,15 +299,21 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
             if not self.quiet:
                 self.append_string(None, "[Finished]")
 
-    def saveViewPositions(self):
-        output_view = self.output_view
-        output_view.last_scroll_region = output_view.viewport_position()
-        output_view.last_caret_region = [(selection.begin(), selection.end()) for selection in output_view.sel()]
+    def saveViewPositions(self, view_settings):
 
-        # print('Before output_view:        ', output_view)
-        # print('Before last_scroll_region: ', output_view.last_scroll_region)
-        # print('Before last_caret_region:  ', output_view.last_caret_region)
-        # print('Before substr:             ', output_view.substr(sublime.Region(0, 10)))
+        if view_settings.get('restore_output_view_scroll' , False):
+            output_view = self.output_view
+            output_view.last_scroll_region = output_view.viewport_position()
+            output_view.last_caret_region = [(selection.begin(), selection.end()) for selection in output_view.sel()]
+
+            # print('Before output_view:        ', output_view)
+            # print('Before last_scroll_region: ', output_view.last_scroll_region)
+            # print('Before last_caret_region:  ', output_view.last_caret_region)
+            # print('Before substr:             ', output_view.substr(sublime.Region(0, 10)))
+
+        else:
+            # Force to disable the scroll restoring, if the setting is disabled
+            self.output_view.last_scroll_region = None
 
     def restoreViewPositions(self):
         output_view = self.output_view
