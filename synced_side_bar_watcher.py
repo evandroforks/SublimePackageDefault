@@ -13,8 +13,8 @@ class SyncedSideBarRevealInSideBarCommand(sublime_plugin.WindowCommand):
 
     def is_visible(self):
 
-        # print( 'isNotSyncedSideBarEnabled: ' + str( isNotSyncedSideBarEnabled ) )
-        return isNotSyncedSideBarEnabled and not not self.window.project_file_name()
+        # print( 'isNotSyncedSideBarEnabled: %s, not not self.window.folders: %s' % ( isNotSyncedSideBarEnabled, not not self.window.folders() ) )
+        return isNotSyncedSideBarEnabled and not not self.window.folders()
 
 
 
