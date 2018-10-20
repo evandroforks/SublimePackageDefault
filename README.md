@@ -30,9 +30,17 @@ Related repositories:
 1. https://github.com/twolfson/sublime-files
 
 
+## Zzz Reload Default
+
+This repository also has the custom plugin `zz_reload_default_package.py`,
+which reload overridden `Default.sublime-package` files because by default,
+Sublime Text on start up does not reload the overridden `Default` packages modules on `Packages/Default`.
+
+
 ## Synced Side Bar Watcher
 
-This repository also has the custom plugin `synced_side_bar_watcher.py` which creates the command `synced_side_bar_reveal_in_side_bar`,
+This repository also has the custom plugin `synced_side_bar_watcher.py`,
+which creates the command `synced_side_bar_reveal_in_side_bar`,
 to hide the default context menu command `reveal_in_side_bar`,
 when the package `SyncedSideBar` is installed.
 
@@ -42,7 +50,8 @@ How to add/remove a default menu entry when a X package is/isn’t enabled/insta
 
 ## Packages Manager Support
 
-This repository also has the custom plugin `install_package_control_extended.py` which creates the command `install_package_control_extended`,
+This repository also has the custom plugin `install_package_control_extended.py`,
+which creates the command `install_package_control_extended`,
 to replace the default context menu command `install_package_control`.
 
 The command `install_package_control_extended` is used to hide the command `install_package_control`
