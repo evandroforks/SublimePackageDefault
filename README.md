@@ -1,5 +1,4 @@
-
-# Default.sublime-package (upstream mirror)
+# Default.sublime-package (downstream/fork)
 
 I use this repository for versioning some files of the Sublime Text default packages
 `Default.sublime-package` over git using two repositories strategy:
@@ -34,13 +33,40 @@ Related repositories:
 
 # License
 
-Almost all files on this repository are Copyrighted for Jon Skinner @ SUBLIME HQ PTY LTD, and were
-downloaded from https://www.sublimetext.com/3dev and with the following
-https://www.sublimetext.com/eula `End User License Agreement`:
+The only purpose of this repository is to early include my fixes or enhancements into the Sublime Text `Default.sublime-package`.
+This repository code/information cannot be used by any other means not authorised by Jon Skinner @ SUBLIME HQ PTY LTD.
 
-The SOFTWARE PRODUCT (SUBLIME TEXT) is protected by copyright laws and international copyright
-treaties, as well as other intellectual property laws and treaties. The SOFTWARE PRODUCT is
-licensed, not sold.
+The file `Find Results.hidden-tmLanguage` contains content Copyrighted by (c) 2014 Allen Bargi under the MIT license,
+included at the end of the file on the `Acknowledgements` section.
+
+The new code or changes created by Evandro Coan are licensed under the same license as Sublime Text (as described later),
+except for the file `Find Results.hidden-tmLanguage`,
+which is licensed under MIT license and it created by Allen Bargi and modified by Evandro Coan.
+
+Jon Skinner @ SUBLIME HQ PTY LTD is welcome to incorporate any change/code or this whole repository code back into Sublime Text next version.
+
+To see which changes are from SUBLIME HQ PTY LTD or Evandro Coan access the git history and read the commit messages.
+The commit messages will explicitly state when the code changes are coming from the next Sublime Text version.
+Otherwise,
+when the commit message or any committed code changes does not explicitly state from where the code changes come,
+it is implied they are coming from Evandro Coan and are licensed under the same license as Sublime Text (as described later).
+
+You can see the commit history only by accessing the following address:
+1. https://github.com/evandrocoan/SublimeDefault/commits/master
+
+Or clone this repository and run following git client command:
+1. `git log`
+1. https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History
+
+Most files on this repository were initially downloaded from https://www.sublimetext.com/3dev and
+are synced with the Sublime Text mirror at https://github.com/evandroforks/DefaultSublimePackage.
+
+Sublime Text which has the following license known as `End User License Agreement` https://www.sublimetext.com/eula by SUBLIME HQ PTY LTD:
+
+The SOFTWARE PRODUCT (SUBLIME TEXT) is protected by copyright laws and international copyright treaties,
+as well as other intellectual property laws and treaties.
+The SOFTWARE PRODUCT is licensed,
+not sold.
 
 1. LICENSES
 
@@ -94,5 +120,28 @@ licensed, not sold.
     trademark rights, business interruption, loss of privacy or the disclosure of confidential
     information.
 
+
+
+# Acknowledgements
+
+```
+<File `Find Results.hidden-tmLanguage`>
+Copyright (c) 2014 Allen Bargi (https://twitter.com/aziz)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+associated documentation files (the "Software"), to deal in the Software without restriction,
+including without limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial
+portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
 
 
