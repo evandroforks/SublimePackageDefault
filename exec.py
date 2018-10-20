@@ -218,13 +218,13 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
                 self.append_string(None, "[Cancelled]")
             return
 
-        if not hasattr(self, 'output_view'):
+        if hasattr(self, 'output_view'):
+            self.saveViewPositions(view_settings)
+
+        else:
             # Try not to call get_output_panel until the regexes are assigned
             self.output_view = self.window.create_output_panel("exec")
             self.output_view.last_scroll_region = None
-
-        else:
-            self.saveViewPositions(view_settings)
 
         # Default the to the current files directory if no working directory was given
         if working_dir == "" and self.window.active_view() and self.window.active_view().file_name():
