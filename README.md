@@ -32,12 +32,29 @@ Related repositories:
 
 ## Synced Side Bar Watcher
 
-It also has the custom plugin `synced_side_bar_watcher.py` creates the command
-`synced_side_bar_reveal_in_side_bar`, to replace the default context menu command
-`SyncedSideBarRevealInSideBar`.
+This repository also has the custom plugin `synced_side_bar_watcher.py` which creates the command `synced_side_bar_reveal_in_side_bar`,
+to hide the default context menu command `reveal_in_side_bar`,
+when the package `SyncedSideBar` is installed.
 
 [forum#22753](https://forum.sublimetext.com/t/solved-how-to-add-remove-a-default-menu-entry-when-a-x-package-is-isnt-enabled-installed/22753)
 How to add/remove a default menu entry when a X package is/isn’t enabled/installed?
+
+
+## Packages Manager Support
+
+This repository also has the custom plugin `install_package_control_extended.py` which creates the command `install_package_control_extended`,
+to replace the default context menu command `install_package_control`.
+
+The command `install_package_control_extended` is used to hide the command `install_package_control`
+when my fork/version of `Package Control` called `PackagesManager` is installed.
+See description and differences from `Package Control` at:
+1. https://github.com/evandrocoan/PackagesManager
+1. https://github.com/evandrocoan/PackagesManager/commits/master
+
+This is useful,
+so the user does not accidentally install 2 Packages Managers which conflicts with each other.
+When there is no Packages Manager installed,
+the default behavior of the command `install_package_control` still installing the standard `Package Control` is preserved.
 
 
 
