@@ -12,6 +12,8 @@ import signal
 import sublime
 import sublime_plugin
 
+g_last_scroll_positions = {}
+
 
 class ProcessListener(object):
     def on_data(self, proc, data):
@@ -167,6 +169,67 @@ class AsyncProcess(object):
                 break
 
 
+class FixSublimeTextOutputBuild(sublime_plugin.WindowCommand):
+
+    def run(self, **kwargs) :
+        window = self.window
+        output_view = window.find_output_panel( "exec" )
+
+        # We need to save the view positions before the builtin `build` command run, because it
+        # immediately erases the view contents.
+        self.saveViewPositions( window, output_view )
+
+        window.run_command( 'build', kwargs )
+
+    def saveViewPositions(self, window, output_view):
+
+        if output_view:
+            window_id = window.id()
+            view_settings = window.active_view().settings()
+
+            if view_settings.get( 'restore_output_view_scroll' , False ):
+
+                g_last_scroll_positions[window_id] = (output_view.viewport_position(),
+                        [(selection.begin(), selection.end()) for selection in output_view.sel()])
+
+                # print( 'Before substr:                     ', output_view.substr(sublime.Region(0, 10)) )
+                # print( 'Before window.id:                  ', window.id() )
+                # print( 'Before output_view:                ', output_view )
+                # print( 'Before output_view.id:             ', output_view.id() )
+                # print( 'g_last_scroll_positions[window_id] ', g_last_scroll_positions[window_id] )
+
+            else:
+                # Force to disable the scroll restoring, if the setting is disabled after being enabled
+                g_last_scroll_positions[window_id] = (None, None)
+
+
+# exit_now = False
+# def plugin_loaded():
+#     def function():
+#         global exit_now
+#         exit_now = False
+#         threading.Thread(target=save_output_view_scroll).start()
+#     global exit_now
+#     exit_now = True
+#     sublime.set_timeout_async( function, 1000 )
+
+# def save_output_view_scroll():
+#     global exit_now
+#     while True:
+#         time.sleep(0.5)
+#         if exit_now:
+#             break
+#         window = sublime.active_window()
+#         output_view = window.find_output_panel("exec")
+#         if output_view:
+#             print('substr1:                 ', output_view.substr(sublime.Region(0, 10)))
+#             print('window.id:               ', window.id())
+#             print('output_view:             ', output_view)
+#             print('output_view.id:          ', output_view.id())
+#         else:
+#             print('output_view:             ', output_view)
+
+
 class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
     BLOCK_SIZE = 2**14
     text_queue = collections.deque()
@@ -218,13 +281,9 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
                 self.append_string(None, "[Cancelled]")
             return
 
-        if hasattr(self, 'output_view'):
-            self.saveViewPositions(view_settings)
-
-        else:
+        if not hasattr(self, 'output_view'):
             # Try not to call get_output_panel until the regexes are assigned
             self.output_view = self.window.create_output_panel("exec")
-            self.output_view.last_scroll_region = None
 
         # Default the to the current files directory if no working directory was given
         if working_dir == "" and self.window.active_view() and self.window.active_view().file_name():
@@ -299,39 +358,29 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
             if not self.quiet:
                 self.append_string(None, "[Finished]")
 
-    def saveViewPositions(self, view_settings):
-
-        if view_settings.get('restore_output_view_scroll' , False):
-            output_view = self.output_view
-            output_view.last_scroll_region = output_view.viewport_position()
-            output_view.last_caret_region = [(selection.begin(), selection.end()) for selection in output_view.sel()]
-
-            # print('Before output_view:        ', output_view)
-            # print('Before last_scroll_region: ', output_view.last_scroll_region)
-            # print('Before last_caret_region:  ', output_view.last_caret_region)
-            # print('Before substr:             ', output_view.substr(sublime.Region(0, 10)))
-
-        else:
-            # Force to disable the scroll restoring, if the setting is disabled
-            self.output_view.last_scroll_region = None
-
     def restoreViewPositions(self):
-        output_view = self.output_view
+        window_id = self.window.id()
 
-        if output_view.last_scroll_region:
-            # print('After  output_view:        ', output_view)
-            # print('After  last_scroll_region: ', output_view.last_scroll_region)
-            # print('After  last_caret_region:  ', output_view.last_caret_region)
-            # print('After  substr:             ', output_view.substr(sublime.Region(0, 10)))
+        if window_id in g_last_scroll_positions:
+            last_scroll_region, last_caret_region = g_last_scroll_positions[window_id]
 
-            def delayed_restore():
-                output_view.set_viewport_position(output_view.last_scroll_region)
-                output_view.sel().clear()
+            if last_scroll_region:
+                output_view = self.output_view
 
-                for selection in output_view.last_caret_region:
-                    output_view.sel().add(sublime.Region(selection[0], selection[1]))
+                # print('After  substr:                     ', output_view.substr(sublime.Region(0, 10)))
+                # print('After  window.id:                  ', self.window.id())
+                # print('After  output_view:                ', output_view)
+                # print('After  output_view.id:             ', output_view.id())
+                # print('g_last_scroll_positions[window_id] ', g_last_scroll_positions[window_id])
 
-            sublime.set_timeout(delayed_restore, 500)
+                def delayed_restore():
+                    output_view.set_viewport_position(last_scroll_region)
+                    output_view.sel().clear()
+
+                    for selection in last_caret_region:
+                        output_view.sel().add(sublime.Region(selection[0], selection[1]))
+
+                sublime.set_timeout(delayed_restore, 0)
 
     def is_enabled(self, kill=False, **kwargs):
         if kill:
