@@ -255,7 +255,8 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
             kill=False,
             update_phantoms_only=False,
             hide_phantoms_only=False,
-            word_wrap=True,
+            word_wrap=None,
+            spell_check=None,
             syntax="Packages/Text/Plain text.tmLanguage",
             # Catches "path" and "shell"
             **kwargs):
@@ -289,10 +290,14 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
         if working_dir == "" and self.window.active_view() and self.window.active_view().file_name():
             working_dir = os.path.dirname(self.window.active_view().file_name())
 
+        if word_wrap is None: word_wrap = view_settings.get("word_wrap", False)
+        if spell_check is None: spell_check = view_settings.get("build_view_spell_check", False)
+
         self.output_view.settings().set("result_file_regex", file_regex)
         self.output_view.settings().set("result_line_regex", line_regex)
         self.output_view.settings().set("result_base_dir", working_dir)
         self.output_view.settings().set("word_wrap", word_wrap)
+        self.output_view.settings().set("spell_check", spell_check)
         self.output_view.settings().set("line_numbers", False)
         self.output_view.settings().set("gutter", False)
         self.output_view.settings().set("scroll_past_end", False)
