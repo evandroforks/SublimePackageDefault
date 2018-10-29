@@ -17,10 +17,6 @@
     // A list of words ignored by spell checker.
     "ignored_words": [],
 
-    // UI scaling factor (hidden setting)
-    // Common values are: "1.0", "1.25", "1.5", "1.75", "2.0"
-    "dpi_scale": 1.0,
-
     // Draw UI shadows (hidden setting)
     "draw_shadows": true,
 
@@ -90,6 +86,9 @@
     // Set to true to turn spell checking on by default
     "spell_check": true,
 
+    // Set to true to turn spell checking on by on the build panel
+    "build_view_spell_check": false,
+
     // The number of spaces a tab is considered equal to
     "tab_size": 4,
 
@@ -141,7 +140,7 @@
     "dictionary": "Packages/Language - English/en_US.dic",
 
     // Sets which scopes are checked for spelling errors
-    "spelling_selector": "text, markup.raw, source string.quoted - punctuation - meta.preprocessor.include - meta.structure.dictionary.value, source comment - source comment.block.preprocessor, -(source, constant, keyword, storage, support, variable, markup.underline.link, meta.tag)",
+    "spelling_selector": "text - keyword - variable, markup.raw, source - entity.name - storage - variable.function",
 
     // Set to true to draw a border around the visible rectangle on the minimap.
     // The color of the border will be determined by the "minimapBorder" key in
@@ -195,13 +194,13 @@
     "line_padding_bottom": 1,
 
     // Set to false to disable scrolling past the end of the buffer.
-    // On Mac, this value is overridden in the platform specific settings, so
+    // On OS X, this value is overridden in the platform specific settings, so
     // you'll need to place this line in your user settings to override it.
     "scroll_past_end": true,
 
     // This controls what happens when pressing up or down when on the first
     // or last line.
-    // On Mac, this value is overridden in the platform specific settings, so
+    // On OS X, this value is overridden in the platform specific settings, so
     // you'll need to place this line in your user settings to override it.
     "move_to_limit_on_up_down": false,
 
@@ -287,7 +286,7 @@
     // This setting can be used to make it complete on tab instead.
     // Completing on tab is generally a superior option, as it removes
     // ambiguity between committing the completion and inserting a newline.
-    "auto_complete_commit_on_tab": true,
+    "auto_complete_commit_on_tab": false,
 
     // Controls if auto complete is shown when snippet fields are active.
     // Only relevant if auto_complete_commit_on_tab is true.
@@ -315,7 +314,7 @@
 
     // If true, the selected text will be copied into the find panel when it's
     // shown.
-    // On Mac, this value is overridden in the platform specific settings, so
+    // On OS X, this value is overridden in the platform specific settings, so
     // you'll need to place this line in your user settings to override it.
     "find_selected_text": true,
 
@@ -355,7 +354,7 @@
     // Draw divider lines between sections of the UI when using the Adaptive theme
     "adaptive_dividers": true,
 
-    // Mac only. Valid values are true, false, and "auto". Auto will enable
+    // OS X only. Valid values are true, false, and "auto". Auto will enable
     // the setting when running on a screen 2560 pixels or wider (i.e., a
     // Retina display). When this setting is enabled, OpenGL is used to
     // accelerate drawing. Sublime Text must be restarted for changes to take
@@ -368,6 +367,9 @@
     // Allows tabs to scroll left and right, instead of simply shrinking
     "enable_tab_scrolling": true,
 
+    // Restores the `output.exec` panel view cursor and scroll position after building a project
+    "restore_output_view_scroll": false,
+
     // Display file encoding in the status bar
     "show_encoding": true,
 
@@ -378,6 +380,9 @@
     // this to take effect.
     "ui_scale": 1.0,
 
+    // Common values are: "1.0", "1.25", "1.5", "1.75", "2.0"
+    // UI scaling factor (hidden setting)
+    //
     // Linux only. Sets the app DPI scale - a decimal number such as 1.0, 1.5,
     // 2.0, etc. A value of 0 auto-detects the DPI scale. Sublime Text must be
     // restarted for this to take effect.
@@ -401,7 +406,7 @@
     // Text will never start in full screen mode.
     "remember_full_screen": false,
 
-    // Mac only. If the user's default shell should be invoked to obtain the
+    // OS X only. If the user's default shell should be invoked to obtain the
     // user's customized environment variables. May be a boolean, or a string
     // of the path the shell to invoke. Sublime Text must be restarted for this
     // to take effect.
@@ -413,24 +418,24 @@
     // be shown.
     "always_prompt_for_file_reload": false,
 
-    // Mac only: When files are opened from finder, or by dragging onto the
+    // OS X only: When files are opened from finder, or by dragging onto the
     // dock icon, this controls if a new window is created or not.
     "open_files_in_new_window": true,
 
-    // Mac only: This controls if an empty window is created at startup or not.
+    // OS X only: This controls if an empty window is created at startup or not.
     "create_window_at_startup": true,
 
-    // Mac only: Show recent files on the Touch Bar.
+    // OS X only: Show recent files on the Touch Bar.
     "show_navigation_bar": true,
 
     // Set to true to close windows as soon as the last file is closed, unless
     // there's a folder open within the window.
-    // On Mac, this value is overridden in the platform specific settings, so
+    // On OS X, this value is overridden in the platform specific settings, so
     // you'll need to place this line in your user settings to override it.
-    "close_windows_when_empty": false,
+    "close_windows_when_empty": true,
 
     // Show the full path to files in the title bar.
-    // On Mac, this value is overridden in the platform specific settings, so
+    // On OS X, this value is overridden in the platform specific settings, so
     // you'll need to place this line in your user settings to override it.
     "show_full_path": false,
 

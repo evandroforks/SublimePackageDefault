@@ -200,21 +200,21 @@
 		[
 			{ "key": "num_selections", "operator": "not_equal", "operand": 1 },
 			{ "key": "auto_complete_visible", "operator": "equal", "operand": false },
-            { "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
+			{ "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
 		]
 	},
 	{ "keys": ["escape"], "command": "clear_fields", "context":
 		[
 			{ "key": "has_next_field", "operator": "equal", "operand": true },
 			{ "key": "auto_complete_visible", "operator": "equal", "operand": false },
-            { "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
+			{ "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
 		]
 	},
 	{ "keys": ["escape"], "command": "clear_fields", "context":
 		[
 			{ "key": "has_prev_field", "operator": "equal", "operand": true },
 			{ "key": "auto_complete_visible", "operator": "equal", "operand": false },
-            { "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
+			{ "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
 		]
 	},
 	{ "keys": ["escape"], "command": "hide_panel", "args": {"cancel": true},
@@ -222,27 +222,27 @@
 		[
 			{ "key": "panel_visible", "operator": "equal", "operand": true },
 			{ "key": "auto_complete_visible", "operator": "equal", "operand": false },
-            { "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
+			{ "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
 		]
 	},
 	{ "keys": ["escape"], "command": "hide_overlay", "context":
 		[
 			{ "key": "overlay_visible", "operator": "equal", "operand": true },
 			{ "key": "auto_complete_visible", "operator": "equal", "operand": false },
-            { "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
+			{ "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
 		]
 	},
 	{ "keys": ["escape"], "command": "hide_popup", "context":
 		[
 			{ "key": "popup_visible", "operator": "equal", "operand": true },
 			{ "key": "auto_complete_visible", "operator": "equal", "operand": false },
-            { "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
+			{ "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
 		]
 	},
 	{ "keys": ["escape"], "command": "hide_auto_complete", "context":
 		[
 			{ "key": "auto_complete_visible", "operator": "equal", "operand": true },
-            { "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
+			{ "key": "fixed_command_palette_last_input_history_context", "operator": "equal", "operand": "other" },
 		]
 	},
 
@@ -291,18 +291,12 @@
 		]
 	},
 
-	// Default tab usage
-	// { "keys": ["tab"], "command": "next_field", "context":
-	//  [
-	//      { "key": "has_next_field", "operator": "equal", "operand": true }
-	//  ]
-	// },
-	// { "keys": ["tab"], "command": "commit_completion", "context":
-	//  [
-	//      { "key": "auto_complete_visible" },
-	//      { "key": "setting.auto_complete_commit_on_tab" }
-	//  ]
-	// },
+	{ "keys": ["tab"], "command": "commit_completion", "context":
+		[
+			{ "key": "auto_complete_visible" },
+			{ "key": "setting.auto_complete_commit_on_tab", "operator": "equal", "operand": true },
+		]
+	},
 
 	{ "keys": ["shift+tab"], "command": "insert", "args": {"characters": "\t"} },
 	{ "keys": ["shift+tab"], "command": "unindent", "context":
@@ -347,10 +341,11 @@
 
 	{ "keys": ["ctrl+enter"], "command": "run_macro_file", "args": {"file": "res://Packages/Default/Add Line.sublime-macro"} },
 	{ "keys": ["ctrl+shift+enter"], "command": "run_macro_file", "args": {"file": "res://Packages/Default/Add Line Before.sublime-macro"} },
+
 	{ "keys": ["enter"], "command": "commit_completion", "context":
 		[
 			{ "key": "auto_complete_visible" },
-			{ "key": "setting.auto_complete_commit_on_tab", "operand": false }
+			{ "key": "setting.auto_complete_commit_on_tab", "operator": "equal", "operand": false },
 		]
 	},
 
@@ -423,13 +418,13 @@
 	// { "keys": ["ctrl+f7"], "command": "cancel_build" },
 	// { "keys": ["ctrl+f7"], "command": "exec", "args": {"kill": true} },
 
-	{ "keys": ["f7"], "command": "build" },
-	{ "keys": ["ctrl+b"], "command": "build" },
+	{ "keys": ["f7"], "command": "fix_sublime_text_output_build" },
+	{ "keys": ["ctrl+b"], "command": "fix_sublime_text_output_build" },
 
 	{ "keys": ["f8"], "command": "show_panel", "args": {"panel": "output.exec"} },
 	{ "keys": ["f8"], "command": "cancel_build", "context": [{ "key": "panel", "operand": "output.exec" }] },
 
-	{ "keys": ["ctrl+shift+b"], "command": "build", "args": {"select": true} },
+	{ "keys": ["ctrl+shift+b"], "command": "fix_sublime_text_output_build", "args": {"select": true} },
 	{ "keys": ["ctrl+break"], "command": "cancel_build" },
 
 	{ "keys": ["ctrl+t"], "command": "transpose", "args": { "can_transpose_words": true } },
@@ -765,7 +760,11 @@
 
 	{ "keys": ["ctrl+shift+k"], "command": "run_macro_file", "args": {"file": "res://Packages/Default/Delete Line.sublime-macro"} },
 
-	{ "keys": ["alt+q"], "command": "wrap_lines" },
+	{ "keys": ["alt+q"], "command": "wrap_lines", "context":
+		[
+			{ "key": "setting.is_widget", "operator": "equal", "operand": false }
+		]
+	},
 
 	{ "keys": ["ctrl+k", "ctrl+u"], "command": "upper_case" },
 	{ "keys": ["ctrl+k", "ctrl+l"], "command": "lower_case" },
@@ -808,7 +807,7 @@
 
 	{ "keys": ["context_menu"], "command": "context_menu" },
 
-	{ "keys": ["alt+c"], "command": "toggle_case_sensitive", "context":
+	{ "keys": ["alt+s"], "command": "toggle_case_sensitive", "context":
 		[
 			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
 		]
@@ -818,7 +817,7 @@
 			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
 		]
 	},
-	{ "keys": ["alt+w"], "command": "toggle_whole_word", "context":
+	{ "keys": ["alt+q"], "command": "toggle_whole_word", "context":
 		[
 			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
 		]
