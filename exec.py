@@ -363,35 +363,6 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
             if not self.quiet:
                 self.append_string(None, "[Finished]")
 
-    def restoreViewPositions(self):
-        window_id = self.window.id()
-        restoring_scroll = False
-
-        if window_id in g_last_scroll_positions:
-            last_scroll_region, last_caret_region = g_last_scroll_positions[window_id]
-
-            if last_scroll_region:
-                restoring_scroll = True
-                output_view = self.output_view
-
-                # print('After  substr:                     ', output_view.substr(sublime.Region(0, 10)))
-                # print('After  window.id:                  ', self.window.id())
-                # print('After  output_view:                ', output_view)
-                # print('After  output_view.id:             ', output_view.id())
-                # print('g_last_scroll_positions[window_id] ', g_last_scroll_positions[window_id])
-
-                def delayed_restore():
-                    output_view.set_viewport_position(last_scroll_region)
-                    output_view.sel().clear()
-
-                    for selection in last_caret_region:
-                        output_view.sel().add(sublime.Region(selection[0], selection[1]))
-
-                sublime.set_timeout(delayed_restore, 0)
-
-        if not restoring_scroll:
-            sublime.set_timeout(self.fix_line_wrap_bug, 0)
-
     def is_enabled(self, kill=False, **kwargs):
         if kill:
             return (self.proc is not None) and self.proc.poll()
@@ -471,6 +442,35 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
             sublime.status_message("Build finished with %d errors" % len(errs))
 
         self.restoreViewPositions()
+
+    def restoreViewPositions(self):
+        window_id = self.window.id()
+        restoring_scroll = False
+
+        if window_id in g_last_scroll_positions:
+            last_scroll_region, last_caret_region = g_last_scroll_positions[window_id]
+
+            if last_scroll_region:
+                restoring_scroll = True
+                output_view = self.output_view
+
+                # print('After  substr:                     ', output_view.substr(sublime.Region(0, 10)))
+                # print('After  window.id:                  ', self.window.id())
+                # print('After  output_view:                ', output_view)
+                # print('After  output_view.id:             ', output_view.id())
+                # print('g_last_scroll_positions[window_id] ', g_last_scroll_positions[window_id])
+
+                def delayed_restore():
+                    output_view.set_viewport_position(last_scroll_region)
+                    output_view.sel().clear()
+
+                    for selection in last_caret_region:
+                        output_view.sel().add(sublime.Region(selection[0], selection[1]))
+
+                sublime.set_timeout(delayed_restore, 0)
+
+        if not restoring_scroll:
+            sublime.set_timeout(self.fix_line_wrap_bug, 0)
 
     def fix_line_wrap_bug(self):
         """
