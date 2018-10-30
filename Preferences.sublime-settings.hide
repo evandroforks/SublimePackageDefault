@@ -86,7 +86,7 @@
     // Set to true to turn spell checking on by default
     "spell_check": true,
 
-    // Set to true to turn spell checking on by on the build panel
+    // Set to true to turn spell checking on by default on the build panel
     "build_view_spell_check": false,
 
     // The number of spaces a tab is considered equal to
