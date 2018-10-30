@@ -365,11 +365,13 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
 
     def restoreViewPositions(self):
         window_id = self.window.id()
+        restoring_scroll = False
 
         if window_id in g_last_scroll_positions:
             last_scroll_region, last_caret_region = g_last_scroll_positions[window_id]
 
             if last_scroll_region:
+                restoring_scroll = True
                 output_view = self.output_view
 
                 # print('After  substr:                     ', output_view.substr(sublime.Region(0, 10)))
@@ -386,6 +388,9 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
                         output_view.sel().add(sublime.Region(selection[0], selection[1]))
 
                 sublime.set_timeout(delayed_restore, 0)
+
+        if not restoring_scroll:
+            sublime.set_timeout(self.fix_line_wrap_bug, 0)
 
     def is_enabled(self, kill=False, **kwargs):
         if kill:
@@ -466,6 +471,17 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
             sublime.status_message("Build finished with %d errors" % len(errs))
 
         self.restoreViewPositions()
+
+    def fix_line_wrap_bug(self):
+        """
+            The output build panel is completely scrolled horizontally to the right when there are build errors
+            https://github.com/SublimeTextIssues/Core/issues/2239
+        """
+        window = self.window
+        output_view = window.find_output_panel( "exec" )
+
+        viewport_position = output_view.viewport_position()
+        output_view.set_viewport_position((0, viewport_position[1]))
 
     def on_data(self, proc, data):
         # Normalize newlines, Sublime Text always uses a single \n separator
