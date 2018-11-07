@@ -80,6 +80,8 @@ class EditSettingsCommand(sublime_plugin.ApplicationCommand):
                 'rows': [0.0, 1.0],
                 'cells': [[0, 0, 1, 1], [1, 0, 2, 1]]
             })
+
+        base_file = self.fix_base_file(base_file)
         new_window.focus_group(0)
         new_window.run_command('open_file', {'file': base_file})
         new_window.focus_group(1)
@@ -162,6 +164,36 @@ class EditSettingsCommand(sublime_plugin.ApplicationCommand):
             pass
 
         return syntax
+
+    def fix_base_file(self, base_file):
+        base_file = os.path.normpath(base_file)
+        # print('base_file', base_file)
+
+        settings_files = \
+        [
+            "Default (Linux).sublime-mousemap",
+            "Default (Linux).sublime-keymap",
+            "Default (OSX).sublime-keymap",
+            "Default (OSX).sublime-mousemap",
+            "Default (Windows).sublime-mousemap",
+            "Default (Windows).sublime-keymap",
+            "Preferences (Linux).sublime-settings",
+            "Preferences (OSX).sublime-settings",
+            "Preferences (Windows).sublime-settings",
+            "Preferences.sublime-settings",
+        ]
+
+        for file in settings_files:
+            base_path = os.path.join( 'Default', file )
+            base_path = os.path.normpath( base_path )
+            # print('base_path', base_path)
+
+            if base_path in base_file:
+                base_file = base_file.replace('.sublime-keymap', '.sublime-keymap.hide')
+                base_file = base_file.replace('.sublime-settings', '.sublime-settings.hide')
+                break
+
+        return base_file
 
 
 class EditSyntaxSettingsCommand(sublime_plugin.WindowCommand):
