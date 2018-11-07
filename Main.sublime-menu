@@ -882,7 +882,7 @@
             { "command": "open_dir", "args": {"dir": "$packages"}, "caption": "Browse Packages…", "mnemonic": "B" },
             { "caption": "-" },
             {
-                "command": "edit_settings", "args":
+                "command": "platform_edit_settings", "args":
                 {
                     "base_file": "${packages}/Default/Preferences.sublime-settings",
                     "default": "// Settings in here override those in \"Default/Preferences.sublime-settings\",\n// and are overridden in turn by syntax-specific settings.\n{\n\t$0\n}\n"
@@ -900,7 +900,11 @@
             },
             { "caption": "-" },
             {
-                "command": "platform_edit_settings",
+                "command": "platform_edit_settings", "args":
+                {
+                    "base_file": "${packages}/Default/Default ($platform).sublime-keymap",
+                    "default": "[\n\t$0\n]\n"
+                },
                 "caption": "Key Bindings"
             },
             { "caption": "-" },

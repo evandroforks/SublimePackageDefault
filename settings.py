@@ -1,4 +1,5 @@
 import os.path
+import tempfile
 
 import sublime
 import sublime_plugin
@@ -70,6 +71,7 @@ class EditSettingsCommand(sublime_plugin.ApplicationCommand):
 
         sublime.run_command('new_window')
         new_window = sublime.active_window()
+        self.window = new_window
 
         new_window.run_command(
             'set_layout',
@@ -99,6 +101,67 @@ class EditSettingsCommand(sublime_plugin.ApplicationCommand):
         if not os.path.exists(user_file):
             user_view.set_scratch(True)
             user_settings.set('edit_settings_default', default.replace('$0', ''))
+
+        if base_file.endswith('.hide'):
+            syntax = self.get_file_extension_syntax(base_file.replace('.hide', ''))
+            base_view.set_syntax_file(syntax)
+
+    #
+    # https://forum.sublimetext.com/t/get-syntax-associated-with-file-extension/26348
+    # https://gist.github.com/mattst/71488757f2a2ca573c2d5e73af636d4c#file-getfileextensionsyntax-py
+    #
+    # Retrieve the path of the syntax that a user has
+    # associated with any file extension in Sublime Text.
+    #
+    # 1) Create a temp file with the file extension of the desired syntax.
+    # 2) Open the temp file in ST with the API `open_file()` method; use a
+    #    sublime.TRANSIENT buffer so that no tab is shown on the tab bar.
+    # 3) Retrieve the syntax ST has assigned to the view's settings.
+    # 4) Close the temp file's ST buffer.
+    # 5) Delete the temp file.
+    #
+    # ST command of demo: get_file_extension_syntax
+    def get_file_extension_syntax(self, base_file):
+        filename, file_extension = os.path.splitext(base_file)
+
+        try:
+            tmp_base = "GetFileExtensionSyntaxTempFile"
+            tmp_file = tempfile.NamedTemporaryFile(prefix = tmp_base,
+                                                   suffix = file_extension,
+                                                   delete = False)
+            tmp_path = tmp_file.name
+
+        except Exception:
+            return None
+
+        finally:
+            tmp_file.close()
+
+        active_buffer = self.window.active_view()
+
+        # Using TRANSIENT prevents the creation of a tab bar tab.
+        tmp_buffer = self.window.open_file(tmp_path, sublime.TRANSIENT)
+
+        # Even if is_loading() is true the view's settings can be
+        # retrieved; settings assigned before open_file() returns.
+        syntax = tmp_buffer.settings().get("syntax", None)
+
+        self.window.run_command("close")
+
+        if active_buffer:
+            self.window.focus_view(active_buffer)
+
+        try:
+            os.remove(tmp_path)
+
+        # In the unlikely event of remove() failing: on Linux/OSX
+        # the OS will delete the contents of /tmp on boot or daily
+        # by default, on Windows the file will remain in the user
+        # temporary directory (amazingly never cleaned by default).
+        except Exception:
+            pass
+
+        return syntax
 
 
 class EditSyntaxSettingsCommand(sublime_plugin.WindowCommand):
