@@ -109,10 +109,11 @@ def create_settings_loader():
     settings_files = \
     [
         "Default (Linux).sublime-mousemap.hide",
+        "Default (Linux).sublime-keymap.hide",
         "Default (OSX).sublime-keymap.hide",
         "Default (OSX).sublime-mousemap.hide",
         "Default (Windows).sublime-mousemap.hide",
-        "Default.sublime-keymap.hide",
+        "Default (Windows).sublime-keymap.hide",
         "Preferences (Linux).sublime-settings.hide",
         "Preferences (OSX).sublime-settings.hide",
         "Preferences (Windows).sublime-settings.hide",
