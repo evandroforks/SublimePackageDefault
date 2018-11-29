@@ -37,7 +37,7 @@ class ExprInputHandler(sublime_plugin.TextInputHandler):
             if count != len(s):
                 results.append("...")
             return ", ".join(results)
-        except Exception as e:
+        except Exception:
             return ""
 
     def validate(self, expr):
@@ -46,7 +46,7 @@ class ExprInputHandler(sublime_plugin.TextInputHandler):
             s = v.sel()
             [eval_expr(v.substr(s[i]), i, expr) for i in range(len(s))]
             return True
-        except Exception as e:
+        except Exception:
             return False
 
 
