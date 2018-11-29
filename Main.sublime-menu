@@ -170,8 +170,8 @@
                 ]
             },
             { "caption": "-", "id": "clipboard" },
-            { "command": "copy", "mnemonic": "C" },
             { "command": "cut", "mnemonic": "t" },
+            { "command": "copy", "mnemonic": "C" },
             { "command": "paste", "mnemonic": "P" },
             { "command": "paste_and_indent", "mnemonic": "I" },
             { "command": "paste_from_history", "caption": "Paste from History" },

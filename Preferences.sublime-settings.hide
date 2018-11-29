@@ -449,6 +449,10 @@
     // Shows build errors just under the line on which they occur.
     "show_errors_inline": false,
 
+    // Shows git repository information next to files in sidebar and in
+    // the status bar.
+    "show_git_status": true,
+
     // Preview file contents when clicking on a file in the side bar. Double
     // clicking or editing the preview will open the file and assign it a tab.
     "preview_on_click": false,
