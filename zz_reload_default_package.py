@@ -144,6 +144,9 @@ def check_settings_changes():
                 has_changed_hashes = True
                 print( "[zz_reload_default_package.py] Hash change for setting file: %s" % file_path )
 
+        else:
+            has_changed_hashes = True
+
         clean_file_hashes[file_name] = current_hash
 
     if clean_file_hashes != loaded_file_hashes:
