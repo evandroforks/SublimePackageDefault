@@ -30,6 +30,19 @@ Related repositories:
 1. https://github.com/twolfson/sublime-files
 
 
+## Monkey Patch `sublime` and `sublime_plugin`
+
+On the file `monkey_patch_sublime_modules.py`,
+we patch the `sublime` and `sublime_plugin` files because they have some very annoying bugs,
+not fixed so far:
+1. [SublimeTextIssues/Core#2113](https://github.com/SublimeTextIssues/Core/issues/2113) OSError: resource not found (Which one?)
+   ```python
+   raise IOError("resource not found")
+   # -->
+   raise IOError("resource `%s` not found" % (name))
+   ```
+
+
 ## Zzz Reload Default
 
 This repository also has the custom plugin `zz_reload_default_package.py`,
