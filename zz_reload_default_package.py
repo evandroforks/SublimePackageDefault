@@ -201,6 +201,8 @@ def create_settings_loader():
 
     print( "" )
     if skip_packing:
+        print( "[zz_reload_default_package.py] Warning:\n"
+              "    Skipping packing %s because PackagesManager was not found installed..." % SETTINGS_PACKAGE_NAME )
         return
 
     manager = PackageManager()
