@@ -36,6 +36,23 @@ This repository also has the custom plugin `zz_reload_default_package.py`,
 which reload overridden `Default.sublime-package` files because by default,
 Sublime Text on start up does not reload the overridden `Default` packages modules on `Packages/Default`.
 
+It also creates the package `0_packages_loader.sublime-package` every time the default settings files on `*.sublime-settings.hide` are updated.
+As we ship the `Default.sublime-package` by `PackagesManager`,
+we cannot install the `Default.sublime-package` as a `.sublime-package` because we cannot disable the `Default.sublime-package`.
+And to update a packed package (`Default.sublime-package`),
+we need to disable it before updating.
+Then,
+we ship it as a unpacked package,
+which allows it to be upgraded by `PackagesManager` because we do not need to disable it for updating.
+
+However,
+due the settings loader order,
+we cannot let Sublime Text find the default settings files `*.sublime-settings` on the unpacked packages directory, otherwise,
+it would override all other packages defined settings/keybindings.
+Therefore,
+we create the `0_packages_loader.sublime-package` on the packed packages directory,
+based on the `*.sublime-settings.hide` settings file.
+
 
 ## Synced Side Bar Watcher
 
