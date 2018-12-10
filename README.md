@@ -1,5 +1,4 @@
-
-# Default.sublime-package (upstream mirror)
+# Default.sublime-package (downstream/fork)
 
 I use this repository for versioning some files of the Sublime Text default packages
 `Default.sublime-package` over git using two repositories strategy:
@@ -31,16 +30,109 @@ Related repositories:
 1. https://github.com/twolfson/sublime-files
 
 
+## Monkey Patch `sublime` and `sublime_plugin`
+
+On the file `monkey_patch_sublime_modules.py`,
+we patch the `sublime` and `sublime_plugin` files because they have some very annoying bugs,
+not fixed so far:
+1. [SublimeTextIssues/Core#2113](https://github.com/SublimeTextIssues/Core/issues/2113) OSError: resource not found (Which one?)
+   ```python
+   raise IOError("resource not found")
+   # -->
+   raise IOError("resource `%s` not found" % (name))
+   ```
+
+
+## Zzz Reload Default
+
+This repository also has the custom plugin `zz_reload_default_package.py`,
+which reload overridden `Default.sublime-package` files because by default,
+Sublime Text on start up does not reload the overridden `Default` packages modules on `Packages/Default`.
+
+It also creates the package `0_packages_loader.sublime-package` every time the default settings files on `*.sublime-settings.hide` are updated.
+As we ship the `Default.sublime-package` by `PackagesManager`,
+we cannot install the `Default.sublime-package` as a `.sublime-package` because we cannot disable the `Default.sublime-package`.
+And to update a packed package (`Default.sublime-package`),
+we need to disable it before updating.
+Then,
+we ship it as a unpacked package,
+which allows it to be upgraded by `PackagesManager` because we do not need to disable it for updating.
+
+However,
+due the settings loader order,
+we cannot let Sublime Text find the default settings files `*.sublime-settings` on the unpacked packages directory, otherwise,
+it would override all other packages defined settings/keybindings.
+Therefore,
+we create the `0_packages_loader.sublime-package` on the packed packages directory,
+based on the `*.sublime-settings.hide` settings file.
+
+
+## Synced Side Bar Watcher
+
+This repository also has the custom plugin `synced_side_bar_watcher.py`,
+which creates the command `synced_side_bar_reveal_in_side_bar`,
+to hide the default context menu command `reveal_in_side_bar`,
+when the package `SyncedSideBar` is installed.
+
+[forum#22753](https://forum.sublimetext.com/t/solved-how-to-add-remove-a-default-menu-entry-when-a-x-package-is-isnt-enabled-installed/22753)
+How to add/remove a default menu entry when a X package is/isn’t enabled/installed?
+
+
+## Packages Manager Support
+
+This repository also has the custom plugin `install_package_control_extended.py`,
+which creates the command `install_package_control_extended`,
+to replace the default context menu command `install_package_control`.
+
+The command `install_package_control_extended` is used to hide the command `install_package_control`
+when my fork/version of `Package Control` called `PackagesManager` is installed.
+See description and differences from `Package Control` at:
+1. https://github.com/evandrocoan/PackagesManager
+1. https://github.com/evandrocoan/PackagesManager/commits/master
+
+This is useful,
+so the user does not accidentally install 2 Packages Managers which conflicts with each other.
+When there is no Packages Manager installed,
+the default behavior of the command `install_package_control` still installing the standard `Package Control` is preserved.
+
+
 
 # License
 
-Almost all files on this repository are Copyrighted for Jon Skinner @ SUBLIME HQ PTY LTD, and were
-downloaded from https://www.sublimetext.com/3dev and with the following
-https://www.sublimetext.com/eula `End User License Agreement`:
+The only purpose of this repository is to early include my fixes or enhancements into the Sublime Text `Default.sublime-package`.
+This repository code/information cannot be used by any other means not authorised by Jon Skinner @ SUBLIME HQ PTY LTD.
 
-The SOFTWARE PRODUCT (SUBLIME TEXT) is protected by copyright laws and international copyright
-treaties, as well as other intellectual property laws and treaties. The SOFTWARE PRODUCT is
-licensed, not sold.
+The file `Find Results.hidden-tmLanguage` contains content Copyrighted by (c) 2014 Allen Bargi under the MIT license,
+included at the end of the file on the `Acknowledgements` section.
+
+The new code or changes created by Evandro Coan are licensed under the same license as Sublime Text (as described later),
+except for the file `Find Results.hidden-tmLanguage`,
+which is licensed under MIT license and it created by Allen Bargi and modified by Evandro Coan.
+
+Jon Skinner @ SUBLIME HQ PTY LTD is welcome to incorporate any change/code or this whole repository code back into Sublime Text next version.
+
+To see which changes are from SUBLIME HQ PTY LTD or Evandro Coan access the git history and read the commit messages.
+The commit messages will explicitly state when the code changes are coming from the next Sublime Text version.
+Otherwise,
+when the commit message or any committed code changes does not explicitly state from where the code changes come,
+it is implied they are coming from Evandro Coan and are licensed under the same license as Sublime Text (as described later).
+
+You can see the commit history only by accessing the following address:
+1. https://github.com/evandrocoan/SublimeDefault/commits/master
+
+Or clone this repository and run following git client command:
+1. `git log`
+1. https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History
+
+Most files on this repository were initially downloaded from https://www.sublimetext.com/3dev and
+are synced with the Sublime Text mirror at https://github.com/evandroforks/DefaultSublimePackage.
+
+Sublime Text which has the following license known as `End User License Agreement` https://www.sublimetext.com/eula by SUBLIME HQ PTY LTD:
+
+The SOFTWARE PRODUCT (SUBLIME TEXT) is protected by copyright laws and international copyright treaties,
+as well as other intellectual property laws and treaties.
+The SOFTWARE PRODUCT is licensed,
+not sold.
 
 1. LICENSES
 
@@ -94,5 +186,28 @@ licensed, not sold.
     trademark rights, business interruption, loss of privacy or the disclosure of confidential
     information.
 
+
+
+# Acknowledgements
+
+```
+<File `Find Results.hidden-tmLanguage`>
+Copyright (c) 2014 Allen Bargi (https://twitter.com/aziz)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+associated documentation files (the "Software"), to deal in the Software without restriction,
+including without limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial
+portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
 
 

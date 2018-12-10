@@ -12,6 +12,8 @@ import signal
 import sublime
 import sublime_plugin
 
+g_last_scroll_positions = {}
+
 
 class ProcessListener(object):
     def on_data(self, proc, data):
@@ -167,6 +169,67 @@ class AsyncProcess(object):
                 break
 
 
+class FixSublimeTextOutputBuild(sublime_plugin.WindowCommand):
+
+    def run(self, **kwargs) :
+        window = self.window
+        output_view = window.find_output_panel( "exec" )
+
+        # We need to save the view positions before the builtin `build` command run, because it
+        # immediately erases the view contents.
+        self.saveViewPositions( window, output_view )
+
+        window.run_command( 'build', kwargs )
+
+    def saveViewPositions(self, window, output_view):
+
+        if output_view:
+            window_id = window.id()
+            view_settings = window.active_view().settings()
+
+            if view_settings.get( 'restore_output_view_scroll' , False ):
+
+                g_last_scroll_positions[window_id] = (output_view.viewport_position(),
+                        [(selection.begin(), selection.end()) for selection in output_view.sel()])
+
+                # print( 'Before substr:                     ', output_view.substr(sublime.Region(0, 10)) )
+                # print( 'Before window.id:                  ', window.id() )
+                # print( 'Before output_view:                ', output_view )
+                # print( 'Before output_view.id:             ', output_view.id() )
+                # print( 'g_last_scroll_positions[window_id] ', g_last_scroll_positions[window_id] )
+
+            else:
+                # Force to disable the scroll restoring, if the setting is disabled after being enabled
+                g_last_scroll_positions[window_id] = (None, None)
+
+
+# exit_now = False
+# def plugin_loaded():
+#     def function():
+#         global exit_now
+#         exit_now = False
+#         threading.Thread(target=save_output_view_scroll).start()
+#     global exit_now
+#     exit_now = True
+#     sublime.set_timeout_async( function, 1000 )
+
+# def save_output_view_scroll():
+#     global exit_now
+#     while True:
+#         time.sleep(0.5)
+#         if exit_now:
+#             break
+#         window = sublime.active_window()
+#         output_view = window.find_output_panel("exec")
+#         if output_view:
+#             print('substr1:                 ', output_view.substr(sublime.Region(0, 10)))
+#             print('window.id:               ', window.id())
+#             print('output_view:             ', output_view)
+#             print('output_view.id:          ', output_view.id())
+#         else:
+#             print('output_view:             ', output_view)
+
+
 class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
     BLOCK_SIZE = 2**14
     text_queue = collections.deque()
@@ -192,10 +255,12 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
             kill=False,
             update_phantoms_only=False,
             hide_phantoms_only=False,
-            word_wrap=True,
+            output_build_word_wrap=None,
+            spell_check=None,
             syntax="Packages/Text/Plain text.tmLanguage",
             # Catches "path" and "shell"
             **kwargs):
+        view_settings = self.window.active_view().settings()
 
         if update_phantoms_only:
             if self.show_errors_inline:
@@ -225,10 +290,14 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
         if working_dir == "" and self.window.active_view() and self.window.active_view().file_name():
             working_dir = os.path.dirname(self.window.active_view().file_name())
 
+        if output_build_word_wrap is None: output_build_word_wrap = view_settings.get("output_build_word_wrap", False)
+        if spell_check is None: spell_check = view_settings.get("build_view_spell_check", False)
+
         self.output_view.settings().set("result_file_regex", file_regex)
         self.output_view.settings().set("result_line_regex", line_regex)
         self.output_view.settings().set("result_base_dir", working_dir)
-        self.output_view.settings().set("word_wrap", word_wrap)
+        self.output_view.settings().set("output_build_word_wrap", output_build_word_wrap)
+        self.output_view.settings().set("spell_check", spell_check)
         self.output_view.settings().set("line_numbers", False)
         self.output_view.settings().set("gutter", False)
         self.output_view.settings().set("scroll_past_end", False)
@@ -252,7 +321,7 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
                 print("Running " + cmd_string)
             sublime.status_message("Building")
 
-        show_panel_on_build = sublime.load_settings("Preferences.sublime-settings").get("show_panel_on_build", True)
+        show_panel_on_build = view_settings.get("show_panel_on_build", True)
         if show_panel_on_build:
             self.window.run_command("show_panel", {"panel": "output.exec"})
 
@@ -371,6 +440,48 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
             sublime.status_message("Build finished")
         else:
             sublime.status_message("Build finished with %d errors" % len(errs))
+
+        self.restoreViewPositions()
+
+    def restoreViewPositions(self):
+        window_id = self.window.id()
+        restoring_scroll = False
+
+        if window_id in g_last_scroll_positions:
+            last_scroll_region, last_caret_region = g_last_scroll_positions[window_id]
+
+            if last_scroll_region:
+                restoring_scroll = True
+                output_view = self.output_view
+
+                # print('After  substr:                     ', output_view.substr(sublime.Region(0, 10)))
+                # print('After  window.id:                  ', self.window.id())
+                # print('After  output_view:                ', output_view)
+                # print('After  output_view.id:             ', output_view.id())
+                # print('g_last_scroll_positions[window_id] ', g_last_scroll_positions[window_id])
+
+                def delayed_restore():
+                    output_view.set_viewport_position(last_scroll_region)
+                    output_view.sel().clear()
+
+                    for selection in last_caret_region:
+                        output_view.sel().add(sublime.Region(selection[0], selection[1]))
+
+                sublime.set_timeout(delayed_restore, 0)
+
+        if not restoring_scroll:
+            sublime.set_timeout(self.fix_line_wrap_bug, 0)
+
+    def fix_line_wrap_bug(self):
+        """
+            The output build panel is completely scrolled horizontally to the right when there are build errors
+            https://github.com/SublimeTextIssues/Core/issues/2239
+        """
+        window = self.window
+        output_view = window.find_output_panel( "exec" )
+
+        viewport_position = output_view.viewport_position()
+        output_view.set_viewport_position((0, viewport_position[1]))
 
     def on_data(self, proc, data):
         # Normalize newlines, Sublime Text always uses a single \n separator

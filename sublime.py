@@ -189,14 +189,14 @@ def score_selector(scope_name, selector):
 def load_resource(name):
     s = sublime_api.load_resource(name)
     if s is None:
-        raise IOError("resource not found")
+        raise IOError("resource not found: %s" % name)
     return s
 
 
 def load_binary_resource(name):
     bytes = sublime_api.load_binary_resource(name)
     if bytes is None:
-        raise IOError("resource not found")
+        raise IOError("resource not found: %s" % name)
     return bytes
 
 

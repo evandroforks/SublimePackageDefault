@@ -5,12 +5,18 @@
 		"press_command": "drag_select"
 	},
 	{
-		"button": "button1", "count": 1, "modifiers": ["ctrl"],
+		"button": "button1", "count": 1, "modifiers": ["alt", "ctrl"],
 		"press_command": "drag_select",
 		"press_args": {"additive": true}
 	},
+	// Go to defintion on alt+mouse_click
 	{
 		"button": "button1", "count": 1, "modifiers": ["alt"],
+		"press_command": "drag_select",
+		"command": "goto_definition"
+	},
+	{
+		"button": "button1", "count": 1, "modifiers": ["ctrl"],
 		"press_command": "drag_select",
 		"press_args": {"subtractive": true}
 	},
@@ -66,7 +72,7 @@
 		"press_args": {"by": "lines", "subtractive": true}
 	},
 
-	// Shift + Mouse 2 Column select
+	// Shift + Mouse_Right = Column select
 	{
 		"button": "button2", "modifiers": ["shift"],
 		"press_command": "drag_select",
@@ -83,7 +89,7 @@
 		"press_args": {"by": "columns", "subtractive": true}
 	},
 
-	// Mouse 3 column select
+	// Mouse middle click = column select
 	{
 		"button": "button3",
 		"press_command": "drag_select",
