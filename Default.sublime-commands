@@ -129,6 +129,7 @@
     { "caption": "Plugin Development: Convert Syntax to .sublime-syntax", "command": "convert_syntax" },
 
     { "caption": "About", "command": "show_about_window" },
+    { "caption": "Default Package: Reload Hidden Settings", "command": "reload_hidden_default_settings" },
     { "caption": "Changelog", "command": "show_changelog" },
     { "caption": "Indexing Status", "command": "show_progress_window" },
 ]

@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import sublime
+import sublime_plugin
 
 import os
 import sys
@@ -18,6 +19,8 @@ import threading
 from collections import OrderedDict
 
 skip_packing = False
+_lock = threading.Lock()
+
 
 try:
     from package_control.package_manager import PackageManager
@@ -223,14 +226,35 @@ def create_settings_loader():
 
 
 def run_operations():
-    create_reloader()
 
-    if check_settings_changes():
-        create_settings_loader()
+    if _lock.locked():
+        print( "[zz_reload_default_package.py] Cannot run because it is already running!" )
+        return
+
+    _lock.acquire()
+
+    try:
+        create_reloader()
+
+        if check_settings_changes():
+            create_settings_loader()
+
+    except Exception:
+        raise
+
+    finally:
+        _lock.release()
+
+
+class ReloadHiddenDefaultSettingsCommand(sublime_plugin.WindowCommand):
+
+    def run(self):
+        print( "[zz_reload_default_package.py] Running Default Package Hidden Settings Reload..." )
+        plugin_loaded()
 
 
 def plugin_loaded():
-    threading.Thread(target=run_operations).start()
+    threading.Thread( target=run_operations ).start()
 
 
 def write_data_file(file_path, dictionary_data):
