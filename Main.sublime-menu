@@ -907,6 +907,14 @@
                 },
                 "caption": "Key Bindings"
             },
+            {
+                "command": "edit_settings", "args":
+                {
+                    "base_file": "${packages}/Default/Default ($platform).sublime-mousemap",
+                    "default": "[\n\t$0\n]\n"
+                },
+                "caption": "Mouse Bindings"
+            },
             { "caption": "-" },
             {
                 "caption": "Color Scheme…",

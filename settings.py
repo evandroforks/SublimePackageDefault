@@ -190,6 +190,7 @@ class EditSettingsCommand(sublime_plugin.ApplicationCommand):
 
             if base_path in base_file:
                 base_file = base_file.replace('.sublime-keymap', '.sublime-keymap.hide')
+                base_file = base_file.replace('.sublime-mousemap', '.sublime-mousemap.hide')
                 base_file = base_file.replace('.sublime-settings', '.sublime-settings.hide')
                 break
 
