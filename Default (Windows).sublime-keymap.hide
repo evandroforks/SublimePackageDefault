@@ -151,6 +151,11 @@
 	{ "keys": ["ctrl+shift+home"], "command": "move_to", "args": {"to": "bof", "extend": true} },
 	{ "keys": ["ctrl+shift+end"], "command": "move_to", "args": {"to": "eof", "extend": true} },
 
+    { "keys": ["shift+keypad7"], "command": "move_to", "args": {"to": "bol", "extend": false} },
+    { "keys": ["shift+keypad1"], "command": "move_to", "args": {"to": "eol", "extend": false} },
+    { "keys": ["ctrl+shift+keypad7"], "command": "move_to", "args": {"to": "bof", "extend": false} },
+    { "keys": ["ctrl+shift+keypad1"], "command": "move_to", "args": {"to": "eof", "extend": false} },
+
 	{ "keys": ["ctrl+pagedown"], "command": "next_view" },
 	{ "keys": ["ctrl+pageup"], "command": "prev_view" },
 
