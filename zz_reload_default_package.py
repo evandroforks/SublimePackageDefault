@@ -68,6 +68,8 @@ def create_reloader():
     reloader_code = \
     r"""
     import os
+    import stat
+    import shutil
     from sublime_plugin import reload_plugin
 
     '''
@@ -78,8 +80,32 @@ def create_reloader():
     CURRENT_FILE_NAME = os.path.basename( __file__ )
     DEFAULT_PACKAGE_NAME = 'Default'
 
+    THIS_PACKAGE_ROOT = os.path.dirname( os.path.realpath( __file__ ) )
     PACKAGE_ROOT_DIRECTORY = os.path.dirname( os.path.dirname( os.path.realpath( __file__ ) ) )
+
     DEFAULT_PACKAGE_DIRECTORY = os.path.join( PACKAGE_ROOT_DIRECTORY, DEFAULT_PACKAGE_NAME )
+    ORIGINAL_RELOADER_PATH = os.path.join( DEFAULT_PACKAGE_DIRECTORY, CURRENT_FILE_NAME )
+
+    def safe_remove(path):
+
+        try:
+            os.remove( path )
+
+        except Exception as error:
+            print( "[zz_reload_default_package.py] Failed to remove `%s`. Error is: %s" % ( path, error) )
+
+            try:
+                delete_read_only_file(path)
+
+            except Exception as error:
+                print( "[zz_reload_default_package.py] Failed to remove `%s`. Error is: %s" % ( path, error) )
+
+    def delete_read_only_file(path):
+        _delete_read_only_file( None, path, None )
+
+    def _delete_read_only_file(action, name, exc):
+        os.chmod( name, stat.S_IWRITE )
+        os.remove( name )
 
     def reload_default_package():
 
@@ -93,7 +119,17 @@ def create_reloader():
                     plugin_name = "%s.%s" % ( DEFAULT_PACKAGE_NAME, file_name[:-3] )
                     reload_plugin( plugin_name )
 
-    reload_default_package()
+    try:
+        reload_default_package()
+
+    except FileNotFoundError:
+        pass
+
+    # Remove itself if the Default package is not found
+    if not os.path.exists( ORIGINAL_RELOADER_PATH ):
+        print("[zz_reload_default_package.py] Uninstalling %s... Because the %s package was not found installed at %s." % (
+                THIS_PACKAGE_ROOT, DEFAULT_PACKAGE_NAME, ORIGINAL_RELOADER_PATH ) )
+        shutil.rmtree( THIS_PACKAGE_ROOT, onerror=_delete_read_only_file )
     """
     reloader_code = textwrap.dedent(reloader_code).lstrip()
 
