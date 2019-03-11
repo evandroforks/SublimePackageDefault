@@ -143,7 +143,7 @@
     "dictionary": "Packages/Language - English/en_US.dic",
 
     // Sets which scopes are checked for spelling errors
-    "spelling_selector": "text - keyword - variable, markup.raw, source - entity.name - storage - variable.function - meta",
+    "spelling_selector": "text - keyword - variable, markup.raw, source - keyword - entity - storage - variable - meta",
 
     // Set to true to draw a border around the visible rectangle on the minimap.
     // The color of the border will be determined by the "minimapBorder" key in
