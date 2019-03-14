@@ -17,7 +17,8 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 	{ "keys": ["super+alt+s"], "command": "save_all" },
 	{ "keys": ["super+w"], "command": "close" },
 
-	{ "keys": ["super+k", "super+b"], "command": "synced_side_bar_toggle_side_bar" },
+	{ "keys": ["super+k", "super+r"], "command": "reveal_in_side_bar" },
+	{ "keys": ["super+k", "super+b"], "command": "toggle_side_bar" },
 	{ "keys": ["super+ctrl+f"], "command": "toggle_full_screen" },
 	{ "keys": ["super+ctrl+shift+f"], "command": "toggle_distraction_free" },
 
