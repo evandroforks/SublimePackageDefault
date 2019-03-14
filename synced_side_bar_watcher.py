@@ -97,5 +97,14 @@ def is_package_enabled( userSettings, package_name ):
             or os.path.isfile( sublime.installed_packages_path() + "/" + package_name + ".sublime-package" )
 
 
+class SyncedSideBarToggleSideBarCommand(sublime_plugin.WindowCommand):
+
+    def run(self):
+
+        if self.window.is_sidebar_visible():
+            self.window.run_command ("toggle_side_bar")
+
+        else:
+            self.window.run_command ("reveal_in_side_bar")
 
 
