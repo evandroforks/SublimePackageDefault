@@ -628,6 +628,7 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 	{ "keys": ["ctrl+k", "ctrl+i"], "command": "toggle_tabs" },
 	{ "keys": ["ctrl+k", "ctrl+o"], "command": "toggle_status_bar" },
 	{ "keys": ["ctrl+k", "ctrl+m"], "command": "toggle_menu" },
+	{ "keys": ["ctrl+k", "ctrl+q"], "command": "toggle_setting", "args": {"setting": "word_wrap"} },
 
 	{ "keys": ["super+alt+c"], "command": "toggle_case_sensitive", "context":
 		[
