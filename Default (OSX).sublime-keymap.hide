@@ -624,6 +624,7 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 	{ "keys": ["super+alt+o"], "command": "toggle_overwrite" },
 
 	{ "keys": ["alt+f2"], "command": "context_menu" },
+	{ "keys": ["ctrl+k", "ctrl+m"], "command": "toggle_menu" },
 
 	{ "keys": ["super+alt+c"], "command": "toggle_case_sensitive", "context":
 		[

@@ -811,6 +811,7 @@
 	{ "keys": ["ctrl+k", "ctrl+t"], "command": "fold_tag_attributes" },
 
 	{ "keys": ["alt+f2"], "command": "context_menu" },
+	{ "keys": ["ctrl+k", "ctrl+m"], "command": "toggle_menu" },
 
 	{ "keys": ["alt+s"], "command": "toggle_case_sensitive", "context":
 		[
