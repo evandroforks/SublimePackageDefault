@@ -12,5 +12,6 @@
 	"draw_centered": false,
 	"auto_complete": false,
 	"match_selection": false,
-	"context_menu": "Widget Context.sublime-menu"
+	"context_menu": "Widget Context.sublime-menu",
+	"mini_diff": false,
 }
