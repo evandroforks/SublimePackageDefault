@@ -101,10 +101,9 @@ class SyncedSideBarToggleSideBarCommand(sublime_plugin.WindowCommand):
 
     def run(self):
 
-        if self.window.is_sidebar_visible():
-            self.window.run_command ("toggle_side_bar")
-
-        else:
-            self.window.run_command ("reveal_in_side_bar")
+        # if self.window.is_sidebar_visible():
+        #     self.window.run_command ("toggle_side_bar")
+        # else:
+        self.window.run_command ("reveal_in_side_bar")
 
 
