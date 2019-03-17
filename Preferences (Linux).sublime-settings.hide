@@ -1,7 +1,7 @@
 {
     "font_face": "Monospace",
-    "font_size": 10,
-    "move_to_limit_on_up_down": true,
-    "mouse_wheel_switches_tabs": true
+    "font_face_0": "Consolas",
+    "font_face_1": "Monospace",
+    "font_face_2": "Menlo Regular",
+    "font_face_3": "Inconsolata",
 }
-
