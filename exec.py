@@ -303,6 +303,7 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
         self.output_view.settings().set("gutter", gutter)
         self.output_view.settings().set("line_numbers", False)
         self.output_view.settings().set("fold_buttons", False)
+        self.output_view.settings().set("mini_diff", False)
         self.output_view.settings().set("scroll_past_end", False)
         self.output_view.assign_syntax(syntax)
 
