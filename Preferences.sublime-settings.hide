@@ -211,8 +211,12 @@
     // you'll need to place this line in your user settings to override it.
     "scroll_past_end": true,
 
-    // This controls what happens when pressing up or down when on the first
-    // or last line.
+    // If the setting is enabled and the text cursor is in the middle of the
+    // first line and you press the up-key, the cursor will be placed at the
+    // beginning of the line. Similarly if the cursor is in the middle of the
+    // last line and the down-key is pressed, the cursor is positioned at the
+    // end of the line. If the setting is disabled the cursor is not
+    // repositioned.
     // On OS X, this value is overridden in the platform specific settings, so
     // you'll need to place this line in your user settings to override it.
     "move_to_limit_on_up_down": false,
