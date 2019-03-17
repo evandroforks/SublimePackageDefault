@@ -324,18 +324,27 @@ class ToggleSettingsCommand(sublime_plugin.WindowCommand):
     """
     Given several settings, toggle their values.
     window.run_command("toggle_settings", {"settings": ["fold_buttons", "line_numbers"]})
+
+    @param same_value, if True, will set either all setting to True or False, depending on the first
+                        setting value.
     """
 
-    def run(self, settings):
+    def run(self, settings, same_value=False):
         if not isinstance(settings, list): settings = [settings]
         window_id = self.window.id()
         active_view_settings = {}
 
         per_window_settings[window_id] = active_view_settings
         active_view = self.window.active_view()
+        first_setting_value = not active_view.settings().get(settings[0], False)
 
         for setting in settings:
-            active_view_settings[setting] = not active_view.settings().get(setting, False)
+
+            if same_value:
+                active_view_settings[setting] = first_setting_value
+
+            else:
+                active_view_settings[setting] = not active_view.settings().get(setting, False)
 
         set_settings(self.window.views(), active_view_settings)
 

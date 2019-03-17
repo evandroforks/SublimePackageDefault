@@ -823,7 +823,8 @@
 	{ "keys": ["ctrl+k", "ctrl+o"], "command": "toggle_status_bar" },
 	{ "keys": ["ctrl+k", "ctrl+m"], "command": "toggle_menu" },
 	{ "keys": ["ctrl+k", "ctrl+q"], "command": "toggle_setting", "args": {"setting": "word_wrap"} },
-	{ "keys": ["ctrl+k", "ctrl+n"], "command": "toggle_settings", "args": {"settings": ["line_numbers", "fold_buttons"]} },
+	{ "keys": ["ctrl+k", "ctrl+n"], "command": "toggle_settings", "args":
+			{"settings": ["line_numbers", "fold_buttons", "mini_diff"]}, "same_value": true },
 
 	{ "keys": ["alt+s"], "command": "toggle_case_sensitive", "context":
 		[
