@@ -471,7 +471,7 @@
     // Shows git repository information next to files in sidebar and in
     // the status bar. Sublime Text has to be restarted for this to take
     // effect.
-    "show_git_status": true,
+    "show_git_status": false,
 
     // This setting determines whether tracked Git files should be diffed
     // against the index or HEAD.
