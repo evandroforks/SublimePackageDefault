@@ -14,6 +14,8 @@
             { "caption": "File History…", "command": "sublime_merge_file_history" },
             { "caption": "Line History…", "command": "sublime_merge_line_history" },
             { "caption": "Blame File…", "command": "sublime_merge_blame_file" },
+            { "caption": "-", "id": "diff" },
+            { "command": "toggle_inline_diff" },
             { "caption": "-", "id": "2_row" },
             { "caption": "-", "id": "3_row" },
             { "caption": "-", "id": "4_row" },
