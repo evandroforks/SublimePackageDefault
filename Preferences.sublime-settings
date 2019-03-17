@@ -464,3 +464,4 @@
     // a restart may be required if the package contains plugins.
     "ignored_packages": ["Vintage"]
 }
+
