@@ -21,7 +21,7 @@ class ToggleSettingsCommand(sublime_plugin.WindowCommand):
                         setting value.
     """
 
-    def run(self, settings, same_value=False):
+    def run(self, settings, same_value=True):
         if not isinstance(settings, list): settings = [settings]
         window_id = self.window.id()
         active_view_settings = {}
