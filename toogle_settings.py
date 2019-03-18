@@ -71,3 +71,33 @@ class ToggleSettingsCommandListener(sublime_plugin.EventListener):
 
                 global capture_new_window_from
                 capture_new_window_from = active_view_settings
+
+
+class MinimapPerViewSettingEvent(sublime_plugin.EventListener):
+    """
+        The problem is that because hiding/showing the minimap is a window command, it affects every
+        file in the window. https://forum.sublimetext.com/t/hide-minimap-for-certain-filetypes/24557
+    """
+
+    def on_activated(self, view):
+        show_minimap = view.settings().get('show_minimap')
+
+        if show_minimap:
+            view.window().set_minimap_visible(True)
+
+        elif show_minimap is not None:
+            view.window().set_minimap_visible(False)
+
+
+class ToggleMinimapPerWindow(sublime_plugin.WindowCommand):
+
+    def run(self):
+        settings = self.window.active_view().settings()
+        show_minimap = not settings.get('show_minimap')
+        settings.set('show_minimap', show_minimap)
+
+        if show_minimap:
+            self.window.set_minimap_visible(True)
+
+        elif show_minimap is not None:
+            self.window.set_minimap_visible(False)
