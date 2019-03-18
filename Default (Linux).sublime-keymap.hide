@@ -33,7 +33,6 @@
 	{ "keys": ["ctrl+f4"], "command": "close_file" },
 	{ "keys": ["ctrl+w"], "command": "close" },
 
-	{ "keys": ["ctrl+k", "ctrl+r"], "command": "reveal_in_side_bar" },
 	{ "keys": ["ctrl+k", "ctrl+b"], "command": "toggle_side_bar" },
 	{ "keys": ["f11"], "command": "toggle_full_screen" },
 	{ "keys": ["shift+f11"], "command": "toggle_distraction_free" },
