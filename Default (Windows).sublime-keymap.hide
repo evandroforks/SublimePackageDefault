@@ -123,26 +123,14 @@
 	{ "keys": ["shift+pagedown"], "command": "move", "args": {"by": "pages", "forward": true, "extend": true} },
 
 	{ "keys": ["home"], "command": "move_to", "args": {"to": "bol", "extend": false}, "context":
-		[
-			{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": false }
-		]
-	},
+		[ { "key": "selection_empty", "operator": "equal", "operand": true, "match_all": false } ] },
 	{ "keys": ["home"], "command": "move_to", "args": {"to": "bol", "extend": true}, "context":
-		[
-			{ "key": "selection_empty", "operator": "equal", "operand": false, "match_all": false }
-		]
-	},
+		[ { "key": "selection_empty", "operator": "equal", "operand": false, "match_all": false } ] },
 
 	{ "keys": ["end"], "command": "move_to", "args": {"to": "eol", "extend": false}, "context":
-		[
-			{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": false }
-		]
-	},
+		[ { "key": "selection_empty", "operator": "equal", "operand": true, "match_all": false } ] },
 	{ "keys": ["end"], "command": "move_to", "args": {"to": "eol", "extend": true}, "context":
-		[
-			{ "key": "selection_empty", "operator": "equal", "operand": false, "match_all": false }
-		]
-	},
+		[ { "key": "selection_empty", "operator": "equal", "operand": false, "match_all": false } ] },
 
 	{ "keys": ["shift+home"], "command": "move_to", "args": {"to": "bol", "extend": true} },
 	{ "keys": ["shift+end"], "command": "move_to", "args": {"to": "eol", "extend": true} },
