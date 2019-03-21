@@ -21,6 +21,7 @@
 	{ "keys": ["ctrl+shift+n"], "command": "new_window" },
 
 	// Disable default Sublime Text dangerous commands
+	{ "keys": ["ctrl+q"], "command": "noop" },
 	{ "keys": ["ctrl+shift+w"], "command": "noop" },
 
 	{ "keys": ["ctrl+o"], "command": "prompt_open_file" },
