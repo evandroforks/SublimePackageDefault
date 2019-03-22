@@ -630,6 +630,8 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 	{ "keys": ["super+alt+o"], "command": "toggle_overwrite" },
 
 	{ "keys": ["shift+f10"], "command": "context_menu" },
+	{ "keys": ["context_menu"], "command": "context_menu" },
+
 	{ "keys": ["ctrl+k", "ctrl+p"], "command": "toggle_minimap_per_window" },
 	{ "keys": ["ctrl+k", "ctrl+i"], "command": "toggle_tabs" },
 	{ "keys": ["ctrl+k", "ctrl+o"], "command": "toggle_status_bar" },
