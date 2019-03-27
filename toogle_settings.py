@@ -9,6 +9,7 @@ def set_settings(window_views, active_view_settings):
     for view in window_views:
 
         for setting in active_view_settings:
+            # print('setting view', view.id(), 'active_view_settings', active_view_settings[setting])
             view.settings().set(setting, active_view_settings[setting])
 
 
@@ -30,6 +31,7 @@ class ToggleSettingsCommand(sublime_plugin.WindowCommand):
         active_view = self.window.active_view()
         first_setting_value = not active_view.settings().get(settings[0], False)
 
+        # print('running...')
         for setting in settings:
 
             if same_value:
@@ -43,27 +45,29 @@ class ToggleSettingsCommand(sublime_plugin.WindowCommand):
 
 class ToggleSettingsCommandListener(sublime_plugin.EventListener):
 
-    def on_new_async(self, view):
+    def on_load(self, view):
         global capture_new_window_from
         window = sublime.active_window()
         window_id = window.id()
+        # print("window_id", window_id, 'window_id in per_window_settings', window_id in per_window_settings)
 
         if capture_new_window_from is not None:
             active_view_settings = capture_new_window_from
             capture_new_window_from = None
             per_window_settings[window_id] = active_view_settings
 
-            window_views = [window.active_view()]
+            window_views = [window.active_view(), view]
             window_views.extend(window.views())
             set_settings(window_views, active_view_settings)
 
         elif window_id in per_window_settings:
             active_view_settings = per_window_settings[window_id]
-            set_settings(window.views(), active_view_settings)
+            set_settings([view], active_view_settings)
 
     def on_window_command(self, window, command_name, args):
 
         if command_name == "new_window":
+            # print('command_name', command_name)
             window_id = window.id()
 
             if window_id in per_window_settings:
