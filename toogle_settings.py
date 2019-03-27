@@ -49,6 +49,9 @@ class ToggleSettingsCommand(sublime_plugin.WindowCommand):
 
 class ToggleSettingsCommandListener(sublime_plugin.EventListener):
 
+    def on_new(self, view):
+        self.on_load(view)
+
     def on_load(self, view):
         global capture_new_window_from
         window = sublime.active_window()
@@ -78,9 +81,9 @@ class ToggleSettingsCommandListener(sublime_plugin.EventListener):
                 set_settings([view], active_view_settings)
 
     def on_window_command(self, window, command_name, args):
+        # print('command_name', command_name)
 
         if command_name == "new_window":
-            # print('command_name', command_name)
             window_id = window.id()
 
             if window_id in per_window_settings:
