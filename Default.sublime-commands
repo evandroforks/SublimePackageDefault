@@ -95,6 +95,7 @@
     },
 
     { "caption": "File: Save All", "command": "save_all" },
+    { "caption": "File: Clone View (New View into File)", "command": "clone_file" },
     { "caption": "File: Revert", "command": "revert" },
     { "caption": "File: New View into File", "command": "clone_file" },
     { "caption": "File: Close All", "command": "close_all" },
