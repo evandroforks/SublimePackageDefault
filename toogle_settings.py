@@ -24,14 +24,17 @@ class ToggleSettingsCommand(sublime_plugin.WindowCommand):
 
     def run(self, settings, same_value=True):
         if not isinstance(settings, list): settings = [settings]
+        window = self.window
         window_id = self.window.id()
-        active_view_settings = {}
+
+        window_settings = window.settings()
+        active_view_settings = window_settings.get('toogle_settings', {})
 
         per_window_settings[window_id] = active_view_settings
         active_view = self.window.active_view()
         first_setting_value = not active_view.settings().get(settings[0], False)
 
-        # print('running...')
+        # print('running... active_view_settings', active_view_settings)
         for setting in settings:
 
             if same_value:
@@ -40,6 +43,7 @@ class ToggleSettingsCommand(sublime_plugin.WindowCommand):
             else:
                 active_view_settings[setting] = not active_view.settings().get(setting, False)
 
+        window_settings.set('toogle_settings', active_view_settings)
         set_settings(self.window.views(), active_view_settings)
 
 
@@ -63,6 +67,15 @@ class ToggleSettingsCommandListener(sublime_plugin.EventListener):
         elif window_id in per_window_settings:
             active_view_settings = per_window_settings[window_id]
             set_settings([view], active_view_settings)
+
+        else:
+            window_settings = window.settings()
+            active_view_settings = window_settings.get('toogle_settings', {})
+            # print('on_load... active_view_settings', active_view_settings)
+
+            if active_view_settings:
+                per_window_settings[window_id] = active_view_settings
+                set_settings([view], active_view_settings)
 
     def on_window_command(self, window, command_name, args):
 
