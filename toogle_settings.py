@@ -13,6 +13,19 @@ def set_settings(window_views, active_view_settings):
             view.settings().set(setting, active_view_settings[setting])
 
 
+class EraseWindowSettingsCommand(sublime_plugin.WindowCommand):
+
+    def run(self):
+        global per_window_settings
+        per_window_settings = {}
+
+        window = self.window
+        window_settings = window.settings()
+
+        active_view_settings = window_settings.get('toogle_settings', {})
+        window_settings.set('toogle_settings', active_view_settings)
+
+
 class IncrementSettingCommand(sublime_plugin.WindowCommand):
     """
     Given a setting name and a number, increment the setting by this number.
