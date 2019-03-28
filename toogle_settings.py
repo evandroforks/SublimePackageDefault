@@ -17,13 +17,19 @@ class EraseWindowSettingsCommand(sublime_plugin.WindowCommand):
 
     def run(self):
         global per_window_settings
-        per_window_settings = {}
-
         window = self.window
-        window_settings = window.settings()
 
-        active_view_settings = window_settings.get('toogle_settings', {})
-        window_settings.set('toogle_settings', active_view_settings)
+        window_settings = window.settings()
+        window_views = window.views()
+
+        for setting in window_settings.get('toggle_settings', {}):
+            print('Erasing window', window.id(), 'setting', setting)
+
+            for view in window_views:
+                view.settings().erase(setting)
+
+        per_window_settings = {}
+        window_settings.set('toggle_settings', per_window_settings)
 
 
 class IncrementSettingCommand(sublime_plugin.WindowCommand):
@@ -37,7 +43,7 @@ class IncrementSettingCommand(sublime_plugin.WindowCommand):
         window_id = self.window.id()
 
         window_settings = window.settings()
-        active_view_settings = window_settings.get('toogle_settings', {})
+        active_view_settings = window_settings.get('toggle_settings', {})
 
         per_window_settings[window_id] = active_view_settings
         active_view = self.window.active_view()
@@ -51,10 +57,10 @@ class IncrementSettingCommand(sublime_plugin.WindowCommand):
             active_view_settings[setting] = new_value
 
         except:
-            print('[toogle_settings] Unexpected value for setting', setting, '->', setting_value)
+            print('[toggle_settings] Unexpected value for setting', setting, '->', setting_value)
             active_view_settings[setting] = increment
 
-        window_settings.set('toogle_settings', active_view_settings)
+        window_settings.set('toggle_settings', active_view_settings)
         set_settings(self.window.views(), active_view_settings)
 
 
@@ -73,7 +79,7 @@ class ToggleSettingsCommand(sublime_plugin.WindowCommand):
         window_id = self.window.id()
 
         window_settings = window.settings()
-        active_view_settings = window_settings.get('toogle_settings', {})
+        active_view_settings = window_settings.get('toggle_settings', {})
 
         per_window_settings[window_id] = active_view_settings
         active_view = self.window.active_view()
@@ -88,7 +94,7 @@ class ToggleSettingsCommand(sublime_plugin.WindowCommand):
             else:
                 active_view_settings[setting] = not active_view.settings().get(setting, False)
 
-        window_settings.set('toogle_settings', active_view_settings)
+        window_settings.set('toggle_settings', active_view_settings)
         set_settings(self.window.views(), active_view_settings)
 
 
@@ -118,7 +124,7 @@ class ToggleSettingsCommandListener(sublime_plugin.EventListener):
 
         else:
             window_settings = window.settings()
-            active_view_settings = window_settings.get('toogle_settings', {})
+            active_view_settings = window_settings.get('toggle_settings', {})
             # print('on_load... active_view_settings', active_view_settings)
 
             if active_view_settings:
