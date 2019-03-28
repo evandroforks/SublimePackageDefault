@@ -781,14 +781,14 @@
 	{ "keys": ["ctrl+k", "ctrl+g"], "command": "clear_bookmarks", "args": {"name": "mark"} },
 	{ "keys": ["ctrl+k", "ctrl+c"], "command": "show_at_center" },
 
-	{ "keys": ["ctrl++"], "command": "increase_font_size" },
-	{ "keys": ["ctrl+-"], "command": "decrease_font_size" },
+	{ "keys": ["ctrl++"], "command": "increment_setting", "args": {"setting": "font_size", "increment": 1} },
+	{ "keys": ["ctrl+-"], "command": "increment_setting", "args": {"setting": "font_size", "increment": -1} },
 
-	{ "keys": ["ctrl+keypad_plus"], "command": "increase_font_size" },
-	{ "keys": ["ctrl+keypad_minus"], "command": "decrease_font_size" },
+	{ "keys": ["ctrl+keypad_plus"], "command": "increment_setting", "args": {"setting": "font_size", "increment": 1} },
+	{ "keys": ["ctrl+keypad_minus"], "command": "increment_setting", "args": {"setting": "font_size", "increment": -1} },
 
-	{ "keys": ["ctrl+equals"], "command": "increase_font_size" },
-	{ "keys": ["ctrl+minus"], "command": "decrease_font_size" },
+	{ "keys": ["ctrl+equals"], "command": "increment_setting", "args": {"setting": "font_size", "increment": 1} },
+	{ "keys": ["ctrl+minus"], "command": "increment_setting", "args": {"setting": "font_size", "increment": -1} },
 
 	{ "keys": ["alt+shift+w"], "command": "insert_snippet", "args": { "name": "Packages/XML/Snippets/long-tag.sublime-snippet" } },
 

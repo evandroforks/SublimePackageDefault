@@ -13,6 +13,38 @@ def set_settings(window_views, active_view_settings):
             view.settings().set(setting, active_view_settings[setting])
 
 
+class IncrementSettingCommand(sublime_plugin.WindowCommand):
+    """
+    Given a setting name and a number, increment the setting by this number.
+    window.run_command("increment_setting", {"setting": "font_size", "increment": 1})
+    """
+
+    def run(self, setting, increment):
+        window = self.window
+        window_id = self.window.id()
+
+        window_settings = window.settings()
+        active_view_settings = window_settings.get('toogle_settings', {})
+
+        per_window_settings[window_id] = active_view_settings
+        active_view = self.window.active_view()
+
+        try:
+            # print('running... active_view_settings', active_view_settings)
+            setting_value = active_view.settings().get(setting, 0)
+            new_value = setting_value + increment
+
+            print('Changing setting', setting, 'from', setting_value, '->', new_value)
+            active_view_settings[setting] = new_value
+
+        except:
+            print('[toogle_settings] Unexpected value for setting', setting, '->', setting_value)
+            active_view_settings[setting] = increment
+
+        window_settings.set('toogle_settings', active_view_settings)
+        set_settings(self.window.views(), active_view_settings)
+
+
 class ToggleSettingsCommand(sublime_plugin.WindowCommand):
     """
     Given several settings, toggle their values.
