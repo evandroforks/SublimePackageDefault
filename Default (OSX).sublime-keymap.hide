@@ -602,9 +602,9 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 	{ "keys": ["super+k", "super+x"], "command": "swap_with_mark" },
 	{ "keys": ["super+k", "super+g"], "command": "clear_bookmarks", "args": {"name": "mark"} },
 
-	{ "keys": ["super+equals"], "command": "increment_setting", "args": {"setting": "font_size", "increment": 1} },
-	{ "keys": ["super+plus"], "command": "increment_setting", "args": {"setting": "font_size", "increment": 1} },
-	{ "keys": ["super+minus"], "command": "increment_setting", "args": {"setting": "font_size", "increment": -1} },
+	{ "keys": ["super+equals"], "command": "increase_font_size" },
+	{ "keys": ["super+plus"], "command": "increase_font_size" },
+	{ "keys": ["super+minus"], "command": "decrease_font_size" },
 
 	{ "keys": ["ctrl+shift+w"], "command": "insert_snippet", "args": { "name": "Packages/XML/Snippets/long-tag.sublime-snippet" } },
 
