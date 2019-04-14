@@ -81,6 +81,8 @@ class EditSettingsCommand(sublime_plugin.ApplicationCommand):
                 'cells': [[0, 0, 1, 1], [1, 0, 2, 1]]
             })
 
+        # print('base_file      ', base_file)
+        # print('base_file fixed', self.fix_base_file(base_file))
         base_file = self.fix_base_file(base_file)
         new_window.focus_group(0)
         new_window.run_command('open_file', {'file': base_file})
@@ -194,7 +196,9 @@ class EditSettingsCommand(sublime_plugin.ApplicationCommand):
                 base_file = base_file.replace('.sublime-settings', '.sublime-settings.hide')
                 break
 
-        return base_file
+        # Using os.path.join("Packages", __package__, "resource.name") on Windows causes OSError: resource not found
+        # https://github.com/SublimeTextIssues/Core/issues/2586
+        return base_file.replace('\\', '/')
 
 
 class EditSyntaxSettingsCommand(sublime_plugin.WindowCommand):
