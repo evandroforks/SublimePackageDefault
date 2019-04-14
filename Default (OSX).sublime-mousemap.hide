@@ -96,4 +96,3 @@
 	{ "button": "button2", "modifiers": [], "press_command": "context_menu" },
 	{ "button": "button1", "count": 1, "modifiers": ["ctrl"], "press_command": "context_menu" }
 ]
-
