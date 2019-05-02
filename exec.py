@@ -323,7 +323,10 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
                 if not isinstance(cmd, str):
                     cmd_string = " ".join(cmd)
                 print("Running " + cmd_string)
-            sublime.status_message("Building")
+
+            # https://forum.sublimetext.com/t/how-to-keep-showing-building-on-the-status-bar/43965
+            for view in self.window.views():
+                view.set_status("output_exec_window%s" % self.window.id(), "Building...")
 
         show_panel_on_build = view_settings.get("show_panel_on_build", True)
         if show_panel_on_build:
@@ -439,7 +442,11 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
         if proc != self.proc:
             return
 
+        for view in self.window.views():
+            view.erase_status("output_exec_window%s" % self.window.id())
+
         errs = self.output_view.find_all_results()
+
         if len(errs) == 0:
             sublime.status_message("Build finished")
         else:
