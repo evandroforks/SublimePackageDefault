@@ -230,6 +230,83 @@ class FixSublimeTextOutputBuild(sublime_plugin.WindowCommand):
 #             print('output_view:             ', output_view)
 
 
+class ThreadProgress():
+    """
+    Animates an indicator, [=   ], in the status area while a thread runs
+
+    Based on Package Control
+    https://github.com/wbond/package_control/blob/db53090bd0920ca2c58ef27f0361a4d7b096df0e/package_control/thread_progress.py
+
+    :param thread:
+        The thread to track for activity
+
+    :param message:
+        The message to display next to the activity indicator
+
+    :param success_message:
+        The message to display once the thread is complete
+    """
+    windows = {}
+    running = False
+
+    def __init__(self, message, success_message):
+        self.status_name = "output_build_view_"
+        self.message = message
+        self.success_message = success_message
+        self.addend = 1
+        self.size = 12
+        self.last_view = None
+        self.window = sublime.active_window()
+        self.windows[self.window.id()] = self
+        self.index = 0
+        if not self.running:
+            self.is_alive = True
+            self.running = True
+            sublime.set_timeout(lambda: self.run(), 100)
+
+    @classmethod
+    def stop(cls):
+        window_id = sublime.active_window().id()
+        if window_id in cls.windows:
+            progress = cls.windows[window_id]
+            progress.is_alive = False
+            del cls.windows[window_id]
+
+    def run(self):
+        active_view = self.window.active_view()
+        active_window_id = '%s%s' % ( self.status_name, self.window.id() )
+
+        if self.last_view is not None and active_view != self.last_view:
+            self.last_view.erase_status(active_window_id)
+            self.last_view = None
+
+        if not self.is_alive:
+            def cleanup():
+                active_view.erase_status(active_window_id)
+
+            active_view.set_status(active_window_id, self.success_message)
+            sublime.set_timeout(cleanup, 10000)
+
+            ThreadProgress.running = False
+            return
+
+        before = self.index % self.size
+        after = (self.size - 1) - before
+
+        active_view.set_status(active_window_id, '%s [%s=%s]' % (self.message, ' ' * before, ' ' * after))
+        if self.last_view is None:
+            self.last_view = active_view
+
+        if not after:
+            self.addend = -1
+
+        if not before:
+            self.addend = 1
+
+        self.index += self.addend
+        sublime.set_timeout(lambda: self.run(), 100)
+
+
 class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
     BLOCK_SIZE = 2**14
     text_queue = collections.deque()
@@ -325,8 +402,7 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
                 print("Running " + cmd_string)
 
             # https://forum.sublimetext.com/t/how-to-keep-showing-building-on-the-status-bar/43965
-            for view in self.window.views():
-                view.set_status("output_exec_window%s" % self.window.id(), "Building...")
+            ThreadProgress("Building...", "Successfully Build the Project!")
 
         show_panel_on_build = view_settings.get("show_panel_on_build", True)
         if show_panel_on_build:
@@ -442,9 +518,7 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
         if proc != self.proc:
             return
 
-        for view in self.window.views():
-            view.erase_status("output_exec_window%s" % self.window.id())
-
+        ThreadProgress.stop()
         errs = self.output_view.find_all_results()
 
         if len(errs) == 0:
