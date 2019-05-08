@@ -441,6 +441,7 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
                 self.text_queue_proc = self.proc
 
         except Exception as e:
+            ThreadProgress.stop()
             self.append_string(None, str(e) + "\n")
             self.append_string(None, self.debug_text + "\n")
             if not self.quiet:
