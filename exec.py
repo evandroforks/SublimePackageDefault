@@ -257,11 +257,14 @@ class ThreadProgress():
         self.size = 12
         self.last_view = None
         self.window = sublime.active_window()
-        self.windows[self.window.id()] = self
         self.index = 0
-        if not self.running:
-            self.is_alive = True
-            self.running = True
+        self.is_alive = True
+
+        if self.window.id() in self.windows:
+            print('Skipping ThreadProgress indicator because it is already running!')
+
+        else:
+            self.windows[self.window.id()] = self
             sublime.set_timeout(lambda: self.run(), 100)
 
     @classmethod
@@ -286,8 +289,6 @@ class ThreadProgress():
 
             active_view.set_status(active_window_id, self.success_message)
             sublime.set_timeout(cleanup, 10000)
-
-            ThreadProgress.running = False
             return
 
         before = self.index % self.size
