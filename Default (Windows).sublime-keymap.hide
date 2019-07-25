@@ -120,8 +120,15 @@
 
 	{ "keys": ["pageup"], "command": "move", "args": {"by": "pages", "forward": false} },
 	{ "keys": ["pagedown"], "command": "move", "args": {"by": "pages", "forward": true} },
+
 	{ "keys": ["shift+pageup"], "command": "move", "args": {"by": "pages", "forward": false, "extend": true} },
 	{ "keys": ["shift+pagedown"], "command": "move", "args": {"by": "pages", "forward": true, "extend": true} },
+
+    { "keys": ["alt+pageup"], "command": "scroll_lines_fixed", "args" : {"by": "pages", "amount": 1.0 } },
+    { "keys": ["alt+pagedown"], "command": "scroll_lines_fixed", "args" : {"by": "pages", "amount": -1.0 } },
+
+    { "keys": ["alt+keypad9"], "command": "scroll_lines_fixed", "args" : {"by": "pages", "amount": 1.0 } },
+    { "keys": ["alt+keypad3"], "command": "scroll_lines_fixed", "args" : {"by": "pages", "amount": -1.0 } },
 
 	{ "keys": ["home"], "command": "move_to", "args": {"to": "bol", "extend": false}, "context":
 		[ { "key": "selection_empty", "operator": "equal", "operand": true, "match_all": false } ] },
