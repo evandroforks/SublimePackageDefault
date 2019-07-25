@@ -175,41 +175,6 @@
 	{ "keys": ["ctrl+tab"], "command": "next_view_in_stack" },
 	{ "keys": ["ctrl+shift+tab"], "command": "prev_view_in_stack" },
 
-	// Key bindings for toggling wrap in find / replace panels.
-	{ "keys": ["alt+p"], "command": "toggle_wrap", "context":
-		[
-			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
-		]
-	},
-
-	// Key bindings for toggling in selection in find / replace panels.
-	{ "keys": ["alt+s"], "command": "toggle_in_selection", "context":
-		[
-			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
-		]
-	},
-
-	// Key bindings for toggling highlight matches in find / replace panels.
-	{ "keys": ["alt+h"], "command": "toggle_highlight", "context":
-		[
-			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
-		]
-	},
-
-	// Key bindings for toggling show context in find / replace in files panel.
-	{ "keys": ["alt+t"], "command": "toggle_show_context", "context":
-		[
-			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
-		]
-	},
-
-	// Key bindings for toggling use buffer in find / replace in files panel.
-	{ "keys": ["alt+b"], "command": "toggle_use_buffer", "context":
-		[
-			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
-		]
-	},
-
 	{ "keys": ["ctrl+a"], "command": "select_all" },
 	{ "keys": ["ctrl+shift+l"], "command": "split_selection_into_lines" },
 
@@ -835,32 +800,21 @@
 	{ "keys": ["ctrl+k", "ctrl+n"], "command": "toggle_settings", "args":
 			{"settings": ["line_numbers", "fold_buttons", "mini_diff"]} },
 
-	{ "keys": ["alt+s"], "command": "toggle_case_sensitive", "context":
-		[
-			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
-		]
-	},
-	{ "keys": ["alt+r"], "command": "toggle_regex", "context":
-		[
-			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
-		]
-	},
-	{ "keys": ["alt+q"], "command": "toggle_whole_word", "context":
-		[
-			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
-		]
-	},
-	{ "keys": ["alt+a"], "command": "toggle_preserve_case", "context":
-		[
-			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
-		]
-	},
+	{ "keys": ["alt+p"], "command": "toggle_wrap" },
+	{ "keys": ["alt+s"], "command": "toggle_in_selection" },
+	{ "keys": ["alt+h"], "command": "toggle_highlight" },
+	{ "keys": ["alt+t"], "command": "toggle_show_context" },
+	{ "keys": ["alt+b"], "command": "toggle_use_buffer" },
+	{ "keys": ["alt+s"], "command": "toggle_case_sensitive" },
+	{ "keys": ["alt+r"], "command": "toggle_regex" },
+	{ "keys": ["alt+e"], "command": "toggle_whole_word" },
+	{ "keys": ["alt+a"], "command": "toggle_preserve_case" },
 
 	// Find panel key bindings
 	{ "keys": ["enter"], "command": "find_next", "context":
 		[{"key": "panel", "operand": "find"}, {"key": "panel_has_focus"}]
 	},
-	{ "keys": ["shift+enter"], "command": "find_prev", "context":
+	{ "keys": ["shift+f3"], "command": "find_prev", "context":
 		[{"key": "panel", "operand": "find"}, {"key": "panel_has_focus"}]
 	},
 	{ "keys": ["alt+enter"], "command": "find_all", "args": {"close_panel": true},
@@ -871,13 +825,21 @@
 	{ "keys": ["enter"], "command": "find_next", "context":
 		[{"key": "panel", "operand": "replace"}, {"key": "panel_has_focus"}]
 	},
-	{ "keys": ["shift+enter"], "command": "find_prev", "context":
+	{ "keys": ["shift+f3"], "command": "find_prev", "context":
 		[{"key": "panel", "operand": "replace"}, {"key": "panel_has_focus"}]
 	},
+
+	{ "keys": ["shift+backspace"], "command": "replace_next", "context":
+		[{"key": "panel", "operand": "replace"}, {"key": "panel_has_focus"}]
+	},
+	{ "keys": ["alt+shift+backspace"], "command": "replace_prev", "context":
+		[{"key": "panel", "operand": "replace"}, {"key": "panel_has_focus"}]
+	},
+
 	{ "keys": ["alt+enter"], "command": "find_all", "args": {"close_panel": true},
 		"context": [{"key": "panel", "operand": "replace"}, {"key": "panel_has_focus"}]
 	},
-	{ "keys": ["ctrl+alt+enter"], "command": "replace_all", "args": {"close_panel": true},
+	{ "keys": ["alt+shift+enter"], "command": "replace_all", "args": {"close_panel": true},
 		 "context": [{"key": "panel", "operand": "replace"}, {"key": "panel_has_focus"}]
 	},
 
@@ -893,10 +855,10 @@
 	},
 
 	// Find in Files panel key bindings
-	{ "keys": ["alt+enter"], "command": "find_all",
+	{ "keys": ["enter"], "command": "find_all",
 		 "context": [{"key": "panel", "operand": "find_in_files"}, {"key": "panel_has_focus"}]
 	},
-	{ "keys": ["ctrl+alt+enter"], "command": "replace_all",
+	{ "keys": ["alt+shift+enter"], "command": "replace_all",
 		 "context": [{"key": "panel", "operand": "find_in_files"}, {"key": "panel_has_focus"}]
 	},
 
