@@ -33,6 +33,7 @@
 	{ "keys": ["ctrl+alt+s"], "command": "save_all" },
 	{ "keys": ["ctrl+f4"], "command": "close_file" },
 	{ "keys": ["ctrl+w"], "command": "close" },
+	{ "keys": ["ctrl+q"], "command": "clone_file" },
 
 	{ "keys": ["ctrl+k", "ctrl+b"], "command": "toggle_side_bar" },
 	{ "keys": ["shift+f11"], "command": "toggle_full_screen" },
