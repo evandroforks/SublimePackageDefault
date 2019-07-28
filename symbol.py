@@ -98,9 +98,14 @@ def open_location(window, l):
     fname, display_fname, rowcol = l
     row, col = rowcol
 
+    view = window.active_view()
+    group, view_index = window.get_view_index(view)
+
+    window.set_view_index(view, group, 0)
     window.open_file(
         fname + ":" + str(row) + ":" + str(col),
         sublime.ENCODED_POSITION | sublime.FORCE_GROUP)
+    window.set_view_index(view, group, view_index)
 
 
 def format_location(l):
