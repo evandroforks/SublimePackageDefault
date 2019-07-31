@@ -15,6 +15,14 @@ import sublime_plugin
 g_last_scroll_positions = {}
 
 
+# https://forum.sublimetext.com/t/how-to-set-focus-to-exec-output-panel/26689/5
+class ExecOutputFocusCancelBuildCommand(sublime_plugin.WindowCommand):
+  def run(self):
+    self.window.run_command('show_panel', args={'panel': 'output.exec'})
+    self.window.focus_view(self.window.find_output_panel("exec"))
+    self.window.run_command('cancel_build')
+
+
 class ProcessListener(object):
     def on_data(self, proc, data):
         pass
