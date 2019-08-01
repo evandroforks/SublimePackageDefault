@@ -8,19 +8,56 @@ import threading
 import time
 import codecs
 import signal
+import datetime
 
 import sublime
 import sublime_plugin
 
+g_is_panel_focused = False
 g_last_scroll_positions = {}
 
 
 # https://forum.sublimetext.com/t/how-to-set-focus-to-exec-output-panel/26689/5
+# https://forum.sublimetext.com/t/how-to-track-if-an-output-panel-is-closed-hidden/8453/6
 class ExecOutputFocusCancelBuildCommand(sublime_plugin.WindowCommand):
-  def run(self):
-    self.window.run_command('show_panel', args={'panel': 'output.exec'})
-    self.window.focus_view(self.window.find_output_panel("exec"))
-    self.window.run_command('cancel_build')
+
+    def run(self):
+        window = self.window
+        active_panel = window.active_panel()
+
+        if active_panel:
+            panel_view = self.window.find_output_panel( active_panel ) or \
+                    self.window.find_output_panel( active_panel.lstrip("output.") )
+
+            if g_is_panel_focused:
+                user_notice = "Cancelling the build for '%s'..." % active_panel
+                print( str(datetime.datetime.now())[:-4], user_notice )
+
+                sublime.status_message( user_notice )
+                self.window.run_command( 'cancel_build' )
+
+            else:
+                self.window.focus_view( panel_view )
+
+        else:
+            self.window.run_command('show_panel', args={'panel': 'output.exec'})
+
+
+class HackListener(sublime_plugin.EventListener):
+
+    def on_activated(self, view):
+        global g_is_panel_focused
+
+        active_window = sublime.active_window()
+        view_has_name = not not view.file_name()
+
+        is_widget = view.settings().get('is_widget')
+        active_panel = active_window.active_panel()
+        g_is_panel_focused = active_panel and not view_has_name and not is_widget
+
+        # print( "is_widget:", is_widget )
+        # print( "view_has_name:", view_has_name )
+        # print( "g_is_panel_focused:", g_is_panel_focused )
 
 
 class ProcessListener(object):
