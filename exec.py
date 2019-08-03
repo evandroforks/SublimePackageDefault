@@ -384,6 +384,7 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
             syntax="Packages/Text/Plain text.tmLanguage",
             # Catches "path" and "shell"
             **kwargs):
+        # print( 'ExecCommand arguments: ', locals())
         view_settings = self.window.active_view().settings()
 
         if update_phantoms_only:
