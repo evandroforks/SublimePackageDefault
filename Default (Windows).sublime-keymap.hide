@@ -428,7 +428,7 @@
 	{ "keys": ["ctrl+b"], "command": "fix_sublime_text_output_build" },
 
 	{ "keys": ["f8"], "command": "show_panel", "args": {"panel": "output.exec"} },
-    { "keys": ["f8"], "command": "exec_output_focus_cancel_build", "context": [{ "key": "panel", "operand": "output.exec" }] },
+	{ "keys": ["f8"], "command": "exec_output_focus_cancel_build", "context": [{ "key": "panel", "operand": "output.exec" }] },
 
 	{ "keys": ["ctrl+shift+b"], "command": "fix_sublime_text_output_build", "args": {"select": true} },
 	{ "keys": ["ctrl+break"], "command": "cancel_build" },
@@ -850,15 +850,16 @@
 	{ "keys": ["ctrl+k", "ctrl+n"], "command": "toggle_settings", "args":
 			{"settings": ["line_numbers", "fold_buttons", "mini_diff"]} },
 
-	{ "keys": ["alt+p"], "command": "toggle_wrap" },
-	{ "keys": ["alt+s"], "command": "toggle_in_selection" },
-	{ "keys": ["alt+h"], "command": "toggle_highlight" },
-	{ "keys": ["alt+t"], "command": "toggle_show_context" },
-	{ "keys": ["alt+b"], "command": "toggle_use_buffer" },
-	{ "keys": ["alt+s"], "command": "toggle_case_sensitive" },
-	{ "keys": ["alt+r"], "command": "toggle_regex" },
-	{ "keys": ["alt+e"], "command": "toggle_whole_word" },
-	{ "keys": ["alt+a"], "command": "toggle_preserve_case" },
+	// https://github.com/SublimeTextIssues/Core/issues/2914
+	{ "keys": ["alt+q", "ctrl+p"], "command": "fixed_toggle_find_panel", "args": {"command": "toggle_wrap" } } ,
+	{ "keys": ["alt+q", "ctrl+i"], "command": "fixed_toggle_find_panel", "args": {"command": "toggle_in_selection" } } ,
+	{ "keys": ["alt+q", "ctrl+h"], "command": "fixed_toggle_find_panel", "args": {"command": "toggle_highlight" } } ,
+	{ "keys": ["alt+q", "ctrl+t"], "command": "fixed_toggle_find_panel", "args": {"command": "toggle_show_context" } } ,
+	{ "keys": ["alt+q", "ctrl+b"], "command": "fixed_toggle_find_panel", "args": {"command": "toggle_use_buffer" } } ,
+	{ "keys": ["alt+q", "ctrl+s"], "command": "fixed_toggle_find_panel", "args": {"command": "toggle_case_sensitive" } } ,
+	{ "keys": ["alt+q", "ctrl+r"], "command": "fixed_toggle_find_panel", "args": {"command": "toggle_regex" } } ,
+	{ "keys": ["alt+q", "ctrl+w"], "command": "fixed_toggle_find_panel", "args": {"command": "toggle_whole_word" } } ,
+	{ "keys": ["alt+q", "ctrl+a"], "command": "fixed_toggle_find_panel", "args": {"command": "toggle_preserve_case" } } ,
 
 	// Find panel key bindings
 	{ "keys": ["enter"], "command": "find_next", "context":
