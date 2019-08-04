@@ -87,8 +87,10 @@ class HackListener(sublime_plugin.EventListener):
     def replaceby(self, value, replacements):
         # print('replacements', replacements)
 
-        for source, replacement in replacements.items():
-            value = re.sub( source, replacement, value)
+        for items in replacements:
+            source = items[0]
+            replacement = items[1]
+            value = re.sub( source, replacement, value )
         return value
 
     def on_text_command(self, view, command_name, args):
@@ -142,20 +144,26 @@ class HackListener(sublime_plugin.EventListener):
 
                             window = sublime.active_window()
                             extract_variables = window.extract_variables()
+
                             result_replaceby = view.settings().get('result_replaceby', {})
+                            result_real_dir = view.settings().get('result_real_dir', os.path.abspath('.') )
 
-                            file_name = sublime.expand_variables( file_name, extract_variables )
-                            file_name = self.replaceby( file_name, result_replaceby )
+                            real_dir_file = os.path.join( result_real_dir, file_name )
+                            real_dir_file = sublime.expand_variables( real_dir_file, extract_variables )
+                            real_dir_file = self.replaceby( real_dir_file, result_replaceby )
 
-                            if not os.path.exists( file_name ):
-                                real_dir = view.settings().get('result_real_dir')
-                                file_name = os.path.join( real_dir, file_name )
+                            if os.path.exists( real_dir_file ):
+                                file_name = real_dir_file
 
-                            file_name = sublime.expand_variables( file_name, extract_variables )
-                            file_name = self.replaceby( file_name, result_replaceby )
+                            else:
+                                base_dir_file = view.settings().get('result_base_dir')
+                                file_name = os.path.join( base_dir_file, file_name )
+                                file_name = sublime.expand_variables( file_name, extract_variables )
+                                file_name = self.replaceby( file_name, result_replaceby )
 
+                            file_name = os.path.normpath( file_name )
                             window.open_file(
-                                file_name + ".py:" + str(row) + ":" + str(column),
+                                file_name + ":" + str(row) + ":" + str(column),
                                 sublime.ENCODED_POSITION | sublime.FORCE_GROUP
                             )
 
