@@ -4,6 +4,8 @@ import html
 import os
 import subprocess
 import sys
+
+import re
 import threading
 import time
 import codecs
@@ -13,10 +15,14 @@ import datetime
 import sublime
 import sublime_plugin
 
+g_last_scroll_positions = {}
+
+g_last_click_time = time.time()
+g_last_click_buttons = None
+
 g_widget_view = None
 g_is_panel_focused = False
 g_is_widget_focused = False
-g_last_scroll_positions = {}
 
 # https://forum.sublimetext.com/t/why-do-i-call-show-panel-with-output-exec-but-need-to-call-window-find-output-panel-exec-instead-of-window-find-output-panel-output-exec/45739
 def get_panel_name(panel_name):
@@ -77,6 +83,84 @@ class HackListener(sublime_plugin.EventListener):
         # print( "view_has_name:", view_has_name )
         # print( "g_is_widget_focused:", g_is_widget_focused )
         # print( "g_is_panel_focused:", g_is_panel_focused )
+
+    def replaceby(self, value, replacements):
+        # print('replacements', replacements)
+
+        for source, replacement in replacements.items():
+            value = re.sub( source, replacement, value)
+        return value
+
+    def on_text_command(self, view, command_name, args):
+        # print('command_name', command_name, 'args', args)
+        result_full_regex = view.settings().get('result_full_regex')
+
+        # print('result_full_regex', result_full_regex)
+        if result_full_regex and command_name == 'drag_select' and 'event' in args:
+            global g_last_click_time
+            global g_last_click_buttons
+
+            clicks_buttons = args['event']
+            new_click = time.time()
+
+            if clicks_buttons == g_last_click_buttons:
+                click_time = new_click - g_last_click_time
+
+                if click_time < 0.6:
+                    view_selections = view.sel()
+
+                    if view_selections:
+                        full_line = view.substr( view.full_line( view_selections[0] ) )
+
+                        # print('Double clicking', click_time, 'full_line', full_line )
+                        matchobject = re.search( result_full_regex, full_line )
+
+                        if matchobject:
+                            row = 0
+                            column = 0
+                            file_name = matchobject.group(0)
+                            matchgroups = matchobject.groups()
+
+                            # print( 'matchgroups', matchgroups )
+                            for index, value in enumerate( matchgroups ):
+
+                                if index == 0:
+                                    file_name = value
+
+                                elif index == 1:
+                                    row = value
+
+                                elif index == 2:
+
+                                    try:
+                                        column = int( value )
+                                    except:
+                                        print('Ignoring capture group', index, value)
+
+                                else:
+                                    print('Ignoring extra capture groups', index, value)
+
+                            window = sublime.active_window()
+                            extract_variables = window.extract_variables()
+                            result_replaceby = view.settings().get('result_replaceby', {})
+
+                            file_name = sublime.expand_variables( file_name, extract_variables )
+                            file_name = self.replaceby( file_name, result_replaceby )
+
+                            if not os.path.exists( file_name ):
+                                real_dir = view.settings().get('result_real_dir')
+                                file_name = os.path.join( real_dir, file_name )
+
+                            file_name = sublime.expand_variables( file_name, extract_variables )
+                            file_name = self.replaceby( file_name, result_replaceby )
+
+                            window.open_file(
+                                file_name + ".py:" + str(row) + ":" + str(column),
+                                sublime.ENCODED_POSITION | sublime.FORCE_GROUP
+                            )
+
+            g_last_click_time = new_click
+            g_last_click_buttons = clicks_buttons
 
 
 # https://github.com/SublimeTextIssues/Core/issues/2914
@@ -438,6 +522,9 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
             spell_check=None,
             gutter=None,
             syntax="Packages/Text/Plain text.tmLanguage",
+            full_regex="",
+            result_dir="",
+            replaceby={},
             # Catches "path" and "shell"
             **kwargs):
         # print( 'ExecCommand arguments: ', locals())
@@ -474,6 +561,10 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
         if output_build_word_wrap is None: output_build_word_wrap = view_settings.get("output_build_word_wrap", False)
         if spell_check is None: spell_check = view_settings.get("build_view_spell_check", False)
         if gutter is None: gutter = view_settings.get("gutter", True)
+
+        self.output_view.settings().set("result_full_regex", full_regex)
+        self.output_view.settings().set("result_replaceby", replaceby)
+        self.output_view.settings().set("result_real_dir", result_dir)
 
         self.output_view.settings().set("result_file_regex", file_regex)
         self.output_view.settings().set("result_line_regex", line_regex)
