@@ -188,6 +188,8 @@ class FixedToggleFindPanelCommand(sublime_plugin.WindowCommand):
         self.window.run_command( "show_panel", { "panel": "find", "reverse": False } )
         self.window.run_command( command )
 
+        sublime.status_message( "Successfully toggled the setting '%s'" % command )
+
         if active_panel:
             self.window.run_command( "show_panel", { "panel": active_panel } )
 
