@@ -503,6 +503,40 @@ class ThreadProgress():
         sublime.set_timeout(lambda: self.run(), 100)
 
 
+class ExecRestoreOutputViewScrollingHelperCommand(sublime_plugin.TextCommand):
+
+    def run(self, edit):
+        # print('exec_restore_output_view_scrolling_helper')
+        view = self.view
+        window = view.window()
+
+        window_id = window.id()
+        restoring_scroll = False
+
+        if window_id in g_last_scroll_positions:
+            last_scroll_region, last_caret_region = g_last_scroll_positions[window_id]
+
+            if last_scroll_region:
+                restoring_scroll = True
+
+                # print('After  substr:                     ', view.substr(sublime.Region(0, 10)))
+                # print('After  window.id:                  ', window.id())
+                # print('After  view:                       ', view)
+                # print('After  view.id:                    ', view.id())
+                # print('g_last_scroll_positions[window_id] ', g_last_scroll_positions[window_id])
+                view.set_viewport_position( last_scroll_region )
+                view.sel().clear()
+
+                for selection in last_caret_region:
+                    view.sel().add( sublime.Region( selection[0], selection[1] ) )
+
+        # The output build panel is completely scrolled horizontally to the right when there are build errors
+        # https://github.com/SublimeTextIssues/Core/issues/2239
+        if not restoring_scroll:
+            viewport_position = view.viewport_position()
+            view.set_viewport_position( ( 0, viewport_position[1] ) )
+
+
 class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
     BLOCK_SIZE = 2**14
     text_queue = collections.deque()
@@ -734,44 +768,8 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
         self.restoreViewPositions()
 
     def restoreViewPositions(self):
-        window_id = self.window.id()
-        restoring_scroll = False
-
-        if window_id in g_last_scroll_positions:
-            last_scroll_region, last_caret_region = g_last_scroll_positions[window_id]
-
-            if last_scroll_region:
-                restoring_scroll = True
-                output_view = self.output_view
-
-                # print('After  substr:                     ', output_view.substr(sublime.Region(0, 10)))
-                # print('After  window.id:                  ', self.window.id())
-                # print('After  output_view:                ', output_view)
-                # print('After  output_view.id:             ', output_view.id())
-                # print('g_last_scroll_positions[window_id] ', g_last_scroll_positions[window_id])
-
-                def delayed_restore():
-                    output_view.set_viewport_position(last_scroll_region)
-                    output_view.sel().clear()
-
-                    for selection in last_caret_region:
-                        output_view.sel().add(sublime.Region(selection[0], selection[1]))
-
-                sublime.set_timeout(delayed_restore, 0)
-
-        if not restoring_scroll:
-            sublime.set_timeout(self.fix_line_wrap_bug, 0)
-
-    def fix_line_wrap_bug(self):
-        """
-            The output build panel is completely scrolled horizontally to the right when there are build errors
-            https://github.com/SublimeTextIssues/Core/issues/2239
-        """
-        window = self.window
-        output_view = window.find_output_panel( "exec" )
-
-        viewport_position = output_view.viewport_position()
-        output_view.set_viewport_position((0, viewport_position[1]))
+        output_view = self.output_view
+        output_view.run_command( 'exec_restore_output_view_scrolling_helper' )
 
     def on_data(self, proc, data):
         # Normalize newlines, Sublime Text always uses a single \n separator
