@@ -174,7 +174,7 @@ class HackListener(sublime_plugin.EventListener):
 # https://github.com/SublimeTextIssues/Core/issues/2914
 class FixedToggleFindPanelCommand(sublime_plugin.WindowCommand):
 
-    def run(self, command):
+    def run(self, command, args={}):
         window = self.window
         active_group = window.active_group()
         active_panel = window.active_panel()
@@ -186,8 +186,9 @@ class FixedToggleFindPanelCommand(sublime_plugin.WindowCommand):
         # print('panel_had_focus', panel_had_focus)
         # print('widget_had_focus', widget_had_focus)
         self.window.run_command( "show_panel", { "panel": "find", "reverse": False } )
-        self.window.run_command( command )
+        self.window.run_command( command, args )
 
+        # print('FixedToggleFindPanel running', command, args)
         sublime.status_message( "Successfully toggled the setting '%s'" % command )
 
         if active_panel:
