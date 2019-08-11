@@ -850,17 +850,6 @@
 	{ "keys": ["ctrl+k", "ctrl+n"], "command": "toggle_settings", "args":
 			{"settings": ["line_numbers", "fold_buttons", "mini_diff"]} },
 
-	// https://github.com/SublimeTextIssues/Core/issues/2914
-	{ "keys": ["ctrl+q", "alt+p"], "command": "fixed_toggle_find_panel", "args": {"command": "toggle_wrap" } } ,
-	{ "keys": ["ctrl+q", "alt+i"], "command": "fixed_toggle_find_panel", "args": {"command": "toggle_in_selection" } } ,
-	{ "keys": ["ctrl+q", "alt+h"], "command": "fixed_toggle_find_panel", "args": {"command": "toggle_highlight" } } ,
-	{ "keys": ["ctrl+q", "alt+t"], "command": "fixed_toggle_find_panel", "args": {"command": "toggle_show_context" } } ,
-	{ "keys": ["ctrl+q", "alt+b"], "command": "fixed_toggle_find_panel", "args": {"command": "toggle_use_buffer" } } ,
-	{ "keys": ["ctrl+q", "alt+s"], "command": "fixed_toggle_find_panel", "args": {"command": "toggle_case_sensitive" } } ,
-	{ "keys": ["ctrl+q", "alt+r"], "command": "fixed_toggle_find_panel", "args": {"command": "toggle_regex" } } ,
-	{ "keys": ["ctrl+q", "alt+w"], "command": "fixed_toggle_find_panel", "args": {"command": "toggle_whole_word" } } ,
-	{ "keys": ["ctrl+q", "alt+a"], "command": "fixed_toggle_find_panel", "args": {"command": "toggle_preserve_case" } } ,
-
 	// Find panel key bindings
 	{ "keys": ["enter"], "command": "find_next", "context":
 		[{"key": "panel", "operand": "find"}, {"key": "panel_has_focus"}]
