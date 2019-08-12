@@ -4,6 +4,16 @@ import sublime_plugin
 per_window_settings = {}
 capture_new_window_from = None
 
+try:
+    from FixedToggleFindPanel.fixed_toggle_find_panel import get_panel_view
+
+except ImportError as error:
+    print('Default.toggle_settings Error: Could not import the FixedToggleFindPanel package!', error)
+
+    def get_panel_view(window, panel_name):
+        return None
+
+
 def set_settings(window_views, active_view_settings):
 
     for view in window_views:
@@ -11,6 +21,29 @@ def set_settings(window_views, active_view_settings):
         for setting in active_view_settings:
             # print('setting view', view.id(), 'active_view_settings', active_view_settings[setting])
             view.settings().set(setting, active_view_settings[setting])
+
+
+def get_views(view, window):
+    views = window.views()
+    active_panel = window.active_panel()
+
+    if view:
+        is_widget = view.settings().get( 'is_widget' )
+
+        if not is_widget:
+            views.append( view )
+
+    # https://github.com/SublimeTextIssues/Core/issues/2929
+    if active_panel and active_panel != 'console':
+        panel_view = get_panel_view( window, active_panel )
+
+        if panel_view:
+            is_widget = panel_view.settings().get( 'is_widget' )
+
+            if not is_widget:
+                views.append( panel_view )
+
+    return views
 
 
 class EraseWindowSettingsCommand(sublime_plugin.WindowCommand):
@@ -32,39 +65,43 @@ class EraseWindowSettingsCommand(sublime_plugin.WindowCommand):
         window_settings.set('toggle_settings', per_window_settings)
 
 
-class IncrementSettingCommand(sublime_plugin.WindowCommand):
+class IncrementSettingCommand(sublime_plugin.TextCommand):
     """
     Given a setting name and a number, increment the setting by this number.
     window.run_command("increment_setting", {"setting": "font_size", "increment": 1})
     """
 
-    def run(self, setting, increment):
-        window = self.window
-        window_id = self.window.id()
+    def run(self, edit, setting, increment):
+        view = self.view
+        window = view.window()
+        window_id = window.id()
+
+        is_widget = view.settings().get( 'is_widget' )
+        if is_widget:
+            view = window.active_view()
 
         window_settings = window.settings()
-        active_view_settings = window_settings.get('toggle_settings', {})
-
+        active_view_settings = window_settings.get( 'toggle_settings', {} )
         per_window_settings[window_id] = active_view_settings
-        active_view = self.window.active_view()
 
         try:
             # print('running... active_view_settings', active_view_settings)
-            setting_value = active_view.settings().get(setting, 0)
+            setting_value = view.settings().get( setting, 0 )
             new_value = setting_value + increment
 
-            print('Changing setting', setting, 'from', setting_value, '->', new_value)
+            print( 'Changing setting', setting, 'from', setting_value, '->', new_value )
             active_view_settings[setting] = new_value
 
         except:
-            print('[toggle_settings] Unexpected value for setting', setting, '->', setting_value)
+            print( '[toggle_settings] Unexpected value for setting', setting, '->', setting_value )
             active_view_settings[setting] = increment
 
-        window_settings.set('toggle_settings', active_view_settings)
-        set_settings(self.window.views(), active_view_settings)
+        views = get_views( view, window )
+        window_settings.set( 'toggle_settings', active_view_settings )
+        set_settings( views, active_view_settings )
 
 
-class ToggleSettingsCommand(sublime_plugin.WindowCommand):
+class ToggleSettingsCommand(sublime_plugin.TextCommand):
     """
     Given several settings, toggle their values.
     window.run_command("toggle_settings", {"settings": ["fold_buttons", "line_numbers"]})
@@ -75,15 +112,19 @@ class ToggleSettingsCommand(sublime_plugin.WindowCommand):
 
     def run(self, settings, same_value=True):
         if not isinstance(settings, list): settings = [settings]
-        window = self.window
-        window_id = self.window.id()
+        view = self.view
+        window = view.window()
+        window_id = window.id()
+
+        is_widget = view.settings().get( 'is_widget' )
+        if is_widget:
+            view = window.active_view()
 
         window_settings = window.settings()
-        active_view_settings = window_settings.get('toggle_settings', {})
+        active_view_settings = window_settings.get( 'toggle_settings', {} )
 
         per_window_settings[window_id] = active_view_settings
-        active_view = self.window.active_view()
-        first_setting_value = not active_view.settings().get(settings[0], False)
+        first_setting_value = not view.settings().get( settings[0], False )
 
         # print('running... active_view_settings', active_view_settings)
         for setting in settings:
@@ -92,20 +133,22 @@ class ToggleSettingsCommand(sublime_plugin.WindowCommand):
                 active_view_settings[setting] = first_setting_value
 
             else:
-                active_view_settings[setting] = not active_view.settings().get(setting, False)
+                active_view_settings[setting] = not view.settings().get( setting, False )
 
-        window_settings.set('toggle_settings', active_view_settings)
-        set_settings(self.window.views(), active_view_settings)
+        views = get_views( view, window )
+        window_settings.set( 'toggle_settings', active_view_settings )
+        set_settings( views, active_view_settings )
 
 
 class ToggleSettingsCommandListener(sublime_plugin.EventListener):
 
     def on_new(self, view):
+        # https://github.com/SublimeTextIssues/Core/issues/2906
         self.on_load(view)
 
     def on_load(self, view):
         global capture_new_window_from
-        window = sublime.active_window()
+        window = view.window()
         window_id = window.id()
         # print("window_id", window_id, 'window_id in per_window_settings', window_id in per_window_settings)
 
@@ -142,6 +185,18 @@ class ToggleSettingsCommandListener(sublime_plugin.EventListener):
 
                 global capture_new_window_from
                 capture_new_window_from = active_view_settings
+
+    def on_post_window_command(self, window, command_name, args):
+        # print('command_name', command_name)
+
+        if command_name == "show_panel":
+            active_panel = window.active_panel()
+
+            if active_panel:
+                view = get_panel_view( window, active_panel )
+
+                if view:
+                    self.on_load( view )
 
 
 class MinimapPerViewSettingEvent(sublime_plugin.EventListener):
