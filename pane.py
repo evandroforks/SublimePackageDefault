@@ -177,10 +177,6 @@ def is_automatic_layout(window):
     return True
 
 
-class State(object):
-    is_running = False
-
-
 class AutomaticPaneCloser(sublime_plugin.EventListener):
     def on_activated(self, view):
         # Check for empty groups here, to handle tabs being dragged out of their
@@ -215,39 +211,6 @@ class AutomaticPaneCloser(sublime_plugin.EventListener):
                 if focused_group >= 0:
                     window.focus_group(focused_group)
                 break
-
-    # def on_text_command(self, view, command_name, args):
-    #     print('view command_name', command_name, args)
-
-    def on_window_command(self, window, command_name, args):
-        # print('window command_name', command_name, args)
-
-        if command_name == 'focus_side_bar':
-
-            if State.is_running:
-                return
-
-            else:
-                State.is_running = True
-                window.run_command( 'focus_side_bar' )
-                window.run_command( 'move', { "by": "lines", "forward": False } )
-                window.run_command( 'move', { "by": "lines", "forward": True } )
-
-                # https://github.com/SublimeTextIssues/Core/issues/1265
-                sublime.set_timeout( lambda: window.run_command( 'focus_side_bar_bug_fixer' ), 100 )
-
-
-class FocusSideBarBugFixerCommand(sublime_plugin.WindowCommand):
-    """ Confusing "jumps" in Side Bar keyboard navigation
-    https://github.com/SublimeTextIssues/Core/issues/1265
-    """
-    def run(self):
-        # print('Running fix...')
-        window = self.window
-        window.run_command( 'move', { "by": "lines", "forward": False } )
-        window.run_command( 'move', { "by": "lines", "forward": True } )
-        window.run_command( 'focus_side_bar' )
-        State.is_running = False
 
 
 class FocusNeighboringGroup(sublime_plugin.WindowCommand):
