@@ -427,8 +427,7 @@
 	{ "keys": ["f7"], "command": "fix_sublime_text_output_build" },
 	{ "keys": ["ctrl+b"], "command": "fix_sublime_text_output_build" },
 
-	{ "keys": ["f8"], "command": "show_panel", "args": {"panel": "output.exec"} },
-	{ "keys": ["f8"], "command": "exec_output_focus_cancel_build", "context": [{ "key": "panel", "operand": "output.exec" }] },
+	{ "keys": ["f8"], "command": "exec_output_focus_cancel_build", "args": {"panel": "output.exec"} },
 
 	{ "keys": ["ctrl+shift+b"], "command": "fix_sublime_text_output_build", "args": {"select": true} },
 	{ "keys": ["ctrl+break"], "command": "cancel_build" },

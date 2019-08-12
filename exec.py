@@ -44,11 +44,11 @@ def get_panel_view(window, panel_name ):
 # https://forum.sublimetext.com/t/how-to-track-if-an-output-panel-is-closed-hidden/8453/6
 class ExecOutputFocusCancelBuildCommand(sublime_plugin.WindowCommand):
 
-    def run(self):
+    def run(self, panel):
         window = self.window
         active_panel = window.active_panel()
 
-        if active_panel:
+        if active_panel and active_panel != 'console':
             panel_view = get_panel_view( window, active_panel )
 
             if is_panel_focused():
@@ -56,14 +56,14 @@ class ExecOutputFocusCancelBuildCommand(sublime_plugin.WindowCommand):
                 print( str(datetime.datetime.now())[:-4], user_notice )
 
                 sublime.status_message( user_notice )
-                self.window.run_command( 'cancel_build' )
+                window.run_command( 'cancel_build' )
 
             else:
-                self.window.focus_view( panel_view )
+                window.focus_view( panel_view )
 
         else:
-            self.window.run_command('show_panel', args={'panel': 'output.exec'})
-
+            window.run_command( 'show_panel', { 'panel': panel } )
+            window.focus_group( window.active_group() )
 
 class FullRegexListener(sublime_plugin.EventListener):
 
