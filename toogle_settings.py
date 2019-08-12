@@ -14,13 +14,13 @@ except ImportError as error:
         return None
 
 
-def set_settings(window_views, active_view_settings):
+def set_settings(window_views, view_settings):
 
     for view in window_views:
 
-        for setting in active_view_settings:
-            # print('setting view', view.id(), 'active_view_settings', active_view_settings[setting])
-            view.settings().set(setting, active_view_settings[setting])
+        for setting in view_settings:
+            # print('setting view', view.id(), 'view_settings', view_settings[setting])
+            view.settings().set(setting, view_settings[setting])
 
 
 def get_views(view, window):
@@ -81,24 +81,24 @@ class IncrementSettingCommand(sublime_plugin.TextCommand):
             view = window.active_view()
 
         window_settings = window.settings()
-        active_view_settings = window_settings.get( 'toggle_settings', {} )
-        per_window_settings[window_id] = active_view_settings
+        toggle_settings = window_settings.get( 'toggle_settings', {} )
+        per_window_settings[window_id] = toggle_settings
 
         try:
-            # print('running... active_view_settings', active_view_settings)
+            # print('running... toggle_settings', toggle_settings)
             setting_value = view.settings().get( setting, 0 )
             new_value = setting_value + increment
 
             print( 'Changing setting', setting, 'from', setting_value, '->', new_value )
-            active_view_settings[setting] = new_value
+            toggle_settings[setting] = new_value
 
         except:
             print( '[toggle_settings] Unexpected value for setting', setting, '->', setting_value )
-            active_view_settings[setting] = increment
+            toggle_settings[setting] = increment
 
         views = get_views( view, window )
-        window_settings.set( 'toggle_settings', active_view_settings )
-        set_settings( views, active_view_settings )
+        window_settings.set( 'toggle_settings', toggle_settings )
+        set_settings( views, toggle_settings )
 
 
 class ToggleSettingsCommand(sublime_plugin.TextCommand):
@@ -121,23 +121,23 @@ class ToggleSettingsCommand(sublime_plugin.TextCommand):
             view = window.active_view()
 
         window_settings = window.settings()
-        active_view_settings = window_settings.get( 'toggle_settings', {} )
+        toggle_settings = window_settings.get( 'toggle_settings', {} )
 
-        per_window_settings[window_id] = active_view_settings
+        per_window_settings[window_id] = toggle_settings
         first_setting_value = not view.settings().get( settings[0], False )
 
-        # print('running... active_view_settings', active_view_settings)
+        # print('running... toggle_settings', toggle_settings)
         for setting in settings:
 
             if same_value:
-                active_view_settings[setting] = first_setting_value
+                toggle_settings[setting] = first_setting_value
 
             else:
-                active_view_settings[setting] = not view.settings().get( setting, False )
+                toggle_settings[setting] = not view.settings().get( setting, False )
 
         views = get_views( view, window )
-        window_settings.set( 'toggle_settings', active_view_settings )
-        set_settings( views, active_view_settings )
+        window_settings.set( 'toggle_settings', toggle_settings )
+        set_settings( views, toggle_settings )
 
 
 class ToggleSettingsCommandListener(sublime_plugin.EventListener):
@@ -153,26 +153,26 @@ class ToggleSettingsCommandListener(sublime_plugin.EventListener):
         # print("window_id", window_id, 'window_id in per_window_settings', window_id in per_window_settings)
 
         if capture_new_window_from is not None:
-            active_view_settings = capture_new_window_from
+            toggle_settings = capture_new_window_from
             capture_new_window_from = None
-            per_window_settings[window_id] = active_view_settings
+            per_window_settings[window_id] = toggle_settings
 
             window_views = [window.active_view(), view]
             window_views.extend(window.views())
-            set_settings(window_views, active_view_settings)
+            set_settings(window_views, toggle_settings)
 
         elif window_id in per_window_settings:
-            active_view_settings = per_window_settings[window_id]
-            set_settings([view], active_view_settings)
+            toggle_settings = per_window_settings[window_id]
+            set_settings([view], toggle_settings)
 
         else:
             window_settings = window.settings()
-            active_view_settings = window_settings.get('toggle_settings', {})
-            # print('on_load... active_view_settings', active_view_settings)
+            toggle_settings = window_settings.get('toggle_settings', {})
+            # print('on_load... toggle_settings', toggle_settings)
 
-            if active_view_settings:
-                per_window_settings[window_id] = active_view_settings
-                set_settings([view], active_view_settings)
+            if toggle_settings:
+                per_window_settings[window_id] = toggle_settings
+                set_settings([view], toggle_settings)
 
     def on_window_command(self, window, command_name, args):
         # print('command_name', command_name)
@@ -181,10 +181,10 @@ class ToggleSettingsCommandListener(sublime_plugin.EventListener):
             window_id = window.id()
 
             if window_id in per_window_settings:
-                active_view_settings = per_window_settings[window_id]
+                toggle_settings = per_window_settings[window_id]
 
                 global capture_new_window_from
-                capture_new_window_from = active_view_settings
+                capture_new_window_from = toggle_settings
 
     def on_post_window_command(self, window, command_name, args):
         # print('command_name', command_name)
