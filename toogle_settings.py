@@ -54,7 +54,7 @@ class EraseWindowSettingsCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         global per_window_settings
         view = self.view
-        window = view.window()
+        window = view.window() or sublime.active_window()
 
         window_settings = window.settings()
         window_views = get_views( view, window )
@@ -81,7 +81,7 @@ class IncrementSettingCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, setting, increment, view_only):
         view = self.view
-        window = view.window()
+        window = view.window() or sublime.active_window()
         window_id = window.id()
 
         is_widget = view.settings().get( 'is_widget' )
@@ -146,7 +146,7 @@ class ToggleSettingsCommand(sublime_plugin.TextCommand):
     def run(self, settings, same_value, view_only):
         if not isinstance(settings, list): settings = [settings]
         view = self.view
-        window = view.window()
+        window = view.window() or sublime.active_window()
         window_id = window.id()
 
         is_widget = view.settings().get( 'is_widget' )
@@ -206,7 +206,7 @@ class ToggleSettingsCommandListener(sublime_plugin.EventListener):
 
     def on_load(self, view):
         global capture_new_window_from
-        window = view.window()
+        window = view.window() or sublime.active_window()
         window_id = window.id()
 
         # print("window_id", window_id, 'window_id in per_window_settings', window_id in per_window_settings)
@@ -269,23 +269,26 @@ class MinimapPerViewSettingEvent(sublime_plugin.EventListener):
 
     def on_activated(self, view):
         show_minimap = view.settings().get('show_minimap')
+        window = view.window() or sublime.active_window()
 
         if show_minimap:
-            view.window().set_minimap_visible(True)
+            window.set_minimap_visible(True)
 
         elif show_minimap is not None:
-            view.window().set_minimap_visible(False)
+            window.set_minimap_visible(False)
 
 
 class ToggleMinimapPerWindow(sublime_plugin.WindowCommand):
 
     def run(self):
-        settings = self.window.active_view().settings()
+        window = self.window
+        settings = window.active_view().settings()
+
         show_minimap = not settings.get('show_minimap')
         settings.set('show_minimap', show_minimap)
 
         if show_minimap:
-            self.window.set_minimap_visible(True)
+            window.set_minimap_visible(True)
 
         elif show_minimap is not None:
-            self.window.set_minimap_visible(False)
+            window.set_minimap_visible(False)

@@ -452,7 +452,7 @@ class ExecRestoreOutputViewScrollingHelperCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         # print('exec_restore_output_view_scrolling_helper')
         view = self.view
-        window = view.window()
+        window = view.window() or sublime.active_window()
 
         window_id = window.id()
         restoring_scroll = False
@@ -804,6 +804,6 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
 
 class ExecEventListener(sublime_plugin.EventListener):
     def on_load(self, view):
-        w = view.window()
+        w = view.window() or sublime.active_window()
         if w is not None:
             w.run_command('exec', {'update_phantoms_only': True})
