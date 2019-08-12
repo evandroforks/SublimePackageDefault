@@ -811,14 +811,23 @@
 	{ "keys": ["ctrl+k", "ctrl+g"], "command": "clear_bookmarks", "args": {"name": "mark"} },
 	{ "keys": ["ctrl+k", "ctrl+c"], "command": "show_at_center" },
 
-	{ "keys": ["ctrl++"], "command": "increment_setting", "args": {"setting": "font_size", "increment": 1} },
-	{ "keys": ["ctrl+-"], "command": "increment_setting", "args": {"setting": "font_size", "increment": -1} },
+	{ "keys": ["ctrl++"], "command": "increment_setting", "args": {"setting": "font_size", "increment": 1, "view_only": false} },
+	{ "keys": ["ctrl+-"], "command": "increment_setting", "args": {"setting": "font_size", "increment": -1, "view_only": false} },
 
-	{ "keys": ["ctrl+keypad_plus"], "command": "increment_setting", "args": {"setting": "font_size", "increment": 1} },
-	{ "keys": ["ctrl+keypad_minus"], "command": "increment_setting", "args": {"setting": "font_size", "increment": -1} },
+	{ "keys": ["ctrl+equals"], "command": "increment_setting", "args": {"setting": "font_size", "increment": 1, "view_only": false} },
+	{ "keys": ["ctrl+minus"], "command": "increment_setting", "args": {"setting": "font_size", "increment": -1, "view_only": false} },
 
-	{ "keys": ["ctrl+equals"], "command": "increment_setting", "args": {"setting": "font_size", "increment": 1} },
-	{ "keys": ["ctrl+minus"], "command": "increment_setting", "args": {"setting": "font_size", "increment": -1} },
+	{ "keys": ["ctrl+keypad_plus"], "command": "increase_font_size" },
+	{ "keys": ["ctrl+keypad_minus"], "command": "decrease_font_size" },
+
+	{ "keys": ["ctrl+shift++"], "command": "increment_setting", "args": {"setting": "font_size", "increment": 1, "view_only": true} },
+	{ "keys": ["ctrl+shift+-"], "command": "increment_setting", "args": {"setting": "font_size", "increment": -1, "view_only": true} },
+
+	{ "keys": ["ctrl+shift+equals"], "command": "increment_setting", "args": {"setting": "font_size", "increment": 1, "view_only": true} },
+	{ "keys": ["ctrl+shift+minus"], "command": "increment_setting", "args": {"setting": "font_size", "increment": -1, "view_only": true} },
+
+	{ "keys": ["ctrl+shift+keypad_plus"], "command": "increase_font_size" },
+	{ "keys": ["ctrl+shift+keypad_minus"], "command": "decrease_font_size" },
 
 	{ "keys": ["alt+shift+w"], "command": "insert_snippet", "args": { "name": "Packages/XML/Snippets/long-tag.sublime-snippet" } },
 
@@ -847,7 +856,7 @@
 	{ "keys": ["ctrl+k", "ctrl+q"], "command": "toggle_setting", "args": {"setting": "word_wrap"} },
 
 	{ "keys": ["ctrl+k", "ctrl+n"], "command": "toggle_settings", "args":
-			{"settings": ["line_numbers", "fold_buttons", "mini_diff"]} },
+			{"settings": ["line_numbers", "fold_buttons", "mini_diff"], "same_value": true, "view_only": false} },
 
 	// Find panel key bindings
 	{ "keys": ["enter"], "command": "find_next", "context":
