@@ -19,7 +19,7 @@ except ImportError as error:
 
 
 class State(object):
-    erase_panel_settings = False
+    toggle_settings_for_panel = False
 
 
 def set_settings(window_views, view_settings):
@@ -60,10 +60,11 @@ def get_views(view, window, skip_panel=False):
 
 def erase_settings(window, window_views, toggle_settings):
     for setting in toggle_settings:
-        print('Erasing window', window.id(), 'setting', setting)
 
         for view in window_views:
-            view.settings().erase(setting)
+            settings = view.settings()
+            print( 'Erasing window', window.id(), 'setting', setting, '->', settings.get( setting ), view.file_name() )
+            settings.erase( setting )
 
 
 class EraseWindowSettingsCommand(sublime_plugin.TextCommand):
@@ -73,24 +74,35 @@ class EraseWindowSettingsCommand(sublime_plugin.TextCommand):
         view = self.view
         window = view.window() or sublime.active_window()
 
+        view_settings = view.settings()
         window_settings = window.settings()
         window_views = get_views( view, window )
+
+        toggle_settings = view_settings.get( 'toggle_settings', {} )
+
+        if toggle_settings:
+            erase_settings( window, [view], toggle_settings )
 
         toggle_settings = window_settings.get( 'toggle_settings', {} )
         toggle_settings_for_panel = window_settings.get( 'toggle_settings_for_panel', {} )
 
-        toggle_settings.update( toggle_settings_for_panel )
-        erase_settings( window, window_views, toggle_settings )
+        if toggle_settings:
+            toggle_settings.update( toggle_settings_for_panel )
+            erase_settings( window, window_views, toggle_settings )
 
-        per_window_settings = {}
-        window_settings.set( 'toggle_settings', per_window_settings )
+            per_window_settings = {}
+            window_settings.set( 'toggle_settings', per_window_settings )
 
         if open_panel( window ):
+
+            if not toggle_settings:
+                erase_settings( window, window_views, toggle_settings_for_panel )
+
             window_settings.set( 'toggle_settings_for_panel', {} )
 
         else:
             print('ToggleSettings erase, toggle_settings_for_panel', toggle_settings_for_panel)
-            State.erase_panel_settings = toggle_settings_for_panel
+            State.toggle_settings_for_panel = toggle_settings_for_panel
 
 
 class IncrementSettingCommand(sublime_plugin.TextCommand):
@@ -271,23 +283,29 @@ class ToggleSettingsCommandListener(sublime_plugin.EventListener):
             active_panel = window.active_panel()
 
             if active_panel:
-                view = get_panel_view( window, active_panel )
+                view = open_panel( window )
 
-                if State.erase_panel_settings:
-                    erase_settings( window, [view], State.erase_panel_settings )
-                    State.erase_panel_settings = False
+                if view:
+                    if State.toggle_settings_for_panel:
+                        window_settings = window.settings()
+                        toggle_settings_for_panel = window_settings.get( 'toggle_settings_for_panel', {} )
 
-                    window_settings = window.settings()
-                    window_settings.set( 'toggle_settings_for_panel', {} )
-                    print('Erasing toggle_settings_for_panel... ', window_settings.get( 'toggle_settings_for_panel', {} ))
+                        if toggle_settings_for_panel != State.toggle_settings_for_panel:
+                            return
 
-                elif view:
-                    window_settings = window.settings()
-                    toggle_settings = window_settings.get( 'toggle_settings', {} )
+                        erase_settings( window, [view], State.toggle_settings_for_panel )
+                        State.toggle_settings_for_panel = False
 
-                    # print('ToggleSettings, toggle_settings_for_panel', window_settings.get( 'toggle_settings_for_panel', {} ))
-                    toggle_settings.update( window_settings.get( 'toggle_settings_for_panel', {} ) )
-                    set_settings([view], toggle_settings)
+                        window_settings.set( 'toggle_settings_for_panel', {} )
+                        print('Erasing toggle_settings_for_panel... ', window_settings.get( 'toggle_settings_for_panel', {} ))
+
+                    else:
+                        window_settings = window.settings()
+                        toggle_settings = window_settings.get( 'toggle_settings', {} )
+
+                        # print('ToggleSettings, toggle_settings_for_panel', window_settings.get( 'toggle_settings_for_panel', {} ))
+                        toggle_settings.update( window_settings.get( 'toggle_settings_for_panel', {} ) )
+                        set_settings([view], toggle_settings)
 
 
 class MinimapPerViewSettingEvent(sublime_plugin.EventListener):
