@@ -5,6 +5,7 @@ import sublime
 
 import io
 import os
+import re
 import threading
 
 
@@ -31,9 +32,11 @@ def _monkey_patch_sublime(sublime_directory):
     with io.open(sublime_module_path, 'r', newline=None) as model_file:
         sublime_module_contents = model_file.read()
 
-    new_sublime_module_contents = sublime_module_contents.replace(
-            'raise IOError("resource not found")',
-            'raise IOError("resource `%s` not found" % (name))' )
+    # https://github.com/SublimeTextIssues/Core/issues/2113
+    new_sublime_module_contents = re.sub(
+            r'raise IOError("resource not found")',
+            r'raise IOError("resource `%s` not found" % (name))',
+            sublime_module_contents)
 
     if sublime_module_contents != new_sublime_module_contents:
 
@@ -42,5 +45,18 @@ def _monkey_patch_sublime(sublime_directory):
 
 
 def _monkey_patch_sublime_plugin(sublime_directory):
-    pass
+    sublime_module_path = os.path.join( sublime_directory, "sublime_plugin.py" )
 
+    with io.open(sublime_module_path, 'r', newline=None) as model_file:
+        sublime_module_contents = model_file.read()
+
+    # https://github.com/SublimeTextIssues/Core/issues/2930
+    new_sublime_module_contents = re.sub(
+            r'(?m)^(\s+)return\n(\s+)raise\n$',
+            r'\1return\n\2raise TypeError( "%s, %s" % ( type(self), e ) )\n',
+            sublime_module_contents)
+
+    if sublime_module_contents != new_sublime_module_contents:
+
+        with io.open(sublime_module_path, 'w', newline=None) as destine_file:
+            destine_file.write( new_sublime_module_contents )
