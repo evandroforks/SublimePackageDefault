@@ -63,7 +63,12 @@ def erase_settings(window, window_views, toggle_settings):
 
         for view in window_views:
             settings = view.settings()
-            print( 'Erasing window', window.id(), 'setting', setting, '->', settings.get( setting ), view.file_name() )
+            file_name = view.file_name()
+
+            if not file_name:
+                file_name = repr( view.substr( sublime.Region( 0, 100 ) ) )
+
+            print( "Erasing window %s settings '%s -> %s' %s..." % ( window.id(), setting, settings.get( setting ), file_name ) )
             settings.erase( setting )
 
 
