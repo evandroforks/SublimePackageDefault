@@ -83,13 +83,19 @@ class EraseWindowSettingsCommand(sublime_plugin.TextCommand):
         window_settings = window.settings()
         window_views = get_views( view, window )
 
+        new_settings = {}
         toggle_settings = view_settings.get( 'toggle_settings', {} )
+        new_settings.update( toggle_settings )
 
         if toggle_settings:
             erase_settings( window, [view], toggle_settings )
 
         toggle_settings = window_settings.get( 'toggle_settings', {} )
         toggle_settings_for_panel = window_settings.get( 'toggle_settings_for_panel', {} )
+
+        new_settings.update( toggle_settings )
+        new_settings.update( toggle_settings_for_panel )
+        message = "Erasing settings %.100s..." % new_settings
 
         if toggle_settings:
             toggle_settings.update( toggle_settings_for_panel )
@@ -106,8 +112,11 @@ class EraseWindowSettingsCommand(sublime_plugin.TextCommand):
             window_settings.set( 'toggle_settings_for_panel', {} )
 
         else:
-            print( 'ToggleSettings erase, toggle_settings_for_panel', toggle_settings_for_panel )
+            # print( 'ToggleSettings erase, toggle_settings_for_panel', toggle_settings_for_panel )
             State.toggle_settings_for_panel = toggle_settings_for_panel
+
+        print( message )
+        sublime.status_message( message )
 
 
 class IncrementSettingCommand(sublime_plugin.TextCommand):
@@ -131,11 +140,14 @@ class IncrementSettingCommand(sublime_plugin.TextCommand):
 
             try:
                 new_value = setting_value + increment
-                print( 'Changing setting', setting, 'from', setting_value, '->', new_value )
+                message = "Changing setting %s from %s -> %s" % ( setting, setting_value, new_value )
 
             except:
-                print( '[toggle_settings] Unexpected value for setting', setting, '->', setting_value )
+                message = "[toggle_settings] Unexpected value for setting %s -> %s" % ( setting, setting_value )
                 new_value = increment
+
+            print( message )
+            sublime.status_message( message[:100] )
 
             load_settings.set( setting, new_value )
             sublime.save_settings( 'Preferences.sublime-settings' )
@@ -162,11 +174,11 @@ class IncrementSettingCommand(sublime_plugin.TextCommand):
                 setting_value = view.settings().get( setting, 0 )
                 new_value = setting_value + increment
 
-                print( 'Changing setting', setting, 'from', setting_value, '->', new_value )
+                message = "Changing setting %s from %s -> %s" % ( setting, setting_value, new_value )
                 toggle_settings[setting] = new_value
 
             except:
-                print( '[toggle_settings] Unexpected value for setting', setting, '->', setting_value )
+                message = "[toggle_settings] Unexpected value for setting %s -> %s" % ( setting, setting_value )
                 toggle_settings[setting] = increment
 
             if scope == 'view':
@@ -185,6 +197,8 @@ class IncrementSettingCommand(sublime_plugin.TextCommand):
                 views = get_views( view, window, skip_panel )
                 window_settings.set( 'toggle_settings', toggle_settings )
 
+            print( message )
+            sublime.status_message( message[:100] )
             set_settings( views, toggle_settings )
 
 
@@ -223,7 +237,10 @@ class ToggleSettingsCommand(sublime_plugin.TextCommand):
                     new_settings[setting] = new_value
                     load_settings.set( setting, new_value )
 
-            print( "Toggled settings %s" % new_settings )
+            message = "Toggled settings %s" % new_settings
+            print( message )
+
+            sublime.status_message( message[:100] )
             sublime.save_settings( 'Preferences.sublime-settings' )
 
         else:
@@ -274,7 +291,10 @@ class ToggleSettingsCommand(sublime_plugin.TextCommand):
                 views = get_views( view, window, skip_panel )
                 window_settings.set( 'toggle_settings', toggle_settings )
 
-            print( "Toggled settings %s" % new_settings )
+            message = "Toggled settings %s" % new_settings
+            print( message )
+
+            sublime.status_message( message[:100] )
             set_settings( views, toggle_settings )
 
 
@@ -339,13 +359,14 @@ class ToggleSettingsCommandListener(sublime_plugin.EventListener):
                         toggle_settings_for_panel = window_settings.get( 'toggle_settings_for_panel', {} )
 
                         if toggle_settings_for_panel != State.toggle_settings_for_panel:
+                            print( 'Skipping erasing toggle_settings_for_panel...', window_settings.get( 'toggle_settings_for_panel', {} ) )
                             return
 
                         erase_settings( window, [view], State.toggle_settings_for_panel )
                         State.toggle_settings_for_panel = False
 
                         window_settings.set( 'toggle_settings_for_panel', {} )
-                        print( 'Erasing toggle_settings_for_panel... ', window_settings.get( 'toggle_settings_for_panel', {} ) )
+                        print( 'Erasing toggle_settings_for_panel...', window_settings.get( 'toggle_settings_for_panel', {} ) )
 
                     else:
                         window_settings = window.settings()
