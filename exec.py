@@ -51,15 +51,12 @@ class ExecOutputFocusCancelBuildCommand(sublime_plugin.WindowCommand):
         if active_panel and active_panel != 'console':
             panel_view = get_panel_view( window, active_panel )
 
-            if is_panel_focused():
-                user_notice = "Cancelling the build for '%s'..." % active_panel
-                print( str(datetime.datetime.now())[:-4], user_notice )
+            user_notice = "Cancelling the build for '%s'..." % active_panel
+            print( str(datetime.datetime.now())[:-4], user_notice )
 
-                sublime.status_message( user_notice )
-                window.run_command( 'cancel_build' )
-
-            else:
-                window.focus_view( panel_view )
+            sublime.status_message( user_notice )
+            window.run_command( 'cancel_build' )
+            window.focus_view( panel_view )
 
         else:
             window.run_command( 'show_panel', { 'panel': panel } )
