@@ -9,7 +9,7 @@ try:
     from FixedToggleFindPanel.fixed_toggle_find_panel import is_panel_focused
 
 except ImportError as error:
-    print('Default.toggle_settings Error: Could not import the FixedToggleFindPanel package!', error)
+    print( 'Default.toggle_settings Error: Could not import the FixedToggleFindPanel package!', error )
 
     def get_panel_view(window, panel_name):
         return None
@@ -27,7 +27,7 @@ def set_settings(window_views, view_settings):
     for view in window_views:
 
         for setting in view_settings:
-            # print('setting view', view.id(), 'view_settings', view_settings[setting])
+            # print( 'setting view', view.id(), 'view_settings', view_settings[setting] )
             view.settings().set(setting, view_settings[setting])
 
 
@@ -106,7 +106,7 @@ class EraseWindowSettingsCommand(sublime_plugin.TextCommand):
             window_settings.set( 'toggle_settings_for_panel', {} )
 
         else:
-            print('ToggleSettings erase, toggle_settings_for_panel', toggle_settings_for_panel)
+            print( 'ToggleSettings erase, toggle_settings_for_panel', toggle_settings_for_panel )
             State.toggle_settings_for_panel = toggle_settings_for_panel
 
 
@@ -158,7 +158,7 @@ class IncrementSettingCommand(sublime_plugin.TextCommand):
                 per_window_settings[window_id] = toggle_settings
 
             try:
-                # print('running... toggle_settings', toggle_settings)
+                # print( 'running... toggle_settings', toggle_settings )
                 setting_value = view.settings().get( setting, 0 )
                 new_value = setting_value + increment
 
@@ -223,7 +223,7 @@ class ToggleSettingsCommand(sublime_plugin.TextCommand):
                     new_settings[setting] = new_value
                     load_settings.set( setting, new_value )
 
-            print( "Toggled settings ''" % new_settings )
+            print( "Toggled settings %s" % new_settings )
             sublime.save_settings( 'Preferences.sublime-settings' )
 
         else:
@@ -243,16 +243,20 @@ class ToggleSettingsCommand(sublime_plugin.TextCommand):
                 toggle_settings = window_settings.get( 'toggle_settings', {} )
                 per_window_settings[window_id] = toggle_settings
 
+            new_settings = {}
             first_setting_value = not view.settings().get( settings[0], False )
 
-            # print('running... toggle_settings', toggle_settings)
+            # print( 'Running... toggle_settings', toggle_settings )
             for setting in settings:
 
                 if same_value:
                     toggle_settings[setting] = first_setting_value
+                    new_settings[setting] = first_setting_value
 
                 else:
-                    toggle_settings[setting] = not view.settings().get( setting, False )
+                    new_value = not view.settings().get( setting, False )
+                    new_settings[setting] = new_value
+                    toggle_settings[setting] = new_value
 
             if scope == 'view':
                 views = [view]
@@ -270,6 +274,7 @@ class ToggleSettingsCommand(sublime_plugin.TextCommand):
                 views = get_views( view, window, skip_panel )
                 window_settings.set( 'toggle_settings', toggle_settings )
 
+            print( "Toggled settings %s" % new_settings )
             set_settings( views, toggle_settings )
 
 
@@ -284,7 +289,7 @@ class ToggleSettingsCommandListener(sublime_plugin.EventListener):
         window = view.window() or sublime.active_window()
         window_id = window.id()
 
-        # print("window_id", window_id, 'window_id in per_window_settings', window_id in per_window_settings)
+        # print( "window_id", window_id, 'window_id in per_window_settings', window_id in per_window_settings )
         if capture_new_window_from is not None:
             toggle_settings = capture_new_window_from
             capture_new_window_from = None
@@ -301,14 +306,14 @@ class ToggleSettingsCommandListener(sublime_plugin.EventListener):
         else:
             window_settings = window.settings()
             toggle_settings = window_settings.get('toggle_settings', {})
-            # print('on_load... toggle_settings', toggle_settings)
+            # print( 'on_load... toggle_settings', toggle_settings )
 
             if toggle_settings:
                 per_window_settings[window_id] = toggle_settings
                 set_settings([view], toggle_settings)
 
     def on_window_command(self, window, command_name, args):
-        # print('command_name', command_name)
+        # print( 'command_name', command_name )
 
         if command_name == "new_window":
             window_id = window.id()
@@ -320,7 +325,7 @@ class ToggleSettingsCommandListener(sublime_plugin.EventListener):
                 capture_new_window_from = toggle_settings
 
     def on_post_window_command(self, window, command_name, args):
-        # print('command_name', command_name)
+        # print( 'command_name', command_name )
 
         if command_name == "show_panel":
             active_panel = window.active_panel()
@@ -340,13 +345,13 @@ class ToggleSettingsCommandListener(sublime_plugin.EventListener):
                         State.toggle_settings_for_panel = False
 
                         window_settings.set( 'toggle_settings_for_panel', {} )
-                        print('Erasing toggle_settings_for_panel... ', window_settings.get( 'toggle_settings_for_panel', {} ))
+                        print( 'Erasing toggle_settings_for_panel... ', window_settings.get( 'toggle_settings_for_panel', {} ) )
 
                     else:
                         window_settings = window.settings()
                         toggle_settings = window_settings.get( 'toggle_settings', {} )
 
-                        # print('ToggleSettings, toggle_settings_for_panel', window_settings.get( 'toggle_settings_for_panel', {} ))
+                        # print( 'ToggleSettings, toggle_settings_for_panel', window_settings.get( 'toggle_settings_for_panel', {} ) )
                         toggle_settings.update( window_settings.get( 'toggle_settings_for_panel', {} ) )
                         set_settings([view], toggle_settings)
 
