@@ -116,7 +116,7 @@ class IncrementSettingCommand(sublime_plugin.TextCommand):
     window.run_command("increment_setting", {"setting": "font_size", "increment": 1})
     """
 
-    def run(self, edit, setting, increment, view_only):
+    def run(self, edit, setting, increment, scope):
         view = self.view
         window = view.window() or sublime.active_window()
         window_id = window.id()
@@ -125,50 +125,67 @@ class IncrementSettingCommand(sublime_plugin.TextCommand):
         if is_widget:
             view = window.active_view()
 
-        if view_only:
+        if scope == 'global':
+            load_settings = sublime.load_settings( 'Preferences.sublime-settings' )
+            setting_value = load_settings.get( setting, 0 )
 
-            if is_panel_focused():
+            try:
+                new_value = setting_value + increment
+                print( 'Changing setting', setting, 'from', setting_value, '->', new_value )
+
+            except:
+                print( '[toggle_settings] Unexpected value for setting', setting, '->', setting_value )
+                new_value = increment
+
+            load_settings.set( setting, new_value )
+            sublime.save_settings( 'Preferences.sublime-settings' )
+
+        else:
+
+            if scope == 'view':
+
+                if is_panel_focused():
+                    window_settings = window.settings()
+                    toggle_settings = window_settings.get( 'toggle_settings_for_panel', {} )
+
+                else:
+                    view_settings = view.settings()
+                    toggle_settings = view_settings.get( 'toggle_settings', {} )
+
+            else:
                 window_settings = window.settings()
-                toggle_settings = window_settings.get( 'toggle_settings_for_panel', {} )
+                toggle_settings = window_settings.get( 'toggle_settings', {} )
+                per_window_settings[window_id] = toggle_settings
+
+            try:
+                # print('running... toggle_settings', toggle_settings)
+                setting_value = view.settings().get( setting, 0 )
+                new_value = setting_value + increment
+
+                print( 'Changing setting', setting, 'from', setting_value, '->', new_value )
+                toggle_settings[setting] = new_value
+
+            except:
+                print( '[toggle_settings] Unexpected value for setting', setting, '->', setting_value )
+                toggle_settings[setting] = increment
+
+            if scope == 'view':
+                views = [view]
+
+                if is_panel_focused():
+                    window_settings.set( 'toggle_settings_for_panel', toggle_settings )
+
+                else:
+                    view_settings.set( 'toggle_settings', toggle_settings )
 
             else:
-                view_settings = view.settings()
-                toggle_settings = view_settings.get( 'toggle_settings', {} )
+                toggle_settings_for_panel = window_settings.get( 'toggle_settings_for_panel', {} )
+                skip_panel = setting in toggle_settings_for_panel
 
-        else:
-            window_settings = window.settings()
-            toggle_settings = window_settings.get( 'toggle_settings', {} )
-            per_window_settings[window_id] = toggle_settings
+                views = get_views( view, window, skip_panel )
+                window_settings.set( 'toggle_settings', toggle_settings )
 
-        try:
-            # print('running... toggle_settings', toggle_settings)
-            setting_value = view.settings().get( setting, 0 )
-            new_value = setting_value + increment
-
-            print( 'Changing setting', setting, 'from', setting_value, '->', new_value )
-            toggle_settings[setting] = new_value
-
-        except:
-            print( '[toggle_settings] Unexpected value for setting', setting, '->', setting_value )
-            toggle_settings[setting] = increment
-
-        if view_only:
-            views = [view]
-
-            if is_panel_focused():
-                window_settings.set( 'toggle_settings_for_panel', toggle_settings )
-
-            else:
-                view_settings.set( 'toggle_settings', toggle_settings )
-
-        else:
-            toggle_settings_for_panel = window_settings.get( 'toggle_settings_for_panel', {} )
-            skip_panel = setting in toggle_settings_for_panel
-
-            views = get_views( view, window, skip_panel )
-            window_settings.set( 'toggle_settings', toggle_settings )
-
-        set_settings( views, toggle_settings )
+            set_settings( views, toggle_settings )
 
 
 class ToggleSettingsCommand(sublime_plugin.TextCommand):
@@ -180,7 +197,7 @@ class ToggleSettingsCommand(sublime_plugin.TextCommand):
                         setting value.
     """
 
-    def run(self, settings, same_value, view_only):
+    def run(self, edit, settings, same_value, scope):
         if not isinstance(settings, list): settings = [settings]
         view = self.view
         window = view.window() or sublime.active_window()
@@ -190,49 +207,70 @@ class ToggleSettingsCommand(sublime_plugin.TextCommand):
         if is_widget:
             view = window.active_view()
 
-        if view_only:
+        if scope == 'global':
+            load_settings = sublime.load_settings( 'Preferences.sublime-settings' )
+            first_setting_value = load_settings.get( settings[0], False )
+            new_settings = {}
 
-            if is_panel_focused():
+            for setting in settings:
+
+                if same_value:
+                    load_settings.set( setting, first_setting_value )
+                    new_settings[setting] = first_setting_value
+
+                else:
+                    new_value = not load_settings.get( setting, False )
+                    new_settings[setting] = new_value
+                    load_settings.set( setting, new_value )
+
+            print( "Toggled settings ''" % new_settings )
+            sublime.save_settings( 'Preferences.sublime-settings' )
+
+        else:
+
+            if scope == 'view':
+
+                if is_panel_focused():
+                    window_settings = window.settings()
+                    toggle_settings = window_settings.get( 'toggle_settings_for_panel', {} )
+
+                else:
+                    view_settings = view.settings()
+                    toggle_settings = view_settings.get( 'toggle_settings', {} )
+
+            else:
                 window_settings = window.settings()
-                toggle_settings = window_settings.get( 'toggle_settings_for_panel', {} )
+                toggle_settings = window_settings.get( 'toggle_settings', {} )
+                per_window_settings[window_id] = toggle_settings
+
+            first_setting_value = not view.settings().get( settings[0], False )
+
+            # print('running... toggle_settings', toggle_settings)
+            for setting in settings:
+
+                if same_value:
+                    toggle_settings[setting] = first_setting_value
+
+                else:
+                    toggle_settings[setting] = not view.settings().get( setting, False )
+
+            if scope == 'view':
+                views = [view]
+
+                if is_panel_focused():
+                    window_settings.set( 'toggle_settings_for_panel', toggle_settings )
+
+                else:
+                    view_settings.set( 'toggle_settings', toggle_settings )
 
             else:
-                view_settings = view.settings()
-                toggle_settings = view_settings.get( 'toggle_settings', {} )
+                toggle_settings_for_panel = window_settings.get( 'toggle_settings_for_panel', {} )
+                skip_panel = setting in toggle_settings_for_panel
 
-        else:
-            window_settings = window.settings()
-            toggle_settings = window_settings.get( 'toggle_settings', {} )
-            per_window_settings[window_id] = toggle_settings
+                views = get_views( view, window, skip_panel )
+                window_settings.set( 'toggle_settings', toggle_settings )
 
-        first_setting_value = not view.settings().get( settings[0], False )
-
-        # print('running... toggle_settings', toggle_settings)
-        for setting in settings:
-
-            if same_value:
-                toggle_settings[setting] = first_setting_value
-
-            else:
-                toggle_settings[setting] = not view.settings().get( setting, False )
-
-        if view_only:
-            views = [view]
-
-            if is_panel_focused():
-                window_settings.set( 'toggle_settings_for_panel', toggle_settings )
-
-            else:
-                view_settings.set( 'toggle_settings', toggle_settings )
-
-        else:
-            toggle_settings_for_panel = window_settings.get( 'toggle_settings_for_panel', {} )
-            skip_panel = setting in toggle_settings_for_panel
-
-            views = get_views( view, window, skip_panel )
-            window_settings.set( 'toggle_settings', toggle_settings )
-
-        set_settings( views, toggle_settings )
+            set_settings( views, toggle_settings )
 
 
 class ToggleSettingsCommandListener(sublime_plugin.EventListener):

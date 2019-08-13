@@ -811,23 +811,23 @@
 	{ "keys": ["ctrl+k", "ctrl+g"], "command": "clear_bookmarks", "args": {"name": "mark"} },
 	{ "keys": ["ctrl+k", "ctrl+c"], "command": "show_at_center" },
 
-	{ "keys": ["ctrl++"], "command": "increment_setting", "args": {"setting": "font_size", "increment": 1, "view_only": false} },
-	{ "keys": ["ctrl+-"], "command": "increment_setting", "args": {"setting": "font_size", "increment": -1, "view_only": false} },
+	{ "keys": ["ctrl++"], "command": "increment_setting", "args": {"setting": "font_size", "increment": 1, "scope": "window"} },
+	{ "keys": ["ctrl+-"], "command": "increment_setting", "args": {"setting": "font_size", "increment": -1, "scope": "window"} },
 
-	{ "keys": ["ctrl+equals"], "command": "increment_setting", "args": {"setting": "font_size", "increment": 1, "view_only": false} },
-	{ "keys": ["ctrl+minus"], "command": "increment_setting", "args": {"setting": "font_size", "increment": -1, "view_only": false} },
+	{ "keys": ["ctrl+equals"], "command": "increment_setting", "args": {"setting": "font_size", "increment": 1, "scope": "window"} },
+	{ "keys": ["ctrl+minus"], "command": "increment_setting", "args": {"setting": "font_size", "increment": -1, "scope": "window"} },
 
-	{ "keys": ["ctrl+keypad_plus"], "command": "increase_font_size" },
-	{ "keys": ["ctrl+keypad_minus"], "command": "decrease_font_size" },
+	{ "keys": ["ctrl+keypad_plus"], "command": "increment_setting", "args": {"setting": "font_size", "increment": 1, "scope": "global"} },
+	{ "keys": ["ctrl+keypad_minus"], "command": "increment_setting", "args": {"setting": "font_size", "increment": -1, "scope": "global"} },
 
-	{ "keys": ["ctrl+shift++"], "command": "increment_setting", "args": {"setting": "font_size", "increment": 1, "view_only": true} },
-	{ "keys": ["ctrl+shift+-"], "command": "increment_setting", "args": {"setting": "font_size", "increment": -1, "view_only": true} },
+	{ "keys": ["ctrl+shift++"], "command": "increment_setting", "args": {"setting": "font_size", "increment": 1, "scope": "view"} },
+	{ "keys": ["ctrl+shift+-"], "command": "increment_setting", "args": {"setting": "font_size", "increment": -1, "scope": "view"} },
 
-	{ "keys": ["ctrl+shift+equals"], "command": "increment_setting", "args": {"setting": "font_size", "increment": 1, "view_only": true} },
-	{ "keys": ["ctrl+shift+minus"], "command": "increment_setting", "args": {"setting": "font_size", "increment": -1, "view_only": true} },
+	{ "keys": ["ctrl+shift+equals"], "command": "increment_setting", "args": {"setting": "font_size", "increment": 1, "scope": "view"} },
+	{ "keys": ["ctrl+shift+minus"], "command": "increment_setting", "args": {"setting": "font_size", "increment": -1, "scope": "view"} },
 
-	{ "keys": ["ctrl+shift+keypad_plus"], "command": "increase_font_size" },
-	{ "keys": ["ctrl+shift+keypad_minus"], "command": "decrease_font_size" },
+	{ "keys": ["ctrl+shift+keypad_plus"], "command": "increment_setting", "args": {"setting": "font_size", "increment": 1, "scope": "global"} },
+	{ "keys": ["ctrl+shift+keypad_minus"], "command": "increment_setting", "args": {"setting": "font_size", "increment": -1, "scope": "global"} },
 
 	{ "keys": ["alt+shift+w"], "command": "insert_snippet", "args": { "name": "Packages/XML/Snippets/long-tag.sublime-snippet" } },
 
@@ -856,7 +856,7 @@
 	{ "keys": ["ctrl+k", "ctrl+q"], "command": "toggle_setting", "args": {"setting": "word_wrap"} },
 
 	{ "keys": ["ctrl+k", "ctrl+n"], "command": "toggle_settings", "args":
-			{"settings": ["line_numbers", "fold_buttons", "mini_diff"], "same_value": true, "view_only": false} },
+			{"settings": ["line_numbers", "fold_buttons", "mini_diff"], "same_value": true, "scope": "window"} },
 
 	// Find panel key bindings
 	{ "keys": ["enter"], "command": "find_next", "context":
