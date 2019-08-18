@@ -231,7 +231,9 @@ class JumpBackCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         if self.view.settings().get('is_widget'):
-            return
+            # How to do the jump_back command from find panel?
+            # https://forum.sublimetext.com/t/how-to-do-the-jump-back-command-from-find-panel/25610
+            self.view = sublime.active_window().active_view()
 
         # jump back in history
         # get the new selection
@@ -262,7 +264,9 @@ class JumpForwardCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         if self.view.settings().get('is_widget'):
-            return
+            # How to do the jump_back command from find panel?
+            # https://forum.sublimetext.com/t/how-to-do-the-jump-back-command-from-find-panel/25610
+            self.view = sublime.active_window().active_view()
 
         # jump back in history
         # get the new selection
