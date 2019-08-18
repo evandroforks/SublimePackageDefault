@@ -365,10 +365,6 @@
 	{ "keys": ["f12"], "command": "goto_definition" },
 	{ "keys": ["shift+f12"], "command": "goto_reference" },
 	{ "keys": ["ctrl+shift+r"], "command": "goto_symbol_in_project" },
-	{ "keys": ["alt+-"], "command": "jump_back" },
-	{ "keys": ["alt+shift+-"], "command": "jump_forward" },
-	{ "keys": ["alt+keypad_minus"], "command": "jump_back" },
-	{ "keys": ["alt+shift+keypad_minus"], "command": "jump_forward" },
 
 	{ "keys": ["ctrl+i"], "command": "show_panel", "args": {"panel": "incremental_find", "reverse": false} },
 	{ "keys": ["ctrl+shift+i"], "command": "show_panel", "args": {"panel": "incremental_find", "reverse": true} },
@@ -821,6 +817,12 @@
 	{ "keys": ["ctrl+equals"], "command": "increase_font_size" },
 	{ "keys": ["ctrl+shift+equals"], "command": "decrease_font_size" },
 	{ "keys": ["ctrl+shift+keypad_plus"], "command": "decrease_font_size" },
+
+    { "keys": ["ctrl+shift+keypad_minus"], "command": "jump_back" },
+    { "keys": ["ctrl+shift+keypad_plus"], "command": "jump_forward" },
+
+	{ "keys": ["ctrl+keypad_minus"], "command": "jump_back", "args": { "this_view_only": true } },
+	{ "keys": ["ctrl+keypad_plus"], "command": "jump_forward", "args": { "this_view_only": true } },
 
 	{ "keys": ["alt+shift+w"], "command": "insert_snippet", "args": { "name": "Packages/XML/Snippets/long-tag.sublime-snippet" } },
 

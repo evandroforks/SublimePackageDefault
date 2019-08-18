@@ -140,19 +140,26 @@ class JumpHistory():
 
 # dict from window id to JumpHistory
 jump_history_dict = {}
+jump_view_history_dict = {}
 
 
-def get_jump_history(window_id):
-    global jump_history_dict
-    return jump_history_dict.setdefault(window_id, JumpHistory())
+def get_jump_history(window_id, view_id):
+
+    if view_id is not None:
+        return jump_view_history_dict.setdefault(view_id, JumpHistory())
+    else:
+        return jump_history_dict.setdefault(window_id, JumpHistory())
 
 
-def get_jump_history_for_view(view):
+def get_jump_history_for_view(view, view_id=None):
     win = view.window()
     if not win:
-        return JumpHistory()
+        if view_id is None:
+            return JumpHistory()
+        else:
+            return get_jump_history(None, view_id)
     else:
-        return get_jump_history(win.id())
+        return get_jump_history(win.id(), view_id)
 
 
 # remember that we are jumping and ignore
@@ -184,17 +191,20 @@ class JumpHistoryUpdater(sublime_plugin.EventListener):
         if name == 'move' and args['by'] == 'pages':
             # syntax is {'by': 'lines', 'forward': True}
             get_jump_history_for_view(view).push_selection(view)
+            get_jump_history_for_view(view, view.id()).push_selection(view)
         elif name == 'drag_select':
             # using mouse to move cursor, we only want to capture
             # this if it is in the same view, otherwise on_deactivated()
             # will handle this
             if view.window().active_view() == view:
                 get_jump_history_for_view(view).push_selection(view)
+                get_jump_history_for_view(view, view.id()).push_selection(view)
         elif name == 'move_to':
             where_to = args.get('to')
             if where_to == 'bof' or where_to == 'eof':
                 # move to bof/eof
                 get_jump_history_for_view(view).push_selection(view)
+                get_jump_history_for_view(view, view.id()).push_selection(view)
 
     def on_window_command(self, window, name, args):
         if name == 'goto_definition':
@@ -212,6 +222,7 @@ class JumpHistoryUpdater(sublime_plugin.EventListener):
                 return
 
             get_jump_history_for_view(view).push_selection(view)
+            get_jump_history_for_view(view, view.id()).push_selection(view)
 
     def on_pre_close(self, view):
         """ remove the history from the view """
@@ -221,6 +232,7 @@ class JumpHistoryUpdater(sublime_plugin.EventListener):
         # view on_deactivated
         view.settings().set('history_list_is_closing', True)
         get_jump_history_for_view(view).remove_view(view.id())
+        get_jump_history_for_view(view, view.id()).remove_view(view.id())
         unlock_jump_history()
 
 
@@ -229,7 +241,7 @@ class JumpBackCommand(sublime_plugin.TextCommand):
     Defines a new text command "jump_back"
     """
 
-    def run(self, edit):
+    def run(self, edit, this_view_only=False):
         if self.view.settings().get('is_widget'):
             # How to do the jump_back command from find panel?
             # https://forum.sublimetext.com/t/how-to-do-the-jump-back-command-from-find-panel/25610
@@ -237,7 +249,10 @@ class JumpBackCommand(sublime_plugin.TextCommand):
 
         # jump back in history
         # get the new selection
-        jump_history = get_jump_history_for_view(self.view)
+        if this_view_only:
+            jump_history = get_jump_history_for_view(self.view, self.view.id())
+        else:
+            jump_history = get_jump_history_for_view(self.view)
 
         view, region_list = jump_history.jump_back(self.view)
         if region_list == []:
@@ -262,7 +277,7 @@ class JumpForwardCommand(sublime_plugin.TextCommand):
     Defines a new text command "jump_forward"
     """
 
-    def run(self, edit):
+    def run(self, edit, this_view_only=False):
         if self.view.settings().get('is_widget'):
             # How to do the jump_back command from find panel?
             # https://forum.sublimetext.com/t/how-to-do-the-jump-back-command-from-find-panel/25610
@@ -270,7 +285,11 @@ class JumpForwardCommand(sublime_plugin.TextCommand):
 
         # jump back in history
         # get the new selection
-        jump_history = get_jump_history_for_view(self.view)
+        if this_view_only:
+            jump_history = get_jump_history_for_view(self.view, self.view.id())
+        else:
+            jump_history = get_jump_history_for_view(self.view)
+
         view, region_list = jump_history.jump_forward(self.view)
         if region_list == []:
             sublime.status_message("Already at the newest position")
