@@ -14,8 +14,8 @@ class JumpHistory():
     Stores the current jump history
     """
 
-    LIST_LIMIT = 120
-    LIST_TRIMMED_SIZE = 100
+    LIST_LIMIT = 1200
+    LIST_TRIMMED_SIZE = 1000
 
     def __init__(self):
         self.history_list = []
