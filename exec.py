@@ -571,14 +571,13 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
         self.quiet = quiet
 
         self.proc = None
-        if not self.quiet:
-            if shell_cmd:
-                print("Running " + shell_cmd)
-            elif cmd:
-                cmd_string = cmd
-                if not isinstance(cmd, str):
-                    cmd_string = " ".join(cmd)
-                print("Running " + cmd_string)
+        if shell_cmd:
+            print("Running " + shell_cmd)
+        elif cmd:
+            cmd_string = cmd
+            if not isinstance(cmd, str):
+                cmd_string = " ".join(cmd)
+            print("Running " + cmd_string)
 
             # https://forum.sublimetext.com/t/how-to-keep-showing-building-on-the-status-bar/43965
             ThreadProgress("Building...", "Successfully Build the Project!")
@@ -686,13 +685,15 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
             sublime.set_timeout(self.service_text_queue, 1)
 
     def finish(self, proc):
-        if not self.quiet:
-            elapsed = time.time() - proc.start_time
-            exit_code = proc.exit_code()
-            if exit_code == 0 or exit_code is None:
-                self.append_string(proc, "[Finished in %.1fs]" % elapsed)
-            else:
-                self.append_string(proc, "[Finished in %.1fs with exit code %d]\n" % (elapsed, exit_code))
+        elapsed = time.time() - proc.start_time
+        exit_code = proc.exit_code()
+
+        if exit_code == 0 or exit_code is None:
+            self.append_string(proc, "[Finished in %.1fs]" % elapsed)
+        else:
+            self.append_string(proc, "[Finished in %.1fs with exit code %d]\n" % (elapsed, exit_code))
+
+            if not self.quiet:
                 self.append_string(proc, self.debug_text)
 
         if proc != self.proc:
