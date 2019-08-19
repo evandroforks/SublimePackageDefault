@@ -143,7 +143,7 @@ jump_history_dict = {}
 jump_view_history_dict = {}
 
 
-def get_jump_history(window_id, view_id):
+def get_jump_history(window_id, view_id=None):
 
     if view_id is not None:
         return jump_view_history_dict.setdefault(view_id, JumpHistory())
@@ -211,6 +211,7 @@ class JumpHistoryUpdater(sublime_plugin.EventListener):
             view = window.active_view()
             if not view.settings().get('is_widget'):
                 get_jump_history(window.id()).push_selection(view)
+                get_jump_history(window.id(), view.id()).push_selection(view)
 
     def on_deactivated(self, view):
         if not g_is_jumping:
