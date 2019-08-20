@@ -122,8 +122,13 @@ class FullRegexListener(sublime_plugin.EventListener):
                                 else:
                                     print('Ignoring extra capture groups', index, value)
 
-                            window = sublime.active_window()
+                            window = view.window() or sublime.active_window()
                             extract_variables = window.extract_variables()
+
+                            # github.com/SublimeTextIssues/Core/issues/1482
+                            active_view = window.active_view()
+                            group, view_index = window.get_view_index( active_view )
+                            window.set_view_index( active_view, group, 0 )
 
                             result_replaceby = view.settings().get('result_replaceby', {})
                             result_real_dir = view.settings().get('result_real_dir', os.path.abspath('.') )
@@ -146,6 +151,8 @@ class FullRegexListener(sublime_plugin.EventListener):
                                 file_name + ":" + str(row) + ":" + str(column),
                                 sublime.ENCODED_POSITION | sublime.FORCE_GROUP
                             )
+
+                            window.set_view_index( active_view, group, view_index )
 
             g_last_click_time = new_click
             g_last_click_buttons = clicks_buttons
