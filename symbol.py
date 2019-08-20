@@ -98,6 +98,7 @@ def open_location(window, l):
     fname, display_fname, rowcol = l
     row, col = rowcol
 
+    # https://github.com/SublimeTextIssues/Core/issues/1482
     view = window.active_view()
     group, view_index = window.get_view_index(view)
 
