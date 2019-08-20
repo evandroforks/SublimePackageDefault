@@ -48,15 +48,18 @@ class ExecOutputFocusCancelBuildCommand(sublime_plugin.WindowCommand):
         window = self.window
         active_panel = window.active_panel()
 
-        if active_panel and active_panel != 'console':
+        if active_panel and get_panel_name( active_panel ) == 'exec':
             panel_view = get_panel_view( window, active_panel )
 
             user_notice = "Cancelling the build for '%s'..." % active_panel
             print( str(datetime.datetime.now())[:-4], user_notice )
 
-            sublime.status_message( user_notice )
-            window.run_command( 'cancel_build' )
             window.focus_view( panel_view )
+            window.run_command( 'cancel_build' )
+
+            # https://github.com/SublimeTextIssues/Core/issues/2198
+            ThreadProgress.stop()
+            sublime.status_message( user_notice )
 
         else:
             window.run_command( 'show_panel', { 'panel': panel } )
@@ -402,6 +405,7 @@ class ThreadProgress():
         self.window = sublime.active_window()
         self.index = 0
         self.is_alive = True
+        self.silent = False
 
         if self.window.id() in self.windows:
             print('Skipping ThreadProgress indicator because it is already running!')
@@ -411,11 +415,13 @@ class ThreadProgress():
             sublime.set_timeout(lambda: self.run(), 100)
 
     @classmethod
-    def stop(cls):
+    def stop(cls, silent=True):
         window_id = sublime.active_window().id()
         if window_id in cls.windows:
             progress = cls.windows[window_id]
             progress.is_alive = False
+
+            if silent: progress.silent = True
             del cls.windows[window_id]
 
     def run(self):
@@ -427,11 +433,12 @@ class ThreadProgress():
             self.last_view = None
 
         if not self.is_alive:
-            def cleanup():
+            if self.silent:
                 active_view.erase_status(active_window_id)
+                return
 
             active_view.set_status(active_window_id, self.success_message)
-            sublime.set_timeout(cleanup, 10000)
+            sublime.set_timeout( lambda: active_view.erase_status(active_window_id), 10000)
             return
 
         before = self.index % self.size
