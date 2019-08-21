@@ -150,12 +150,14 @@ class FullRegexListener(sublime_plugin.EventListener):
                                 file_name = self.replaceby( file_name, result_replaceby )
 
                             file_name = os.path.normpath( file_name )
-                            window.open_file(
+                            fileview = window.open_file(
                                 file_name + ":" + str(row) + ":" + str(column),
                                 sublime.ENCODED_POSITION | sublime.FORCE_GROUP
                             )
 
                             window.set_view_index( active_view, group, view_index )
+                            # window.focus_group( group )
+                            # window.focus_view( fileview )
 
             g_last_click_time = new_click
             g_last_click_buttons = clicks_buttons
