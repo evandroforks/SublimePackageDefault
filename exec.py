@@ -65,6 +65,7 @@ class ExecOutputFocusCancelBuildCommand(sublime_plugin.WindowCommand):
             window.run_command( 'show_panel', { 'panel': panel } )
             window.focus_group( window.active_group() )
 
+
 class FullRegexListener(sublime_plugin.EventListener):
 
     def replaceby(self, value, replacements):
@@ -487,11 +488,68 @@ class ExecRestoreOutputViewScrollingHelperCommand(sublime_plugin.TextCommand):
                 for selection in last_caret_region:
                     view.sel().add( sublime.Region( selection[0], selection[1] ) )
 
+                restore_view( view, window, lambda: None )
+
         # The output build panel is completely scrolled horizontally to the right when there are build errors
         # https://github.com/SublimeTextIssues/Core/issues/2239
         if not restoring_scroll:
             viewport_position = view.viewport_position()
             view.set_viewport_position( ( 0, viewport_position[1] ) )
+
+
+TIME_AFTER_FOCUS_VIEW = 30
+TIME_AFTER_RESTORE_VIEW = 15
+
+def restore_view(view, window, next_target, withfocus=True):
+    """ Taken from the https://github.com/evandrocoan/FixProjectSwitchRestartBug package
+    Because on Linux, set_viewport was not restoring the scroll.
+    """
+
+    if view.is_loading():
+        sublime.set_timeout( lambda: restore_view( view, window, next_target, withfocus=withfocus ), 200 )
+
+    else:
+        selections = view.sel()
+        file_name = view.file_name()
+
+        if len( selections ):
+            first_selection = selections[0].begin()
+            original_selections = list( selections )
+
+            def super_refocus():
+                view.run_command( "move", {"by": "lines", "forward": False} )
+                view.run_command( "move", {"by": "lines", "forward": True} )
+
+                def fix_selections():
+                    selections.clear()
+
+                    for selection in original_selections:
+                        selections.add( selection )
+
+                    sublime.set_timeout( next_target, TIME_AFTER_RESTORE_VIEW )
+
+                sublime.set_timeout( fix_selections, TIME_AFTER_RESTORE_VIEW )
+
+            if file_name and withfocus:
+
+                def reforce_focus():
+                    # https://github.com/SublimeTextIssues/Core/issues/1482
+                    group, view_index = window.get_view_index( view )
+                    window.set_view_index( view, group, 0 )
+
+                    # https://github.com/SublimeTextIssues/Core/issues/538
+                    row, column = view.rowcol( first_selection )
+                    window.open_file( "%s:%d:%d" % ( file_name, row + 1, column + 1 ), sublime.ENCODED_POSITION )
+                    window.set_view_index( view, group, view_index )
+
+                    sublime.set_timeout( super_refocus, TIME_AFTER_RESTORE_VIEW )
+
+                view.show_at_center( first_selection )
+                sublime.set_timeout( reforce_focus, TIME_AFTER_FOCUS_VIEW )
+
+            else:
+                view.show_at_center( first_selection )
+                sublime.set_timeout( super_refocus, TIME_AFTER_RESTORE_VIEW )
 
 
 class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
