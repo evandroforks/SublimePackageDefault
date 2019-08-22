@@ -38,6 +38,12 @@ def _monkey_patch_sublime(sublime_directory):
             r'raise IOError("resource `%s` not found" % (name))',
             sublime_module_contents)
 
+    # https://github.com/SublimeTextIssues/Core/issues/2949
+    new_sublime_module_contents = re.sub(
+            r'(?m)^(\s+)return self.view_id != 0\n(?=[\s\n]+def is\_valid\(self\):)',
+            r'\1return self.view_id != 0 and not not len( self )\n',
+            sublime_module_contents)
+
     if sublime_module_contents != new_sublime_module_contents:
 
         with io.open(sublime_module_path, 'w', newline=None) as destine_file:
