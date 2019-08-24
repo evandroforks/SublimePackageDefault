@@ -59,7 +59,7 @@ def _monkey_patch_sublime_plugin(sublime_directory):
     # https://github.com/SublimeTextIssues/Core/issues/2930
     new_sublime_module_contents = re.sub(
             r'(?m)^(\s+)return\n(\s+)raise\n$',
-            r'\1return\n\2raise TypeError( "%s, %s" % ( type(self), e ) )\n',
+            r'\1return\n\2raise TypeError( "%s, %s" % ( type(self), e ) ) from None\n',
             sublime_module_contents)
 
     if sublime_module_contents != new_sublime_module_contents:
