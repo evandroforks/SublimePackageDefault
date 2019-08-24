@@ -68,14 +68,14 @@ class ExecOutputFocusCancelBuildCommand(sublime_plugin.WindowCommand):
 
 class FullRegexListener(sublime_plugin.EventListener):
 
-    def replaceby(self, value, replacements):
+    def replaceby(self, string, replacements):
         # print('replacements', replacements)
 
         for items in replacements:
-            source = items[0]
+            regex = items[0]
             replacement = items[1]
-            value = re.sub( source, replacement, value )
-        return value
+            string = re.sub( regex, replacement, string )
+        return string
 
     def on_text_command(self, view, command_name, args):
         # print('command_name', command_name, 'args', args)
@@ -99,32 +99,16 @@ class FullRegexListener(sublime_plugin.EventListener):
                         full_line = view.substr( view.full_line( view_selections[0] ) )
 
                         # print('Double clicking', click_time, 'full_line', full_line )
-                        matchobject = re.search( result_full_regex, full_line )
+                        full_regex_object = re.compile( result_full_regex )
+                        matchobject = full_regex_object.search( full_line )
 
                         if matchobject:
-                            row = 0
-                            column = 0
-                            file_name = matchobject.group(0)
-                            matchgroups = matchobject.groups()
+                            groupindex = full_regex_object.groupindex
 
-                            # print( 'matchgroups', matchgroups )
-                            for index, value in enumerate( matchgroups ):
-
-                                if index == 0:
-                                    file_name = value
-
-                                elif index == 1:
-                                    row = value
-
-                                elif index == 2:
-
-                                    try:
-                                        column = int( value )
-                                    except:
-                                        print('Ignoring capture group', index, value)
-
-                                else:
-                                    print('Ignoring extra capture groups', index, value)
+                            # https://github.com/SublimeTextIssues/Core/issues/227
+                            file_name = matchobject.group('file').strip( ' ' )   if 'file'   in groupindex else None
+                            line      = matchobject.group('line').strip( ' ' )   if 'line'   in groupindex else "0"
+                            column    = matchobject.group('column').strip( ' ' ) if 'column' in groupindex else "0"
 
                             window = view.window() or sublime.active_window()
                             extract_variables = window.extract_variables()
@@ -134,25 +118,31 @@ class FullRegexListener(sublime_plugin.EventListener):
                             group, view_index = window.get_view_index( active_view )
                             window.set_view_index( active_view, group, 0 )
 
+                            # https://github.com/SublimeTextIssues/Core/issues/938
                             result_replaceby = view.settings().get('result_replaceby', {})
                             result_real_dir = view.settings().get('result_real_dir', os.path.abspath('.') )
 
-                            real_dir_file = os.path.join( result_real_dir, file_name )
-                            real_dir_file = sublime.expand_variables( real_dir_file, extract_variables )
-                            real_dir_file = self.replaceby( real_dir_file, result_replaceby )
+                            if file_name:
+                                real_dir_file = os.path.join( result_real_dir, file_name )
+                                real_dir_file = sublime.expand_variables( real_dir_file, extract_variables )
+                                real_dir_file = self.replaceby( real_dir_file, result_replaceby )
 
-                            if os.path.exists( real_dir_file ):
-                                file_name = real_dir_file
+                                if os.path.exists( real_dir_file ):
+                                    file_name = real_dir_file
+
+                                else:
+                                    base_dir_file = view.settings().get('result_base_dir')
+                                    file_name = os.path.join( base_dir_file, file_name )
+                                    file_name = sublime.expand_variables( file_name, extract_variables )
+                                    file_name = self.replaceby( file_name, result_replaceby )
+
+                                file_name = os.path.normpath( file_name )
 
                             else:
-                                base_dir_file = view.settings().get('result_base_dir')
-                                file_name = os.path.join( base_dir_file, file_name )
-                                file_name = sublime.expand_variables( file_name, extract_variables )
-                                file_name = self.replaceby( file_name, result_replaceby )
+                                file_name = active_view.file_name()
 
-                            file_name = os.path.normpath( file_name )
                             fileview = window.open_file(
-                                file_name + ":" + str(row) + ":" + str(column),
+                                file_name + ":" + line + ":" + column,
                                 sublime.ENCODED_POSITION | sublime.FORCE_GROUP
                             )
 
