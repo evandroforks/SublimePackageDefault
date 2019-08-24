@@ -146,7 +146,10 @@ class FullRegexListener(sublime_plugin.EventListener):
                                 sublime.ENCODED_POSITION | sublime.FORCE_GROUP
                             )
 
+                            # https://github.com/SublimeTextIssues/Core/issues/2506
+                            restore_view( fileview, window, lambda: None )
                             window.set_view_index( active_view, group, view_index )
+
                             # window.focus_group( group )
                             # window.focus_view( fileview )
 
@@ -532,6 +535,7 @@ def restore_view(view, window, next_target, withfocus=True):
                     window.open_file( "%s:%d:%d" % ( file_name, row + 1, column + 1 ), sublime.ENCODED_POSITION )
                     window.set_view_index( view, group, view_index )
 
+                    # print( 'Super reforce focus focusing...' )
                     sublime.set_timeout( super_refocus, TIME_AFTER_RESTORE_VIEW )
 
                 view.show_at_center( first_selection )
