@@ -321,6 +321,9 @@ class FixSublimeTextOutputBuild(sublime_plugin.WindowCommand):
         # immediately erases the view contents.
         self.saveViewPositions( window, output_view )
 
+        # https://github.com/SublimeTextIssues/Core/issues/1049
+        self.window.run_command( 'cancel_build' )
+
         window.run_command( 'build', kwargs )
 
     def saveViewPositions(self, window, output_view):
