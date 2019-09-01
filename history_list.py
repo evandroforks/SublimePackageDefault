@@ -83,7 +83,7 @@ class JumpHistory():
 
         # check the newest entry is not the same as selection
         if self.history_list != []:
-            first_view, first_key = self.history_list[-1]
+            first_view, first_key, viewport = self.history_list[-1]
             if first_view.view_id == view.view_id:
                 first_sel = self.all_regions.get(view, first_key)
                 # print( 'first_sel', first_sel )
@@ -95,7 +95,7 @@ class JumpHistory():
         self.all_regions.add(view, key, region_list)
 
         # print( 'set the new selection as the current item, as a tuple (view_id, key)' )
-        self.history_list.append((view, key))
+        self.history_list.append((view, key, view.viewport_position()))
         self.trim_selections()
 
     def jump_back(self, active_view):
@@ -115,25 +115,25 @@ class JumpHistory():
 
         if self.current_item == -len(self.history_list):
             # print( 'already pointing to the oldest' )
-            return None, []
+            return None, [], None
 
         self.current_item -= 1
         # print( 'get the next (older) selection, current_item', self.current_item )
-        view, key = self.history_list[self.current_item]
-        return view, self.all_regions.get(view, key)
+        view, key, viewport = self.history_list[self.current_item]
+        return view, self.all_regions.get(view, key), viewport
 
     def jump_forward(self, active_view):
         if self.history_list == []:
-            return None, []
+            return None, [], None
 
         if self.current_item >= -1:
             # print( 'already pointing to the front' )
-            return None, []
+            return None, [], None
 
         self.current_item += 1
         # print( 'get the top selection, current_item', self.current_item )
-        view, key = self.history_list[self.current_item]
-        return view, self.all_regions.get(view, key)
+        view, key, viewport = self.history_list[self.current_item]
+        return view, self.all_regions.get(view, key), viewport
 
     def remove_view(self, view_id):
         i = 0
@@ -169,7 +169,7 @@ class JumpHistory():
 
         # remove all history that are newer than current
         for i in range(-1, self.current_item):
-            view, key = self.history_list[i]
+            view, key, viewport = self.history_list[i]
             self.all_regions.erase(view, key)
 
         if self.current_item < -1:
@@ -184,7 +184,7 @@ class JumpHistory():
             # trim to a smaller size to avoid doing on this every insert
             for i in range(0, len(self.history_list) - self.LIST_TRIMMED_SIZE):
                 # erase the regions from view
-                view, key = self.history_list[i]
+                view, key, viewport = self.history_list[i]
                 self.all_regions.erase(view, key)
             del self.history_list[: len(self.history_list) - self.LIST_TRIMMED_SIZE]
 
@@ -299,7 +299,7 @@ class JumpBackCommand(sublime_plugin.TextCommand):
         else:
             jump_history = get_jump_history_for_view(self.view)
 
-        view, region_list = jump_history.jump_back(self.view)
+        view, region_list, viewport = jump_history.jump_back(self.view)
         if region_list == []:
             sublime.status_message("Already at the earliest position")
             return
@@ -312,7 +312,10 @@ class JumpBackCommand(sublime_plugin.TextCommand):
         self.view.window().focus_view(view)
         view.sel().clear()
         view.sel().add_all(region_list)
-        view.show(region_list[0], True)
+        # print( region_list )
+        # view.show(region_list[0], True)
+        view.set_viewport_position( viewport, True )
+
         sublime.status_message("")
         unlock_jump_history()
 
@@ -335,7 +338,7 @@ class JumpForwardCommand(sublime_plugin.TextCommand):
         else:
             jump_history = get_jump_history_for_view(self.view)
 
-        view, region_list = jump_history.jump_forward(self.view)
+        view, region_list, viewport = jump_history.jump_forward(self.view)
         if region_list == []:
             sublime.status_message("Already at the newest position")
             return
@@ -349,7 +352,8 @@ class JumpForwardCommand(sublime_plugin.TextCommand):
         view.sel().clear()
         view.sel().add_all(region_list)
         # print( region_list )
-        view.show(region_list[0], True)
+        # view.show(region_list[0], True)
+        view.set_viewport_position( viewport, True )
         sublime.status_message("")
 
         unlock_jump_history()
