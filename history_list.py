@@ -7,6 +7,45 @@ jump backwards and forwards
 import sublime
 import sublime_plugin
 import unittest
+import time
+
+# https://github.com/SublimeTextIssues/Core/issues/1846
+class RegionsManager(object):
+  def __init__(self):
+    self.regions = {}
+
+  def add(self, view, region, contents):
+    view_id = view.id()
+    regions = self.regions
+
+    if isinstance( contents, sublime.Selection ):
+        contents = [ s for s in contents ]
+
+    if view_id not in regions:
+      regions[view_id] = {}
+
+    # print( 'Adding region', contents )
+    regions[view_id][region] = contents
+
+  def get(self, view, region):
+    view_id = view.id()
+    regions = self.regions
+
+    if view_id in regions:
+      if region in regions[view_id]:
+        # print( 'Getting region', regions[view_id][region] )
+        return regions[view_id][region]
+
+    return []
+
+  def erase(self, view, region):
+    view_id = view.id()
+    regions = self.regions
+
+    if view_id in regions:
+      if region in regions:
+        # print( 'Deleting region', regions[view_id][region] )
+        del regions[view_id][region]
 
 
 class JumpHistory():
@@ -19,6 +58,7 @@ class JumpHistory():
 
     def __init__(self):
         self.history_list = []
+        self.all_regions = RegionsManager()
 
         # current_item point to newest item of the queue, which is at the back of the
         # list. To make appending easier current_item is a negative index
@@ -45,14 +85,16 @@ class JumpHistory():
         if self.history_list != []:
             first_view, first_key = self.history_list[-1]
             if first_view.view_id == view.view_id:
-                first_sel = view.get_regions(first_key)
+                first_sel = self.all_regions.get(view, first_key)
+                # print( 'first_sel', first_sel )
                 if first_sel == region_list:
+                    # print( 'Same as newest selection entry' )
                     return
 
         key = self.generate_key()
-        view.add_regions(key, region_list)
+        self.all_regions.add(view, key, region_list)
 
-        # set the new selection as the current item, as a tuple (view_id, key)
+        # print( 'set the new selection as the current item, as a tuple (view_id, key)' )
         self.history_list.append((view, key))
         self.trim_selections()
 
@@ -63,7 +105,7 @@ class JumpHistory():
         active view sel() into the history.
         """
         if self.current_item == 0:
-            # we got no head, add one so we can jump back there
+            # print( 'we got no head, add one so we can jump back there' )
             # note that the push might not add anything if the region
             # is empty or if the region is the same as the previous
             # one, but we still increment current item. This is such
@@ -72,25 +114,26 @@ class JumpHistory():
             self.current_item = -1
 
         if self.current_item == -len(self.history_list):
-            # already pointing to the oldest
+            # print( 'already pointing to the oldest' )
             return None, []
 
-        # get the next (older) selection
         self.current_item -= 1
+        # print( 'get the next (older) selection, current_item', self.current_item )
         view, key = self.history_list[self.current_item]
-        return view, view.get_regions(key)
+        return view, self.all_regions.get(view, key)
 
     def jump_forward(self, active_view):
         if self.history_list == []:
             return None, []
-        # already pointing to the front
+
         if self.current_item >= -1:
+            # print( 'already pointing to the front' )
             return None, []
-        # get the top selection
-        # print(self.current_item)
+
         self.current_item += 1
+        # print( 'get the top selection, current_item', self.current_item )
         view, key = self.history_list[self.current_item]
-        return view, view.get_regions(key)
+        return view, self.all_regions.get(view, key)
 
     def remove_view(self, view_id):
         i = 0
@@ -104,6 +147,13 @@ class JumpHistory():
                 if self.current_item <= i:
                     self.current_item += 1
 
+    def delete_view(self, view_id):
+        if view_id in jump_view_history_dict:
+            del jump_view_history_dict[view_id]
+
+        if view_id in self.all_regions.regions:
+            del self.all_regions.regions[view_id]
+
     def generate_key(self):
         # generate enough keys for 5 times the jump history limit
         # this can still cause clashes as new history can be erased when we jump
@@ -113,25 +163,29 @@ class JumpHistory():
         return 'jump_key_' + hex(self.key_counter)
 
     def clear_history_after_current(self):
+        # print( 'clear_history_after_current, current_item', self.current_item )
         if self.current_item == 0:
             return
 
         # remove all history that are newer than current
         for i in range(-1, self.current_item):
             view, key = self.history_list[i]
-            view.erase_regions(key)
-        del self.history_list[self.current_item + 1:]
+            self.all_regions.erase(view, key)
+
+        if self.current_item < -1:
+            del self.history_list[self.current_item + 1:]
         # set current_item to the imaginary back (current caret position not yet pushed)
         self.current_item = 0
 
     def trim_selections(self):
+        # print( 'history_list', self.history_list )
         if len(self.history_list) > self.LIST_LIMIT:
             # max reached, remove everything too old
             # trim to a smaller size to avoid doing on this every insert
             for i in range(0, len(self.history_list) - self.LIST_TRIMMED_SIZE):
                 # erase the regions from view
                 view, key = self.history_list[i]
-                view.erase_regions(key)
+                self.all_regions.erase(view, key)
             del self.history_list[: len(self.history_list) - self.LIST_TRIMMED_SIZE]
 
     def len(self):
@@ -142,14 +196,11 @@ class JumpHistory():
 jump_history_dict = {}
 jump_view_history_dict = {}
 
-
 def get_jump_history(window_id, view_id=None):
-
     if view_id is not None:
         return jump_view_history_dict.setdefault(view_id, JumpHistory())
     else:
         return jump_history_dict.setdefault(window_id, JumpHistory())
-
 
 def get_jump_history_for_view(view, view_id=None):
     win = view.window()
@@ -169,11 +220,13 @@ g_is_jumping = False
 
 def lock_jump_history():
     global g_is_jumping
+    JumpHistoryUpdater.lasttime = time.time()
     g_is_jumping = True
 
 
 def unlock_jump_history():
     global g_is_jumping
+    JumpHistoryUpdater.lasttime = time.time()
     g_is_jumping = False
 
 
@@ -182,36 +235,28 @@ class JumpHistoryUpdater(sublime_plugin.EventListener):
     Listens on the sublime text events and push the navigation history into the
     JumpHistory object
     """
+    lasttime = time.time()
 
-    def on_text_command(self, view, name, args):
-        if view.settings().get('is_widget'):
+    def on_selection_modified(self, view):
+
+        if view.settings().get('is_widget') or g_is_jumping:
             return
-        # print(view.id())
-        # print(name)
-        if name == 'move' and args['by'] == 'pages':
-            # syntax is {'by': 'lines', 'forward': True}
-            get_jump_history_for_view(view).push_selection(view)
-            get_jump_history_for_view(view, view.id()).push_selection(view)
-        elif name == 'drag_select':
-            # using mouse to move cursor, we only want to capture
-            # this if it is in the same view, otherwise on_deactivated()
-            # will handle this
-            if view.window().active_view() == view:
-                get_jump_history_for_view(view).push_selection(view)
-                get_jump_history_for_view(view, view.id()).push_selection(view)
-        elif name == 'move_to':
-            where_to = args.get('to')
-            if where_to == 'bof' or where_to == 'eof':
-                # move to bof/eof
-                get_jump_history_for_view(view).push_selection(view)
-                get_jump_history_for_view(view, view.id()).push_selection(view)
 
-    def on_window_command(self, window, name, args):
-        if name == 'goto_definition':
-            view = window.active_view()
-            if not view.settings().get('is_widget'):
-                get_jump_history(window.id()).push_selection(view)
-                get_jump_history(window.id(), view.id()).push_selection(view)
+        timenow = time.time()
+        if timenow - JumpHistoryUpdater.lasttime < 0.5:
+            return
+
+        # print( 'on_selection_modified' )
+        JumpHistoryUpdater.lasttime = timenow
+
+        # https://github.com/SublimeTextIssues/Core/issues/289
+        view = sublime.active_window().active_view()
+
+        get_jump_history_for_view(view).push_selection(view)
+        get_jump_history_for_view(view, view.id()).push_selection(view)
+
+    def on_activated(self, view):
+        self.on_deactivated( view )
 
     def on_deactivated(self, view):
         if not g_is_jumping:
@@ -223,7 +268,6 @@ class JumpHistoryUpdater(sublime_plugin.EventListener):
                 return
 
             get_jump_history_for_view(view).push_selection(view)
-            get_jump_history_for_view(view, view.id()).push_selection(view)
 
     def on_pre_close(self, view):
         """ remove the history from the view """
@@ -233,7 +277,7 @@ class JumpHistoryUpdater(sublime_plugin.EventListener):
         # view on_deactivated
         view.settings().set('history_list_is_closing', True)
         get_jump_history_for_view(view).remove_view(view.id())
-        get_jump_history_for_view(view, view.id()).remove_view(view.id())
+        get_jump_history_for_view(view, view.id()).delete_view(view.id())
         unlock_jump_history()
 
 
@@ -262,7 +306,7 @@ class JumpBackCommand(sublime_plugin.TextCommand):
 
         lock_jump_history()
         # inputs a dict where the first is the argument name
-        # print(view.window(), region_list)
+        # print( view.window(), region_list )
         # change to another view
 
         self.view.window().focus_view(view)
@@ -299,12 +343,12 @@ class JumpForwardCommand(sublime_plugin.TextCommand):
         lock_jump_history()
 
         # inputs a dict where the first is the argument name
-        # print(region_list)
+        # print( region_list )
         # change to another view
         self.view.window().focus_view(view)
         view.sel().clear()
         view.sel().add_all(region_list)
-        # print(region_list)
+        # print( region_list )
         view.show(region_list[0], True)
         sublime.status_message("")
 
