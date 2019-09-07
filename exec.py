@@ -322,8 +322,7 @@ class FixSublimeTextOutputBuild(sublime_plugin.WindowCommand):
         self.saveViewPositions( window, output_view )
 
         # https://github.com/SublimeTextIssues/Core/issues/1049
-        self.window.run_command( 'cancel_build' )
-
+        window.run_command( 'cancel_build' )
         window.run_command( 'build', kwargs )
 
     def saveViewPositions(self, window, output_view):
@@ -484,7 +483,9 @@ class ExecRestoreOutputViewScrollingHelperCommand(sublime_plugin.TextCommand):
                 for selection in last_caret_region:
                     view.sel().add( sublime.Region( selection[0], selection[1] ) )
 
-                restore_view( view, window, lambda: None )
+                # Linux is bugged and does not restore the viewport
+                if sys.platform == "linux":
+                    restore_view( view, window, lambda: None )
 
         # The output build panel is completely scrolled horizontally to the right when there are build errors
         # https://github.com/SublimeTextIssues/Core/issues/2239
