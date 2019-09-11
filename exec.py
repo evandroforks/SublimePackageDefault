@@ -106,9 +106,9 @@ class FullRegexListener(sublime_plugin.EventListener):
                             groupindex = full_regex_object.groupindex
 
                             # https://github.com/SublimeTextIssues/Core/issues/227
-                            file_name = matchobject.group('file').strip( ' ' )   if 'file'   in groupindex else None
-                            line      = matchobject.group('line').strip( ' ' )   if 'line'   in groupindex else "0"
-                            column    = matchobject.group('column').strip( ' ' ) if 'column' in groupindex else "0"
+                            filename = matchobject.group('file').strip( ' ' )   if 'file'   in groupindex else None
+                            line     = matchobject.group('line').strip( ' ' )   if 'line'   in groupindex else "0"
+                            column   = matchobject.group('column').strip( ' ' ) if 'column' in groupindex else "0"
 
                             window = view.window() or sublime.active_window()
                             extract_variables = window.extract_variables()
@@ -119,30 +119,32 @@ class FullRegexListener(sublime_plugin.EventListener):
                             window.set_view_index( active_view, group, 0 )
 
                             # https://github.com/SublimeTextIssues/Core/issues/938
-                            result_replaceby = view.settings().get('result_replaceby', {})
-                            result_real_dir = view.settings().get('result_real_dir', os.path.abspath('.') )
+                            result_replaceby = view.settings().get( 'result_replaceby', {} )
+                            result_real_dir = view.settings().get( 'result_real_dir', os.path.abspath('.') )
 
-                            if file_name:
-                                real_dir_file = os.path.join( result_real_dir, file_name )
+                            if filename:
+                                real_dir_file = os.path.join( result_real_dir, filename )
                                 real_dir_file = sublime.expand_variables( real_dir_file, extract_variables )
                                 real_dir_file = self.replaceby( real_dir_file, result_replaceby )
 
                                 if os.path.exists( real_dir_file ):
-                                    file_name = real_dir_file
+                                    filepath = real_dir_file
 
                                 else:
-                                    base_dir_file = view.settings().get('result_base_dir')
-                                    file_name = os.path.join( base_dir_file, file_name )
-                                    file_name = sublime.expand_variables( file_name, extract_variables )
-                                    file_name = self.replaceby( file_name, result_replaceby )
+                                    base_dir_file = view.settings().get( 'result_base_dir' )
+                                    filepath = os.path.join( base_dir_file, filename )
+                                    filepath = sublime.expand_variables( filepath, extract_variables )
+                                    filepath = self.replaceby( filepath, result_replaceby )
 
-                                file_name = os.path.normpath( file_name )
+                                filepath = os.path.normpath( filepath )
 
                             else:
-                                file_name = active_view.file_name()
+                                filepath = active_view.file_name()
+
+                            print( '[exec] Opening', filename, line, column, 'file', filepath, real_dir_file )
 
                             fileview = window.open_file(
-                                file_name + ":" + line + ":" + column,
+                                filepath + ":" + line + ":" + column,
                                 sublime.ENCODED_POSITION | sublime.FORCE_GROUP
                             )
 
