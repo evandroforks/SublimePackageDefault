@@ -120,15 +120,19 @@ class FullRegexListener(sublime_plugin.EventListener):
 
                             # https://github.com/SublimeTextIssues/Core/issues/938
                             result_replaceby = view.settings().get( 'result_replaceby', {} )
-                            result_real_dir = view.settings().get( 'result_real_dir', os.path.abspath('.') )
+                            result_real_dir = view.settings().get( 'result_real_dir', [ os.path.abspath( '.' ) ] )
 
                             if filename:
-                                real_dir_file = os.path.join( result_real_dir, filename )
-                                real_dir_file = sublime.expand_variables( real_dir_file, extract_variables )
-                                real_dir_file = self.replaceby( real_dir_file, result_replaceby )
+                                assert isinstance( result_real_dir, list ), "Error: '%s' must be an instance of list!" % result_real_dir
 
-                                if os.path.exists( real_dir_file ):
-                                    filepath = real_dir_file
+                                for possible_root in result_real_dir:
+                                    real_dir_file = os.path.join( possible_root, filename )
+                                    real_dir_file = sublime.expand_variables( real_dir_file, extract_variables )
+                                    real_dir_file = self.replaceby( real_dir_file, result_replaceby )
+
+                                    if os.path.exists( real_dir_file ):
+                                        filepath = real_dir_file
+                                        break
 
                                 else:
                                     base_dir_file = view.settings().get( 'result_base_dir' )
