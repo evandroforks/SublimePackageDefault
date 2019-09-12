@@ -510,6 +510,10 @@
     // index_exclude_patterns indicate which files won't be indexed.
     "index_exclude_patterns": ["*.log"],
 
+    // Hidden setting, Sublime Text no longer clears the selection when another
+    // view makes a selection: https://github.com/SublimeTextIssues/Core/issues/2931
+    "clear_selection": false,
+
     // List any packages to ignore here. When removing entries from this list,
     // a restart may be required if the package contains plugins.
     //
