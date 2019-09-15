@@ -117,7 +117,7 @@
 
     // Adds whitespace up to the first open bracket when indenting. Requires
     // auto_indent to be enabled.
-    "indent_to_bracket": true,
+    "indent_to_bracket": false,
 
     // Trims white space added by auto_indent when moving the caret off the
     // line.
@@ -143,7 +143,7 @@
     "draw_centered": false,
 
     // Controls auto pairing of quotes, brackets etc
-    "auto_match_enabled": false,
+    "auto_match_enabled": true,
 
     // Word list to use for spell checking.
     "dictionary": "Packages/Language - English/en_US.dic",
