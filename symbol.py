@@ -150,6 +150,10 @@ def filter_current_symbol(view, point, symbol, locations):
 
 
 def navigate_to_symbol(view, symbol, locations):
+    # https://github.com/SublimeTextIssues/Core/issues/1482
+    window = view.window()
+    group, view_index = window.get_view_index(view)
+
     def select_entry(window, locations, idx, orig_view, orig_sel):
         if idx >= 0:
             open_location(window, locations[idx])
@@ -164,10 +168,12 @@ def navigate_to_symbol(view, symbol, locations):
         fname, display_fname, rowcol = locations[idx]
         row, col = rowcol
 
+        window.set_view_index(view, group, 0)
         window.open_file(
             fname + ":" + str(row) + ":" + str(col),
             group=window.active_group(),
             flags=sublime.TRANSIENT | sublime.ENCODED_POSITION | sublime.FORCE_GROUP)
+        window.set_view_index(view, group, view_index)
 
     orig_sel = None
     if view:
@@ -284,9 +290,15 @@ class ShowDefinitions(sublime_plugin.EventListener):
         ref_links = '<br>'.join(ref_links)
 
         def on_navigate(href):
+            # https://github.com/SublimeTextIssues/Core/issues/1482
+            view = window.active_view()
+            group, view_index = window.get_view_index(view)
+
+            window.set_view_index(view, group, 0)
             view.window().open_file(
                 href,
                 sublime.ENCODED_POSITION | sublime.FORCE_GROUP)
+            window.set_view_index(view, group, view_index)
 
         if len(locations) > 0:
             def_section = """
