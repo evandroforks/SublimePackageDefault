@@ -275,6 +275,9 @@ def run_operations():
         if check_settings_changes():
             create_settings_loader()
 
+        else:
+            print( "[zz_reload_default_package.py] No changes in any settings file!" )
+
     except Exception:
         raise
 
