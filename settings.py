@@ -311,3 +311,32 @@ class OpenFileSettingsCommand(sublime_plugin.WindowCommand):
 
     def is_enabled(self):
         return self.window.active_view() is not None
+
+
+class InsertSelectionMatchCommand(sublime_plugin.TextCommand):
+    def run(self, edit, start, end):
+        # import time; print( time.time(), 'start', start, 'end', end)
+        view = self.view
+        selections = view.sel()
+
+        for selection in selections:
+            first_char = sublime.Region( selection.begin() - 1, selection.begin())
+            first_char = view.substr(first_char)
+            last_char = sublime.Region( selection.end() + 1, selection.end())
+            last_char = view.substr(last_char)
+            # import time; print( time.time(),  'first_char', first_char, 'last_char', last_char )
+
+            if first_char == start and last_char == end:
+                view.insert( edit, selection.begin(), start )
+                view.insert( edit, selection.end() + 1, end )
+
+            elif first_char != start and last_char != end:
+                view.insert( edit, selection.begin(), start )
+                view.insert( edit, selection.end() + 1, end )
+
+            elif first_char != start:
+                view.insert( edit, selection.begin(), start )
+
+            else:
+                view.insert( edit, selection.end(), end )
+
