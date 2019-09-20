@@ -528,8 +528,8 @@
 			{ "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
 			{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
 			{ "key": "following_text", "operator": "regex_contains", "operand": "^(?:\t| |\\)|]|\\}|>|$)", "match_all": true },
-			{ "key": "following_text", "operator": "not_regex_match", "operand": ".*\".*", "match_all": true },
-			{ "key": "preceding_text", "operator": "not_regex_match", "operand": ".*\".*", "match_all": true },
+			{ "key": "following_text", "operator": "not_regex_contains", "operand": "\"", "match_all": true },
+			{ "key": "preceding_text", "operator": "not_regex_contains", "operand": "\"", "match_all": true },
 			{ "key": "preceding_text", "operator": "not_regex_contains", "operand": "[\"a-zA-Z0-9_]$", "match_all": true },
 			{ "key": "eol_selector", "operator": "not_equal", "operand": "string.quoted.double - punctuation.definition.string.end", "match_all": true },
 		]
@@ -566,8 +566,8 @@
 			{ "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
 			{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
 			{ "key": "following_text", "operator": "regex_contains", "operand": "^(?:\t| |\\)|]|\\}|>|$)", "match_all": true },
-			{ "key": "following_text", "operator": "not_regex_match", "operand": ".*'.*", "match_all": true },
-			{ "key": "preceding_text", "operator": "not_regex_match", "operand": ".*'.*", "match_all": true },
+			{ "key": "following_text", "operator": "not_regex_contains", "operand": "'", "match_all": true },
+			{ "key": "preceding_text", "operator": "not_regex_contains", "operand": "'", "match_all": true },
 			{ "key": "preceding_text", "operator": "not_regex_contains", "operand": "['a-zA-Z0-9_]$", "match_all": true },
 			{ "key": "eol_selector", "operator": "not_equal", "operand": "string.quoted.single - punctuation.definition.string.end", "match_all": true },
 		]
@@ -604,7 +604,7 @@
 			{ "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
 			{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
 			{ "key": "following_text", "operator": "regex_contains", "operand": "^(?:\t| |\\)|]|;|\\}|$)", "match_all": true },
-			{ "key": "following_text", "operator": "not_regex_match", "operand": ".*\\).*", "match_all": true },
+			{ "key": "following_text", "operator": "not_regex_contains", "operand": "\\)", "match_all": true },
 		]
 	},
 	{ "keys": ["("], "command": "insert_snippet", "args": {"contents": "(${0:$SELECTION})"}, "context":
@@ -635,7 +635,7 @@
 			{ "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
 			{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
 			{ "key": "following_text", "operator": "regex_contains", "operand": "^(?:\t| |\\)|]|;|\\}|$)", "match_all": true },
-			{ "key": "following_text", "operator": "not_regex_match", "operand": ".*\\].*", "match_all": true },
+			{ "key": "following_text", "operator": "not_regex_contains", "operand": "\\]", "match_all": true },
 		]
 	},
 	{ "keys": ["["], "command": "insert_snippet", "args": {"contents": "[${0:$SELECTION}]"}, "context":
@@ -666,7 +666,7 @@
 			{ "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
 			{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
 			{ "key": "following_text", "operator": "regex_contains", "operand": "^(?:\t| |\\)|]|\\}|$)", "match_all": true },
-			{ "key": "following_text", "operator": "not_regex_match", "operand": ".*\\}.*", "match_all": true },
+			{ "key": "following_text", "operator": "not_regex_contains", "operand": "\\}", "match_all": true },
 		]
 	},
 	{ "keys": ["{"], "command": "wrap_block", "args": {"begin": "{", "end": "}"}, "context":
