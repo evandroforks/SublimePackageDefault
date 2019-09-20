@@ -145,6 +145,9 @@
     // Controls auto pairing of quotes, brackets etc
     "auto_match_enabled": true,
 
+    // Enabled the auto pairing deletion of quotes, brackets etc.
+    "auto_match_enabled_delete": false,
+
     // Word list to use for spell checking.
     "dictionary": "Packages/Language - English/en_US.dic",
 
