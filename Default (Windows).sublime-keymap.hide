@@ -434,6 +434,8 @@
 	// Disable this evil command which mess up my files several times
 	// { "keys": ["f9"], "command": "sort_lines", "args": {"case_sensitive": false} },
 	// { "keys": ["ctrl+f9"], "command": "sort_lines", "args": {"case_sensitive": true} },
+	{ "keys": ["f9"], "command": "nope" },
+	{ "keys": ["ctrl+f9"], "command": "nope" },
 
 	// Disable the default `auto_match_enabled` keybinds on `Default.sublime-package`
 	{ "keys": ["\""], "command": "insert_snippet", "args": {"contents": "\""}, "context":
