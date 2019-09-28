@@ -382,6 +382,7 @@
 	{ "keys": ["f4"], "command": "next_result" },
 	{ "keys": ["shift+f4"], "command": "prev_result" },
 
+    { "keys": ["shift+f5"], "command": "reset_view_syntax" },
 	{ "keys": ["f6"], "command": "toggle_setting", "args": {"setting": "spell_check"} },
 	{ "keys": ["ctrl+f6"], "command": "next_misspelling" },
 	{ "keys": ["ctrl+shift+f6"], "command": "prev_misspelling" },

@@ -5,6 +5,31 @@ import sublime
 import sublime_plugin
 
 
+def status(message, *formatting):
+    print("Default Settings:", message, " ".join( str( item ) for item in formatting ) )
+    sublime.status_message(message)
+
+
+class ResetViewSyntaxCommand(sublime_plugin.TextCommand):
+
+    def run(self, edit):
+        view = self.view
+        window = view.window() or sublime.active_window()
+
+        if view.settings().get("is_widget"):
+            status("Cannot run 'reset_view_syntax' command on widgets!")
+            return
+
+        file_path = view.file_name()
+
+        if not file_path:
+            status("Cannot run 'reset_view_syntax' command on files without names!")
+            return
+
+        syntax = get_file_extension_syntax(window, file_path)
+        view.set_syntax_file(syntax)
+
+
 class EditSettingsCommand(sublime_plugin.ApplicationCommand):
     def run(self, base_file, user_file=None, default=None):
         """
@@ -82,8 +107,8 @@ class EditSettingsCommand(sublime_plugin.ApplicationCommand):
             })
 
         # print('base_file      ', base_file)
-        # print('base_file fixed', self.fix_base_file(base_file))
-        base_file = self.fix_base_file(base_file)
+        # print('base_file fixed', fix_base_file(base_file))
+        base_file = fix_base_file(base_file)
         new_window.focus_group(0)
         new_window.run_command('open_file', {'file': base_file})
         new_window.focus_group(1)
@@ -107,98 +132,99 @@ class EditSettingsCommand(sublime_plugin.ApplicationCommand):
             user_settings.set('edit_settings_default', default.replace('$0', ''))
 
         if base_file.endswith('.hide'):
-            syntax = self.get_file_extension_syntax(base_file.replace('.hide', ''))
+            syntax = get_file_extension_syntax(self.window, base_file.replace('.hide', ''))
             base_view.set_syntax_file(syntax)
 
-    #
-    # https://forum.sublimetext.com/t/get-syntax-associated-with-file-extension/26348
-    # https://gist.github.com/mattst/71488757f2a2ca573c2d5e73af636d4c#file-getfileextensionsyntax-py
-    #
-    # Retrieve the path of the syntax that a user has
-    # associated with any file extension in Sublime Text.
-    #
-    # 1) Create a temp file with the file extension of the desired syntax.
-    # 2) Open the temp file in ST with the API `open_file()` method; use a
-    #    sublime.TRANSIENT buffer so that no tab is shown on the tab bar.
-    # 3) Retrieve the syntax ST has assigned to the view's settings.
-    # 4) Close the temp file's ST buffer.
-    # 5) Delete the temp file.
-    #
-    # ST command of demo: get_file_extension_syntax
-    def get_file_extension_syntax(self, base_file):
-        filename, file_extension = os.path.splitext(base_file)
+#
+# https://forum.sublimetext.com/t/get-syntax-associated-with-file-extension/26348
+# https://gist.github.com/mattst/71488757f2a2ca573c2d5e73af636d4c#file-getfileextensionsyntax-py
+#
+# Retrieve the path of the syntax that a user has
+# associated with any file extension in Sublime Text.
+#
+# 1) Create a temp file with the file extension of the desired syntax.
+# 2) Open the temp file in ST with the API `open_file()` method; use a
+#    sublime.TRANSIENT buffer so that no tab is shown on the tab bar.
+# 3) Retrieve the syntax ST has assigned to the view's settings.
+# 4) Close the temp file's ST buffer.
+# 5) Delete the temp file.
+#
+# ST command of demo: get_file_extension_syntax
+def get_file_extension_syntax(window, base_file):
+    filename, file_extension = os.path.splitext(base_file)
 
-        try:
-            tmp_base = "GetFileExtensionSyntaxTempFile"
-            tmp_file = tempfile.NamedTemporaryFile(prefix = tmp_base,
-                                                   suffix = file_extension,
-                                                   delete = False)
-            tmp_path = tmp_file.name
+    try:
+        tmp_base = "GetFileExtensionSyntaxTempFile"
+        tmp_file = tempfile.NamedTemporaryFile(prefix = tmp_base,
+                                               suffix = file_extension,
+                                               delete = False)
+        tmp_path = tmp_file.name
 
-        except Exception:
-            return None
+    except Exception:
+        return None
 
-        finally:
-            tmp_file.close()
+    finally:
+        tmp_file.close()
 
-        active_buffer = self.window.active_view()
+    active_buffer = window.active_view()
 
-        # Using TRANSIENT prevents the creation of a tab bar tab.
-        tmp_buffer = self.window.open_file(tmp_path, sublime.TRANSIENT)
+    # Using TRANSIENT prevents the creation of a tab bar tab.
+    tmp_buffer = window.open_file(tmp_path, sublime.TRANSIENT)
 
-        # Even if is_loading() is true the view's settings can be
-        # retrieved; settings assigned before open_file() returns.
-        syntax = tmp_buffer.settings().get("syntax", None)
+    # Even if is_loading() is true the view's settings can be
+    # retrieved; settings assigned before open_file() returns.
+    syntax = tmp_buffer.settings().get("syntax", None)
 
-        self.window.run_command("close")
+    window.run_command("close")
 
-        if active_buffer:
-            self.window.focus_view(active_buffer)
+    if active_buffer:
+        window.focus_view(active_buffer)
 
-        try:
-            os.remove(tmp_path)
+    try:
+        os.remove(tmp_path)
 
-        # In the unlikely event of remove() failing: on Linux/OSX
-        # the OS will delete the contents of /tmp on boot or daily
-        # by default, on Windows the file will remain in the user
-        # temporary directory (amazingly never cleaned by default).
-        except Exception:
-            pass
+    # In the unlikely event of remove() failing: on Linux/OSX
+    # the OS will delete the contents of /tmp on boot or daily
+    # by default, on Windows the file will remain in the user
+    # temporary directory (amazingly never cleaned by default).
+    except Exception:
+        pass
 
-        return syntax
+    return syntax
 
-    def fix_base_file(self, base_file):
-        base_file = os.path.normpath(base_file)
-        # print('base_file', base_file)
 
-        settings_files = \
-        [
-            "Default (Linux).sublime-mousemap",
-            "Default (Linux).sublime-keymap",
-            "Default (OSX).sublime-keymap",
-            "Default (OSX).sublime-mousemap",
-            "Default (Windows).sublime-mousemap",
-            "Default (Windows).sublime-keymap",
-            "Preferences (Linux).sublime-settings",
-            "Preferences (OSX).sublime-settings",
-            "Preferences (Windows).sublime-settings",
-            "Preferences.sublime-settings",
-        ]
+def fix_base_file(base_file):
+    base_file = os.path.normpath(base_file)
+    # print('base_file', base_file)
 
-        for file in settings_files:
-            base_path = os.path.join( 'Default', file )
-            base_path = os.path.normpath( base_path )
-            # print('base_path', base_path)
+    settings_files = \
+    [
+        "Default (Linux).sublime-mousemap",
+        "Default (Linux).sublime-keymap",
+        "Default (OSX).sublime-keymap",
+        "Default (OSX).sublime-mousemap",
+        "Default (Windows).sublime-mousemap",
+        "Default (Windows).sublime-keymap",
+        "Preferences (Linux).sublime-settings",
+        "Preferences (OSX).sublime-settings",
+        "Preferences (Windows).sublime-settings",
+        "Preferences.sublime-settings",
+    ]
 
-            if base_path in base_file:
-                base_file = base_file.replace('.sublime-keymap', '.sublime-keymap.hide')
-                base_file = base_file.replace('.sublime-mousemap', '.sublime-mousemap.hide')
-                base_file = base_file.replace('.sublime-settings', '.sublime-settings.hide')
-                break
+    for file in settings_files:
+        base_path = os.path.join( 'Default', file )
+        base_path = os.path.normpath( base_path )
+        # print('base_path', base_path)
 
-        # Using os.path.join("Packages", __package__, "resource.name") on Windows causes OSError: resource not found
-        # https://github.com/SublimeTextIssues/Core/issues/2586
-        return base_file.replace('\\', '/')
+        if base_path in base_file:
+            base_file = base_file.replace('.sublime-keymap', '.sublime-keymap.hide')
+            base_file = base_file.replace('.sublime-mousemap', '.sublime-mousemap.hide')
+            base_file = base_file.replace('.sublime-settings', '.sublime-settings.hide')
+            break
+
+    # Using os.path.join("Packages", __package__, "resource.name") on Windows causes OSError: resource not found
+    # https://github.com/SublimeTextIssues/Core/issues/2586
+    return base_file.replace('\\', '/')
 
 
 class EditSyntaxSettingsCommand(sublime_plugin.WindowCommand):
