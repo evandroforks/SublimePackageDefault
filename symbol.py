@@ -244,6 +244,7 @@ class ContextGotoDefinitionCommand(sublime_plugin.TextCommand):
 
 class ShowDefinitions(sublime_plugin.EventListener):
     def on_hover(self, view, point, hover_zone):
+        window = view.window() or sublime.active_window()
         if not view.settings().get('show_definitions'):
             return
 
