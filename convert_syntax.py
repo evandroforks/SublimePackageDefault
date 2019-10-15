@@ -460,7 +460,7 @@ try:
 
         def syntax_info(self, view):
             syn = view.settings().get('syntax')
-            if syn.endswith('.tmLanguage'):
+            if syn and syn.endswith('.tmLanguage'):
                 return syn
 
             fname = view.file_name()
