@@ -168,12 +168,13 @@ def navigate_to_symbol(view, symbol, locations):
         fname, display_fname, rowcol = locations[idx]
         row, col = rowcol
 
-        window.set_view_index(view, group, 0)
+        # Do not use this fix for transient views!!!!!
+        # window.set_view_index(view, group, 0)
         window.open_file(
             fname + ":" + str(row) + ":" + str(col),
             group=window.active_group(),
             flags=sublime.TRANSIENT | sublime.ENCODED_POSITION | sublime.FORCE_GROUP)
-        window.set_view_index(view, group, view_index)
+        # window.set_view_index(view, group, view_index)
 
     orig_sel = None
     if view:
