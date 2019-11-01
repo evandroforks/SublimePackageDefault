@@ -50,15 +50,22 @@ class ExecOutputFocusCancelBuildCommand(sublime_plugin.WindowCommand):
 
         if active_panel and get_panel_name( active_panel ) == 'exec':
             panel_view = get_panel_view( window, active_panel )
+            settings = panel_view.settings()
 
-            user_notice = "Cancelling the build for '%s'..." % active_panel
-            print( str(datetime.datetime.now())[:-4], user_notice )
+            if is_panel_focused() or settings.get( 'always_cancel_output_build_panel', False ):
+                user_notice = "Cancelling the build for '%s' panel..." % active_panel
+                print( str(datetime.datetime.now())[:-4], user_notice )
 
-            window.focus_view( panel_view )
-            window.run_command( 'cancel_build' )
+                # https://github.com/SublimeTextIssues/Core/issues/2198
+                window.focus_view( panel_view )
+                window.run_command( 'cancel_build' )
+                ThreadProgress.stop()
 
-            # https://github.com/SublimeTextIssues/Core/issues/2198
-            ThreadProgress.stop()
+            else:
+                user_notice = "Focusing on the '%s' panel..." % active_panel
+                print( str(datetime.datetime.now())[:-4], user_notice )
+                window.focus_view( panel_view )
+
             sublime.status_message( user_notice )
 
         else:
@@ -588,6 +595,7 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
             full_regex="",
             result_dir="",
             replaceby={},
+            always_cancel_output_build_panel=False,
             # Catches "path" and "shell"
             **kwargs):
         # print( 'ExecCommand arguments: ', locals())
@@ -633,6 +641,7 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
         self.output_view.settings().set("result_line_regex", line_regex)
         self.output_view.settings().set("result_base_dir", working_dir)
         self.output_view.settings().set("output_build_word_wrap", output_build_word_wrap)
+        self.output_view.settings().set("always_cancel_output_build_panel", always_cancel_output_build_panel)
         self.output_view.settings().set("spell_check", spell_check)
         self.output_view.settings().set("gutter", gutter)
         self.output_view.settings().set("line_numbers", False)
