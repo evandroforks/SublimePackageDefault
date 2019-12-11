@@ -73,7 +73,7 @@
         }
     },
     { "caption": "Preferences: Settings – Syntax Specific", "command": "edit_syntax_settings" },
-    { "caption": "Preferences: Erase Window Settings", "command": "erase_window_settings" },
+    { "caption": "Preferences: Reset Font Size", "command": "reset_font_size" },
     { "caption": "Preferences: Reset View Syntax", "command": "reset_view_syntax" },
     { "caption": "Install Package Control", "command": "install_package_control_extended" },
     { "caption": "Preferences: Browse Packages", "command": "open_dir", "args": {"dir": "$packages"} },
