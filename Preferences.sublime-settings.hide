@@ -499,7 +499,7 @@
     "file_exclude_patterns": ["*.pyc", "*.pyo", "*.exe", "*.dll", "*.o", "*.a", "*.lib", "*.so", "*.dylib", "*.ncb", "*.sdf", "*.suo", "*.pdb", "*.idb", ".DS_Store", "*.class", "*.psd", "*.db", "*.sublime-workspace"],
     // These files will still show up in the side bar, but won't be included in
     // Goto Anything or Find in Files
-    "binary_file_patterns": ["*.jpg", "*.jpeg", "*.png", "*.gif", "*.ttf", "*.tga", "*.so", "*.dds", "*.ico", "*.eot", "*.pdf", "*.swf", "*.jar", "*.zip"],
+    "binary_file_patterns": [ ".fuse_hidden*", "*.vcproj", "*.vcxproj", "*.jpg", "*.jpeg", "*.png", "*.gif", "*.ttf", "*.tga", "*.dds", "*.ico", "*.eot", "*.pdf", "*.swf", "*.jar", "*.zip", "*.so", "*.os" ],
 
     // File indexing parses all files in the side bar, and builds an index of
     // their symbols. This is required for Goto Definition to work.
