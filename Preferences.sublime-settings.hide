@@ -495,7 +495,7 @@
     // folder_exclude_patterns and file_exclude_patterns control which files
     // are listed in folders on the side bar. These can also be set on a per-
     // project basis.
-    "folder_exclude_patterns": [".svn", ".git", ".tox", ".hg", "CVS"],
+    "folder_exclude_patterns": [".svn", ".git", ".tox", ".hg", "CVS", "node_modules", "__pycache__"],
     "file_exclude_patterns": ["*.pyc", "*.pyo", "*.exe", "*.dll", "*.o", "*.a", "*.lib", "*.so", "*.dylib", "*.ncb", "*.sdf", "*.suo", "*.pdb", "*.idb", ".DS_Store", "*.class", "*.psd", "*.db", "*.sublime-workspace"],
     // These files will still show up in the side bar, but won't be included in
     // Goto Anything or Find in Files
