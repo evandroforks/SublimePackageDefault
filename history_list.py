@@ -243,7 +243,7 @@ class JumpHistoryUpdater(sublime_plugin.EventListener):
             return
 
         timenow = time.time()
-        if timenow - JumpHistoryUpdater.lasttime < 0.5:
+        if timenow - JumpHistoryUpdater.lasttime < 1.5:
             return
 
         # print( 'on_selection_modified' )
