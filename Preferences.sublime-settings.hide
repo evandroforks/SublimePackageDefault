@@ -142,11 +142,14 @@
     // Draws text centered in the window rather than left aligned
     "draw_centered": false,
 
-    // Controls auto pairing of quotes, brackets etc
-    "auto_match_enabled": true,
+    // Controls auto pairing of quotes, brackets, etc, when there is no selection
+    "auto_match_enabled": false,
 
     // Move the selection when insert brackets, i.e., "|" -> ""| instead of "|" -> ""|"
     "auto_match_enabled_move": false,
+
+    // Enabled the auto pairing of quotes, brackets, etc, when there is a selection
+    "auto_match_enabled_selection": true,
 
     // Enabled the auto pairing deletion of quotes, brackets etc.
     "auto_match_enabled_delete": false,
