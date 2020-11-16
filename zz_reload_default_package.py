@@ -167,6 +167,9 @@ def compute_file_hash(file_path):
 
 
 def check_settings_changes():
+    settings_package_file = os.path.join( sublime.installed_packages_path(), "%s.sublime-package" % SETTINGS_PACKAGE_NAME )
+    if not os.path.exists( settings_package_file ): return True
+
     has_changed_hashes = False
     hashes_cache_path = os.path.join( sublime.cache_path(), "zz_reload_default_package.json" )
 
