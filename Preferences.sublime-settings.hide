@@ -22,7 +22,7 @@
 
     // Check for updates on startup (hidden setting)
     // Only available to registered users.
-    "update_check": true,
+    "update_check": false,
 
     // Note that the font_face and font_size are overridden in the platform
     // specific settings file, for example, "Preferences (Linux).sublime-settings".
