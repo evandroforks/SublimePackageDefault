@@ -23,8 +23,8 @@ _lock = threading.Lock()
 
 
 try:
-    from package_control.package_manager import PackageManager
-    from package_control.package_disabler_iterator import IgnoredPackagesBugFixer
+    from PackagesManager.package_control.package_manager import PackageManager
+    from PackagesManager.package_control.package_disabler_iterator import IgnoredPackagesBugFixer
 
 except ImportError:
     skip_packing = True
