@@ -4,10 +4,57 @@
 // Settings may also be placed in syntax-specific setting files, for
 // example, in Packages/User/Python.sublime-settings for python files.
 {
+    // Hidden setting, Sublime Text no longer clears the selection when another
+    // view makes a selection: https://github.com/SublimeTextIssues/Core/issues/2931
+    "clear_selection": false,
+
+    // Common values are: "1.0", "1.25", "1.5", "1.75", "2.0"
+    // UI scaling factor (hidden setting)
+    //
+    // Linux only. Sets the app DPI scale - a decimal number such as 1.0, 1.5,
+    // 2.0, etc. A value of 0 auto-detects the DPI scale. Sublime Text must be
+    // restarted for this to take effect.
+    "dpi_scale": 0,
+
+    // Restores the `output.exec` panel view cursor and scroll position after building a project
+    "restore_output_view_scroll": false,
+
+    // Move the selection when insert brackets, i.e., "|" -> ""| instead of "|" -> ""|"
+    "auto_match_enabled_move": false,
+
+    // Enabled the auto pairing of quotes, brackets, etc, when there is a selection
+    "auto_match_enabled_selection": true,
+
+    // Enabled the auto pairing deletion of quotes, brackets etc.
+    "auto_match_enabled_delete": false,
+
+    // Disables horizontal scrolling on the output build panel if enabled.
+    "output_build_word_wrap": true,
+
+    // Set to true to turn spell checking on by default on the build panel
+    "build_view_spell_check": false,
+
+    // A list of valid spell checker words added by the user.
+    "added_words": [],
+
+    // List of extensions that should be opened with a corresponding syntax.
+    // Only makes sense in syntax-specific settings.
+    "extensions": [],
+
+    // A list of words ignored by spell checker.
+    "ignored_words": [],
+
+    // Draw UI shadows (hidden setting)
+    "draw_shadows": true,
+
+    // Check for updates on startup (hidden setting)
+    // Only available to registered users.
+    "update_check": false,
+
 	// Sets the colors used within the text area.
 	// The value "auto" will switch between the "light_color_scheme" and
 	// "dark_color_scheme" based on the operating system appearance.
-	"color_scheme": "Mariana.sublime-color-scheme",
+	"color_scheme": "Monokai.sublime-color-scheme",
 
 	// Controls the "color_scheme" when set to "auto"
 	"light_color_scheme": "Breakers.sublime-color-scheme",
@@ -48,7 +95,7 @@
 	"font_options": [],
 	// Font options for theme text. Valid options are the same as
 	// "font_options", except "no_bold" and "no_italic" are not supported
-	"theme_font_options": [],
+	"theme_font_options": ["gdi"],
 
 	// Characters that are considered to separate words
 	"word_separators": "./\\()\"'-:,.;<>~!@#$%^&*|+=[]{}`~?",
@@ -66,7 +113,7 @@
 	"fold_buttons": true,
 
 	// Hides the fold buttons unless the mouse is over the gutter
-	"fade_fold_buttons": true,
+	"fade_fold_buttons": false,
 
 	// Indicate modified lines in the gutter
 	// - true: Enables modified line indicators on all files
@@ -75,10 +122,10 @@
 	"mini_diff": true,
 
 	// Columns in which to display vertical rulers
-	"rulers": [],
+	"rulers": [100],
 
 	// Set to true to turn spell checking on by default
-	"spell_check": false,
+	"spell_check": true,
 
 	// The number of spaces a tab is considered equal to
 	"tab_size": 4,
@@ -111,7 +158,7 @@
 	// Disables horizontal scrolling if enabled.
 	// May be set to true, false, or "auto", where it will be disabled for
 	// source code, and otherwise enabled.
-	"word_wrap": "auto",
+	"word_wrap": "true",
 
 	// Set to a value other than 0 to force wrapping at that column rather than
 	// the window width. See "wrap_width_style" for extra options.
@@ -131,7 +178,7 @@
 	"draw_centered": false,
 
 	// Controls auto pairing of quotes, brackets etc
-	"auto_match_enabled": true,
+	"auto_match_enabled": false,
 
 	// Automatically close HTML and XML tags when </ is entered.
 	"auto_close_tags": true,
@@ -140,19 +187,20 @@
 	"dictionary": "Packages/Language - English/en_US.dic",
 
 	// Sets which scopes are checked for spelling errors
+    // "spelling_selector": "text - keyword - entity - storage - variable - meta - support, markup.raw, source - keyword - entity - storage - variable - meta - support, meta.string, comment, meta.paragraph, string - entity.name.tag",
 	"spelling_selector": "markup.raw, source string.quoted - punctuation - meta.preprocessor.include, source comment - source comment.block.preprocessor, -(source, constant, keyword, storage, support, variable, markup.underline.link, meta.tag)",
 
 	// Set to true to draw a border around the visible rectangle on the minimap.
 	// The color of the border will be determined by the "minimap_border" key
 	// in the color scheme
-	"draw_minimap_border": false,
+	"draw_minimap_border": true,
 
 	// Always visualise the viewport on the minimap, as opposed to only
 	// showing it on mouse over
-	"always_show_minimap_viewport": false,
+	"always_show_minimap_viewport": true,
 
 	// If enabled, will highlight any line with a caret
-	"highlight_line": false,
+	"highlight_line": true,
 
 	// If enabled, will highlight the gutter for any line with a caret
 	"highlight_gutter": true,
@@ -200,10 +248,10 @@
 	"match_selection": true,
 
 	// Additional spacing at the top of each line, in pixels
-	"line_padding_top": 0,
+	"line_padding_top": 1,
 
 	// Additional spacing at the bottom of each line, in pixels
-	"line_padding_bottom": 0,
+	"line_padding_bottom": 1,
 
 	// Set to false to disable scrolling past the end of the buffer.
 	// On Mac, this value is overridden in the platform specific settings, so
@@ -312,7 +360,7 @@
 	//    group containing the caret in a different color
 	//  - "solid" - can be combined with any of the draw_* options to draw
 	//    solid instead of stippled lines
-	"indent_guide_options": ["draw_normal"],
+	"indent_guide_options": ["draw_normal", "draw_active"],
 
 	// Controls where trailing white space is removed on save.
 	// - "none": Do not remove any trailing white space on save.
@@ -322,7 +370,7 @@
 	//                   certain desktop environments that frequently make the
 	//                   application lose focus this avoids the caret jumping
 	//                   around a lot.
-	"trim_trailing_white_space_on_save": "none",
+	"trim_trailing_white_space_on_save": "not_on_caret",
 
 	// Only trim white space on save for the parts of a file that have been
 	// modified by you. If there is trailing white space in other parts of the
@@ -349,7 +397,7 @@
 	"default_encoding": "UTF-8",
 
 	// Files containing null bytes are opened as hexadecimal by default
-	"enable_hexadecimal_encoding": true,
+	"enable_hexadecimal_encoding": false,
 
 	// Determines what character(s) are used to terminate each line in new files.
 	// Valid values are 'system' (whatever the OS uses), 'windows' (CRLF) and
@@ -364,7 +412,7 @@
 	// When disabled, tab will only trigger snippets or insert a tab.
 	// Shift+tab can be used to insert an explicit tab when tab_completion is
 	// enabled.
-	"tab_completion": true,
+	"tab_completion": false,
 
 	// Enable auto complete to be triggered automatically when typing.
 	"auto_complete": true,
@@ -373,16 +421,17 @@
 	"auto_complete_size_limit": 4194304,
 
 	// The delay, in ms, before the auto complete window is shown after typing
-	"auto_complete_delay": 50,
+	"auto_complete_delay": 0,
 
 	// Controls what scopes auto complete will be triggered in
-	"auto_complete_selector": "meta.tag, source - comment - string.quoted.double.block - string.quoted.single.block - string.unquoted.heredoc",
+	"auto_complete_selector": "source, text",
 
 	// Additional situations to trigger auto complete
 	"auto_complete_triggers":
 	[
 		{"selector": "text.html, text.xml", "characters": "<"},
 		{"selector": "punctuation.accessor", "rhs_empty": true},
+        {"characters": "\\", "selector": "text.tex.latex"},
 	],
 
 	// By default, auto complete will commit the current completion on enter.
@@ -393,13 +442,13 @@
 
 	// Controls if auto complete is shown when snippet fields are active.
 	// Only relevant if auto_complete_commit_on_tab is true.
-	"auto_complete_with_fields": false,
+	"auto_complete_with_fields": true,
 
 	// Controls what happens when pressing the up key while the first item in
 	// the auto complete window is selected: if false, the window is hidden,
 	// otherwise the last item in the window is selected. Likewise for the
 	// down key when the last item is selected.
-	"auto_complete_cycle": false,
+	"auto_complete_cycle": true,
 
 	// Auto complete will used indexed data to provide completions from other
 	// files when this is enabled
@@ -470,7 +519,7 @@
 	// tab character - this allows tabs to be inserted when tab_completion is
 	// enabled. Set this to true to make shift+tab always unindent, instead of
 	// inserting tabs.
-	"shift_tab_unindent": false,
+	"shift_tab_unindent": true,
 
 	// If true, the copy and cut commands will operate on the current line
 	// when the selection is empty, rather than doing nothing.
@@ -502,7 +551,7 @@
 
 	// When drag_text is enabled, clicking on selected text will begin a
 	// drag-drop operation.
-	"drag_text": true,
+	"drag_text": false,
 
 	//
 	// User Interface Settings
@@ -540,13 +589,13 @@
 	"scroll_speed": 1.0,
 
 	// Controls side bar animation when expanding or collapsing folders
-	"tree_animation_enabled": true,
+	"tree_animation_enabled": false,
 
 	// Controls animation throughout the application
 	"animation_enabled": true,
 
 	// Makes tabs with modified files more visible
-	"highlight_modified_tabs": false,
+	"highlight_modified_tabs": true,
 
 	// Hides the tab close button when false
 	"show_tab_close_buttons": true,
@@ -556,7 +605,7 @@
 	"show_tab_close_buttons_on_left": false,
 
 	// Show folders in the side bar in bold
-	"bold_folder_labels": false,
+	"bold_folder_labels": true,
 
 	// Draw divider lines between sections of the UI when using the Adaptive theme
 	"adaptive_dividers": false,
@@ -587,13 +636,13 @@
 
 	// Display the git status in the status bar, requires the show_git_status
 	// setting to be enabled
-	"show_git_status_in_status_bar": true,
+	"show_git_status_in_status_bar": false,
 
 	// Display file encoding in the status bar
-	"show_encoding": false,
+	"show_encoding": true,
 
 	// Display line endings in the status bar
-	"show_line_endings": false,
+	"show_line_endings": true,
 
 	// Display indentation in the status bar
 	"show_indentation": true,
@@ -691,12 +740,12 @@
 	// there's a folder open within the window.
 	// On Mac, this value is overridden in the platform specific settings, so
 	// you'll need to place this line in your user settings to override it.
-	"close_windows_when_empty": false,
+	"close_windows_when_empty": true,
 
 	// Show the full path to files in the title bar. On Mac, this value is
 	// overridden in the platform specific settings, with a default value of
 	// false.
-	"show_full_path": true,
+	"show_full_path": false,
 
 	// Show the relative path to files in the title bar. This overrides
 	// show_full_path for files that are listed in the side bar, however
@@ -711,7 +760,7 @@
 	"show_panel_on_build": true,
 
 	// Shows build errors just under the line on which they occur.
-	"show_errors_inline": true,
+	"show_errors_inline": false,
 
 	// Shows git repository information next to files in sidebar and in
 	// the status bar. Sublime Text has to be restarted for this to take
@@ -739,7 +788,7 @@
 	// - false: Never preview
 	// - "only_left": Only preview on left click, right click will change the
 	//                selection but not preview the file.
-	"preview_on_click": true,
+	"preview_on_click": false,
 
 	// Controls the maximum number of lines kept in the console's history. Note
 	// a large limit will increase memory usage. Use 0 to remove any limit.
@@ -748,11 +797,11 @@
 	// folder_exclude_patterns and file_exclude_patterns control which files
 	// are listed in folders on the side bar. These can also be set on a per-
 	// project basis.
-	"folder_exclude_patterns": [".svn", ".git", ".hg", "CVS", ".Trash", ".Trash-*"],
-	"file_exclude_patterns": ["*.pyc", "*.pyo", "*.exe", "*.dll", "*.obj","*.o", "*.a", "*.lib", "*.so", "*.dylib", "*.ncb", "*.sdf", "*.suo", "*.pdb", "*.idb", ".DS_Store", ".directory", "desktop.ini", "*.class", "*.psd", "*.db", "*.sublime-workspace"],
+	"folder_exclude_patterns": [".svn", ".git", ".hg", "CVS", ".Trash", ".Trash-*", ".tox", "node_modules", "__pycache__"],
+	"file_exclude_patterns": ["*.pyc", "*.pyo", "*.exe", "*.dll", "*.obj","*.o", "*.a", "*.lib", "*.so", "*.dylib", "*.ncb", "*.sdf", "*.suo", "*.pdb", "*.idb", ".DS_Store", ".directory", "desktop.ini", "*.class", "*.psd", "*.db", "*.sublime-workspace", ".fuse_hidden*", "*.os"],
 	// These files will still show up in the side bar, but won't be included in
 	// Goto Anything or Find in Files
-	"binary_file_patterns": ["*.jpg", "*.jpeg", "*.png", "*.gif", "*.ttf", "*.tga", "*.dds", "*.ico", "*.eot", "*.pdf", "*.swf", "*.jar", "*.zip"],
+	"binary_file_patterns": ["*.jpg", "*.jpeg", "*.png", "*.gif", "*.ttf", "*.tga", "*.dds", "*.ico", "*.eot", "*.pdf", "*.swf", "*.jar", "*.zip",],
 
 	// File indexing parses all files in the side bar, and builds an index of
 	// their symbols. This is required for Goto Definition to work.

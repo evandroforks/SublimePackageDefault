@@ -464,11 +464,11 @@ try:
             extensions = ['.tmLanguage', '.hidden-tmLanguage']
 
             fname = view.file_name()
-            if fname and os.path.splitext(fname)[1] in extensions:
+            if fname and len(os.path.splitext(fname)) > 0 and os.path.splitext(fname)[1] in extensions:
                 return fname
 
             syn = view.settings().get('syntax')
-            if os.path.splitext(syn)[1] in extensions:
+            if syn and len(os.path.splitext(syn)) > 0 and os.path.splitext(syn)[1] in extensions:
                 return syn
 
             return None

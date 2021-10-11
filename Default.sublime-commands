@@ -72,7 +72,12 @@
 		}
 	},
 
-	{ "caption": "Install Package Control", "command": "install_package_control" },
+    { "caption": "Preferences: Reset Font Size", "command": "reset_font_size" },
+    { "caption": "Preferences: Reset View Syntax", "command": "reset_view_syntax" },
+    { "caption": "Default Package: Reload Hidden Settings", "command": "reload_hidden_default_settings" },
+    { "caption": "File: Clone View (New View into File)", "command": "clone_file" },
+
+	{ "caption": "Install Package Control", "command": "install_package_control_extended" },
 
 	{ "caption": "UI: Select Color Scheme", "command": "select_color_scheme" },
 	{ "caption": "UI: Select Theme", "command": "select_theme" },

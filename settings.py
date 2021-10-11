@@ -1,7 +1,33 @@
 import os.path
+import tempfile
 
 import sublime
 import sublime_plugin
+
+
+def status(message, *formatting):
+    print("Default Settings:", message, " ".join( str( item ) for item in formatting ) )
+    sublime.status_message(message)
+
+
+class ResetViewSyntaxCommand(sublime_plugin.TextCommand):
+
+    def run(self, edit):
+        view = self.view
+        window = view.window() or sublime.active_window()
+
+        if view.settings().get("is_widget"):
+            status("Cannot run 'reset_view_syntax' command on widgets!")
+            return
+
+        file_path = view.file_name()
+
+        if not file_path:
+            status("Cannot run 'reset_view_syntax' command on files without names!")
+            return
+
+        syntax = get_file_extension_syntax(window, file_path)
+        view.set_syntax_file(syntax)
 
 
 class EditSettingsCommand(sublime_plugin.ApplicationCommand):
@@ -91,6 +117,11 @@ class EditSettingsCommand(sublime_plugin.ApplicationCommand):
         else:
             sublime.run_command('new_window')
             new_window = sublime.active_window()
+            self.window = new_window
+
+            # print('base_file      ', base_file)
+            # print('base_file fixed', fix_base_file(base_file))
+            base_file = fix_base_file(base_file)
 
             new_window.run_command(
                 'set_layout',
@@ -120,6 +151,129 @@ class EditSettingsCommand(sublime_plugin.ApplicationCommand):
             if not os.path.exists(user_file):
                 user_view.set_scratch(True)
                 user_settings.set('edit_settings_default', default.replace('$0', ''))
+
+            if base_file.endswith('.hide'):
+                syntax = get_file_extension_syntax(self.window, base_file.replace('.hide', ''))
+                base_view.set_syntax_file(syntax)
+
+
+# https://forum.sublimetext.com/t/get-syntax-associated-with-file-extension/26348
+# https://gist.github.com/mattst/71488757f2a2ca573c2d5e73af636d4c#file-getfileextensionsyntax-py
+#
+# Retrieve the path of the syntax that a user has
+# associated with any file extension in Sublime Text.
+#
+# 1) Create a temp file with the file extension of the desired syntax.
+# 2) Open the temp file in ST with the API `open_file()` method; use a
+#    sublime.TRANSIENT buffer so that no tab is shown on the tab bar.
+# 3) Retrieve the syntax ST has assigned to the view's settings.
+# 4) Close the temp file's ST buffer.
+# 5) Delete the temp file.
+#
+# ST command of demo: get_file_extension_syntax
+def get_file_extension_syntax(window, base_file):
+    filename, file_extension = os.path.splitext(base_file)
+
+    try:
+        tmp_base = "GetFileExtensionSyntaxTempFile"
+        tmp_file = tempfile.NamedTemporaryFile(prefix = tmp_base,
+                                               suffix = file_extension,
+                                               delete = False)
+        tmp_path = tmp_file.name
+
+    except Exception:
+        return None
+
+    finally:
+        tmp_file.close()
+
+    active_buffer = window.active_view()
+
+    # Using TRANSIENT prevents the creation of a tab bar tab.
+    tmp_buffer = window.open_file(tmp_path, sublime.TRANSIENT)
+
+    # Even if is_loading() is true the view's settings can be
+    # retrieved; settings assigned before open_file() returns.
+    syntax = tmp_buffer.settings().get("syntax", None)
+
+    window.run_command("close")
+
+    if active_buffer:
+        window.focus_view(active_buffer)
+
+    try:
+        os.remove(tmp_path)
+
+    # In the unlikely event of remove() failing: on Linux/OSX
+    # the OS will delete the contents of /tmp on boot or daily
+    # by default, on Windows the file will remain in the user
+    # temporary directory (amazingly never cleaned by default).
+    except Exception:
+        pass
+
+    return syntax
+
+
+def fix_base_file(base_file):
+    base_file = os.path.normpath(base_file)
+    # print('base_file', base_file)
+
+    settings_files = \
+    [
+        "Default (Linux).sublime-mousemap",
+        "Default (Linux).sublime-keymap",
+        "Default (OSX).sublime-keymap",
+        "Default (OSX).sublime-mousemap",
+        "Default (Windows).sublime-mousemap",
+        "Default (Windows).sublime-keymap",
+        "Preferences (Linux).sublime-settings",
+        "Preferences (OSX).sublime-settings",
+        "Preferences (Windows).sublime-settings",
+        "Preferences.sublime-settings",
+    ]
+
+    for file in settings_files:
+        base_path = os.path.join( 'Default', file )
+        base_path = os.path.normpath( base_path )
+        # print('base_path', base_path)
+
+        if base_path in base_file:
+            base_file = base_file.replace('.sublime-keymap', '.sublime-keymap.hide')
+            base_file = base_file.replace('.sublime-mousemap', '.sublime-mousemap.hide')
+            base_file = base_file.replace('.sublime-settings', '.sublime-settings.hide')
+            break
+
+    # Using os.path.join("Packages", __package__, "resource.name") on Windows causes OSError: resource not found
+    # https://github.com/SublimeTextIssues/Core/issues/2586
+    return base_file.replace('\\', '/')
+
+
+class InsertSelectionMatchCommand(sublime_plugin.TextCommand):
+    def run(self, edit, start, end):
+        # import time; print( time.time(), 'start', start, 'end', end)
+        view = self.view
+        selections = view.sel()
+
+        for selection in selections:
+            first_char = sublime.Region( selection.begin() - 1, selection.begin())
+            first_char = view.substr(first_char)
+            last_char = sublime.Region( selection.end() + 1, selection.end())
+            last_char = view.substr(last_char)
+            # import time; print( time.time(),  'first_char', first_char, 'last_char', last_char )
+
+            if first_char == start and last_char == end:
+                view.insert( edit, selection.begin(), start )
+                view.insert( edit, selection.end() + 1, end )
+
+            elif first_char != start and last_char != end:
+                view.insert( edit, selection.begin(), start )
+                view.insert( edit, selection.end() + 1, end )
+
+            elif first_char != start:
+                view.insert( edit, selection.begin(), start )
+
+            else:
+                view.insert( edit, selection.end(), end )
 
 
 class EditSyntaxSettingsCommand(sublime_plugin.WindowCommand):
