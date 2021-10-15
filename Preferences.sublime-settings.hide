@@ -211,7 +211,7 @@
 
 	// Valid values are "smooth", "phase", "blink" and "solid". Previous
 	// versions of Sublime Text used "smooth" by default.
-	"caret_style": "solid",
+	"caret_style": "smooth",
 
 	// These settings control the size of the caret
 	"caret_extra_top": 4,
