@@ -568,7 +568,7 @@
 	// Take focus when a file is dragged and dropped onto Sublime Text. On
 	// Windows this value is overidden to true in the platform specific
 	// settings.
-	"focus_on_file_drop": false,
+	"focus_on_file_drop": true,
 
 	//
 	// User Interface Settings
@@ -716,7 +716,7 @@
 
 	// remember_layout makes Sublime Text start with the same layout it closed
 	// with. Only applies when hot_exit is disabled.
-	"remember_layout": false,
+	"remember_layout": true,
 
 	// Mac only. If the user's default shell should be invoked to obtain the
 	// user's customized environment variables. May be a boolean, or a string
