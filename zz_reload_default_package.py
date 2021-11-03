@@ -138,11 +138,14 @@ def create_reloader():
 
     RELOADER_PACKAGE_DIRECTORY = os.path.join( PACKAGE_ROOT_DIRECTORY, RELOADER_PACKAGE_NAME )
     RELOADER_PACKAGE_FILE = os.path.join( RELOADER_PACKAGE_DIRECTORY, CURRENT_FILE_NAME )
+    PYTHON_VERSION_FILE = os.path.join( RELOADER_PACKAGE_DIRECTORY, '.python-version' )
 
     if not os.path.exists( RELOADER_PACKAGE_DIRECTORY ):
         os.makedirs( RELOADER_PACKAGE_DIRECTORY )
 
     if not compare_text_with_file(reloader_code, RELOADER_PACKAGE_FILE):
+        with open( PYTHON_VERSION_FILE, 'w', newline='\n', encoding='utf-8' ) as output_file:
+            output_file.write( '3.8' )
 
         with open( RELOADER_PACKAGE_FILE, 'w', newline='\n', encoding='utf-8' ) as output_file:
             print( "[zz_reload_default_package.py] Updating the plugin file: %s" % RELOADER_PACKAGE_FILE )
