@@ -77,6 +77,7 @@ def create_reloader():
     not reload the overridden `Default` packages modules on `Packages/Default`.
     '''
 
+    VERSION = '1.0.0'
     CURRENT_FILE_NAME = os.path.basename( __file__ )
     DEFAULT_PACKAGE_NAME = 'Default'
 
@@ -127,8 +128,8 @@ def create_reloader():
 
     # Remove itself if the Default package is not found
     if not os.path.exists( ORIGINAL_RELOADER_PATH ):
-        print("[zz_reload_default_package.py] Uninstalling %s... Because the %s package was not found installed at %s." % (
-                THIS_PACKAGE_ROOT, DEFAULT_PACKAGE_NAME, ORIGINAL_RELOADER_PATH ) )
+        print("[zz_reload_default_package.py] %s Uninstalling %s... Because the %s package was not found installed at %s." % (
+                VERSION, THIS_PACKAGE_ROOT, DEFAULT_PACKAGE_NAME, ORIGINAL_RELOADER_PATH ) )
         shutil.rmtree( THIS_PACKAGE_ROOT, onerror=_delete_read_only_file )
     """
     reloader_code = textwrap.dedent(reloader_code).lstrip()
