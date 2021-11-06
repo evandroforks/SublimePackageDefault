@@ -126,6 +126,9 @@ class ColorSchemeInputHandler(sublime_plugin.ListInputHandler):
             None
 
     def preview(self, name):
+        if name is None:
+            return
+
         self.last_previewed = name
 
         def update_cs():
@@ -376,6 +379,9 @@ class ThemeInputHandler(sublime_plugin.ListInputHandler):
             None
 
     def preview(self, name):
+        if name is None:
+            return
+
         self.last_previewed = name
 
         def update_theme():

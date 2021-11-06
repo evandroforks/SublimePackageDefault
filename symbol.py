@@ -177,10 +177,14 @@ def navigate_to_symbol(
 
             if window.active_view() != highlighted_view:
                 window.select_sheets(prev_selected)
+
                 if highlighted_view.sheet().is_semi_transient():
                     highlighted_view.close()
                 elif view.is_valid():
                     window.focus_view(view)
+
+            elif highlighted_view.sheet().is_transient():
+                window.select_sheets(prev_selected)
 
     def highlight_entry(window, locations, idx):
         nonlocal highlighted_view
