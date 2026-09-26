@@ -254,7 +254,7 @@ class ConvertColorSchemeCommand(sublime_plugin.WindowCommand):
             return
         hidden = fname.endswith('.hidden-tmTheme')
         tm_theme = view.substr(sublime.Region(0, view.size()))
-        plist = plistlib.readPlistFromBytes(tm_theme.encode("utf-8"))
+        plist = plistlib.loads(tm_theme)
 
         scheme = OrderedDict()
         scheme["name"] = plist.get("name", "Unnamed")

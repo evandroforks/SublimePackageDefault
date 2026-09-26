@@ -6,6 +6,7 @@ import time
 import codecs
 import signal
 import html
+import queue
 
 import sublime
 import sublime_plugin
@@ -45,55 +46,59 @@ class AsyncProcess:
             startupinfo = subprocess.STARTUPINFO()
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
-        # Set temporary PATH to locate executable in cmd
-        if path:
-            old_path = os.environ["PATH"]
-            # The user decides in the build system whether he wants to append
-            # $PATH or tuck it at the front: "$PATH;C:\\new\\path",
-            # "C:\\new\\path;$PATH"
-            os.environ["PATH"] = os.path.expandvars(path)
+        try:
+            # Set temporary PATH to locate executable in cmd
+            if path:
+                old_path = os.environ["PATH"]
+                # The user decides in the build system whether he wants to append
+                # $PATH or tuck it at the front: "$PATH;C:\\new\\path",
+                # "C:\\new\\path;$PATH"
+                os.environ["PATH"] = os.path.expandvars(path)
 
-        proc_env = os.environ.copy()
-        proc_env.update(env)
-        for k, v in proc_env.items():
-            proc_env[k] = os.path.expandvars(v)
+            proc_env = os.environ.copy()
+            proc_env.update(env)
+            for k, v in proc_env.items():
+                proc_env[k] = os.path.expandvars(v)
 
-        if sys.platform == "win32":
-            preexec_fn = None
-        else:
-            preexec_fn = os.setsid
-
-        if shell_cmd:
             if sys.platform == "win32":
-                # Use shell=True on Windows, so shell_cmd is passed through
-                # with the correct escaping
-                cmd = shell_cmd
-                shell = True
-            elif sys.platform == "darwin":
-                # Use a login shell on OSX, otherwise the users expected env
-                # vars won't be setup
-                cmd = ["/usr/bin/env", "bash", "-l", "-c", shell_cmd]
-                shell = False
-            elif sys.platform == "linux":
-                # Explicitly use /bin/bash on Linux, to keep Linux and OSX as
-                # similar as possible. A login shell is explicitly not used for
-                # linux, as it's not required
-                cmd = ["/usr/bin/env", "bash", "-c", shell_cmd]
-                shell = False
+                preexec_fn = None
+            else:
+                preexec_fn = os.setsid
 
-        self.proc = subprocess.Popen(
-            cmd,
-            bufsize=0,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            stdin=subprocess.PIPE,
-            startupinfo=startupinfo,
-            env=proc_env,
-            preexec_fn=preexec_fn,
-            shell=shell)
+            if shell_cmd:
+                if sys.platform == "win32":
+                    # Use shell=True on Windows, so shell_cmd is passed through
+                    # with the correct escaping
+                    cmd = shell_cmd
+                    shell = True
+                elif sys.platform == "darwin":
+                    # Use a login shell on OSX, otherwise the users expected env
+                    # vars won't be setup
+                    cmd = ["/usr/bin/env", "bash", "-l", "-c", shell_cmd]
+                    shell = False
+                elif sys.platform == "linux":
+                    # Explicitly use /bin/bash on Linux, to keep Linux and OSX as
+                    # similar as possible. A login shell is explicitly not used for
+                    # linux, as it's not required
+                    cmd = ["/usr/bin/env", "bash", "-c", shell_cmd]
+                    shell = False
 
-        if path:
-            os.environ["PATH"] = old_path
+            self.proc = subprocess.Popen(
+                cmd,
+                bufsize=0,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                stdin=subprocess.PIPE,
+                startupinfo=startupinfo,
+                env=proc_env,
+                preexec_fn=preexec_fn,
+                shell=shell)
+
+        finally:
+            # Make sure this is always run, otherwise we're leaving the PATH set
+            # permanently
+            if path:
+                os.environ["PATH"] = old_path
 
         self.stdout_thread = threading.Thread(
             target=self.read_fileno,
@@ -102,6 +107,22 @@ class AsyncProcess:
 
     def start(self):
         self.stdout_thread.start()
+
+    def start_input_thread(self):
+        input_queue = queue.SimpleQueue()
+
+        def write():
+            while self.poll():
+                text = input_queue.get()
+                if text is None:
+                    break
+
+                self.proc.stdin.write(text)
+                self.proc.stdin.flush()
+
+        threading.Thread(target=write).start()
+
+        return input_queue
 
     def kill(self):
         if not self.killed:
@@ -136,7 +157,7 @@ class AsyncProcess:
                 self.listener.on_data(self, data)
             else:
                 if execute_finished:
-                    self.listener.on_finished(self)
+                    sublime.set_timeout(lambda: self.listener.on_finished(self))
                 break
 
 
@@ -151,7 +172,9 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
         self.errs_by_file = {}
         self.annotation_sets_by_buffer = {}
         self.show_errors_inline = True
+        self.input_view = None
         self.output_view = None
+        self.input_queue = None
 
     def run(
             self,
@@ -167,8 +190,10 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
             kill_previous=False,
             update_annotations_only=False,
             word_wrap=True,
+            interactive=False,
             syntax="Packages/Text/Plain text.tmLanguage",
-            # Catches "path" and "shell"
+            path="",
+            # Catches "shell"
             **kwargs):
 
         if update_annotations_only:
@@ -184,9 +209,11 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
         if kill_previous and self.proc and self.proc.poll():
             self.proc.kill()
 
+        self.output_view, self.input_view = self.window.find_io_panel("exec")
         if self.output_view is None:
             # Try not to call get_output_panel until the regexes are assigned
-            self.output_view = self.window.create_output_panel("exec")
+            self.output_view, self.input_view = self.window.create_io_panel(
+                "exec", self.on_input if interactive else None)
 
         # Default the to the current files directory if no working directory
         # was given
@@ -206,7 +233,7 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
 
         # Call create_output_panel a second time after assigning the above
         # settings, so that it'll be picked up as a result buffer
-        self.window.create_output_panel("exec")
+        self.window.create_io_panel("exec", self.on_input if interactive else None)
 
         self.encoding = encoding
         self.quiet = quiet
@@ -233,7 +260,12 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
         self.show_errors_inline = \
             preferences_settings.get("show_errors_inline", True)
 
-        merged_env = env.copy()
+        merged_env = {}
+
+        if path:
+            merged_env['PATH'] = path
+
+        merged_env.update(env)
         if self.window.active_view():
             user_env = self.window.active_view().settings().get('build_env')
             if user_env:
@@ -251,7 +283,7 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
             self.debug_text += "[cmd: " + str(cmd) + "]\n"
         self.debug_text += "[dir: " + str(os.getcwd()) + "]\n"
         if "PATH" in merged_env:
-            self.debug_text += "[path: " + str(merged_env["PATH"]) + "]"
+            self.debug_text += "[path: " + str(os.path.expandvars(merged_env["PATH"])) + "]"
         else:
             self.debug_text += "[path: " + str(os.environ["PATH"]) + "]"
 
@@ -260,15 +292,23 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
 
         try:
             # Forward kwargs to AsyncProcess
-            self.proc = AsyncProcess(cmd, shell_cmd, merged_env, self, **kwargs)
+            self.proc = AsyncProcess(cmd, shell_cmd, merged_env, self, path, **kwargs)
 
             self.proc.start()
+
+            if interactive:
+                self.input_queue = self.proc.start_input_thread()
+            else:
+                self.input_queue = None
 
         except Exception as e:
             self.write(str(e) + "\n")
             self.write(self.debug_text + "\n")
             if not self.quiet:
                 self.write("[Finished]")
+
+        if interactive:
+            self.window.focus_view(self.input_view)
 
     def is_enabled(self, kill=False, **kwargs):
         if kill:
@@ -300,6 +340,18 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
                 self.should_update_annotations = True
                 sublime.set_timeout(lambda: annotations_check())
 
+    def on_input(self, text):
+        if not self.input_view:
+            return
+
+        if not self.proc.poll():
+            return
+
+        text += '\n'
+
+        self.write(text)
+        self.input_queue.put(text.encode(self.encoding))
+
     def on_data(self, proc, data):
         if proc != self.proc:
             return
@@ -317,6 +369,11 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
     def on_finished(self, proc):
         if proc != self.proc:
             return
+
+        if self.input_queue is not None:
+            # This signals shutdown
+            self.input_queue.put(None)
+            self.input_queue = None
 
         if proc.killed:
             self.write("\n[Cancelled]")

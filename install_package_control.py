@@ -1,7 +1,7 @@
 import base64
-import binascii
 import os
 import threading
+import ssl
 from urllib.error import URLError
 from urllib.request import build_opener, install_opener, ProxyHandler, urlopen
 
@@ -11,14 +11,16 @@ import sublime
 import sublime_api
 import sublime_plugin
 
+global_settings = sublime.load_settings('Preferences.sublime-settings')
+
 
 class InstallPackageControlCommand(sublime_plugin.ApplicationCommand):
 
     error_prefix = 'Error installing Package Control: '
     filename = 'Package Control.sublime-package'
     public_key = (
-        'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEkiE2JtDn/IQDfVLso4HRg0BNMHNj'
-        '5rpuEIVaX6txyFS0HoBmCgd+9AXKcgKAsBKbEBD6a9nVzLLmJrDVFafepQ==')
+        'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAESb4yJlgyRDKhj+ws/6eyYL6RruKD'
+        'mCbx7jsBR8H21uJfUVcijGCnYhYjgCUTKmTRVqScNvHqqkrOFC7HwV6Vrg==')
 
     def run(self):
         threading.Thread(target=self._install).start()
@@ -89,7 +91,7 @@ class InstallPackageControlCommand(sublime_plugin.ApplicationCommand):
             None or a byte string of the verified package file
         """
 
-        host_path = 'packagecontrol.io/' + self.filename.replace(' ', '%20')
+        host_path = 'download.sublimetext.com/' + self.filename.replace(' ', '%20')
         # Don't be fooled by the TLS URL, Python 3.3 does not verify hostnames
         secure_url = 'https://' + host_path
         insecure_url = 'http://' + host_path
@@ -99,9 +101,12 @@ class InstallPackageControlCommand(sublime_plugin.ApplicationCommand):
 
         install_opener(build_opener(ProxyHandler()))
 
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        context.load_verify_locations(certifi.where())
+
         try:
-            package_data = urlopen(secure_url, cafile=certifi.where()).read()
-            sig_data = urlopen(secure_sig_url, cafile=certifi.where()).read()
+            package_data = urlopen(secure_url, context=context).read()
+            sig_data = urlopen(secure_sig_url, context=context).read()
         except (URLError) as e:
             print('%sHTTPS error encountered, falling back to HTTP - %s' % (self.error_prefix, str(e)))
             try:
@@ -129,43 +134,22 @@ class InstallPackageControlCommand(sublime_plugin.ApplicationCommand):
             None if invalid, byte string of package file otherwise
         """
 
-        try:
-            armored_sig = sig_data.decode('ascii').strip()
-        except (UnicodeDecodeError):
-            print(self.error_prefix + 'invalid signature ASCII encoding')
-            return None
-
-        begin = '-----BEGIN PACKAGE CONTROL SIGNATURE-----'
-        end = '-----END PACKAGE CONTROL SIGNATURE-----'
-        pem_error = self.error_prefix + 'invalid signature PEM armor'
-
-        b64_sig = ''
-
-        in_body = None
-        for line in armored_sig.splitlines():
-            if not in_body:
-                if line != begin:
-                    print(pem_error)
-                    return None
-                in_body = True
-
-            else:
-                if line.startswith('-----'):
-                    if line != end:
-                        print(pem_error)
-                        return None
-                    break
-                b64_sig += line
-
-        try:
-            sig = base64.b64decode(b64_sig)
-        except (binascii.Error):
-            print(self.error_prefix + 'invalid signature base64 decoding')
-            return None
-
         public_key = base64.b64decode(self.public_key)
-        if not sublime_api.verify_pc_signature(package_data, sig, public_key):
+        if not sublime_api.verify_pc_signature(package_data, sig_data, public_key):
             print(self.error_prefix + 'signature could not be verified')
             return None
 
         return package_data
+
+
+class EnablePackageControlCommand(sublime_plugin.ApplicationCommand):
+    def is_visible(self):
+        ignored_packages = global_settings.get('ignored_packages', [])
+
+        return 'Package Control' in ignored_packages
+
+    def run(self):
+        pkgs = global_settings.get('ignored_packages', [])
+
+        global_settings['ignored_packages'] = [pkg for pkg in pkgs if pkg != 'Package Control']
+        sublime.save_settings('Preferences.sublime-settings')

@@ -177,7 +177,6 @@ class ColorSchemeInputHandler(sublime_plugin.ListInputHandler):
                 kind=kind_info
             ))
 
-
         files = []
         nameset = set()
         for f in sublime.find_resources('*.tmTheme'):

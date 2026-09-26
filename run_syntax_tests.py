@@ -1,16 +1,20 @@
 import os
 import re
+import statistics
 
 import sublime
 import sublime_api
 import sublime_plugin
 
 
-PACKAGES_FILE_REGEX = r'^Packages/(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$'
+PACKAGES_FILE_REGEX = r'^Packages/(..[^:]*):?([0-9]+)?:?([0-9]+)?'
 
 
 class RunSyntaxTestsCommand(sublime_plugin.WindowCommand):
-    def run(self, find_all=False, **kwargs):
+    def run(self,
+            find_all=False,
+            syntax='Packages/Default/Syntax Test Results.sublime-syntax',
+            **kwargs):
 
         if not hasattr(self, 'output_view'):
             # Try not to call get_output_panel until the regexes are assigned
@@ -23,6 +27,7 @@ class RunSyntaxTestsCommand(sublime_plugin.WindowCommand):
         settings.set('line_numbers', False)
         settings.set('gutter', False)
         settings.set('scroll_past_end', False)
+        settings.set('syntax', syntax)
 
         # Call create_output_panel a second time after assigning the above
         # settings, so that it'll be picked up as a result buffer
@@ -37,28 +42,28 @@ class RunSyntaxTestsCommand(sublime_plugin.WindowCommand):
 
             if is_syntax(relative_path):
                 tests = []
-                for t in sublime.find_resources('syntax_test*'):
-                    lines = sublime.load_resource(t).splitlines()
+                for t in sublime.find_resources('syntax_test_*'):
+                    lines = sublime.load_binary_resource(t).splitlines()
                     if len(lines) == 0:
                         continue
                     first_line = lines[0]
 
-                    match = re.match('^.*SYNTAX TEST "(.*?)"', first_line)
+                    match = re.match(b'^.*SYNTAX TEST .*"(.*?)"', first_line)
                     if not match:
                         continue
 
                     syntax = match.group(1)
-                    if syntax == relative_path or syntax == file_name:
+                    if syntax == relative_path.encode('utf-8') or syntax == file_name.encode('utf-8'):
                         tests.append(t)
-            elif file_name.startswith('syntax_test'):
+            elif file_name.startswith('syntax_test_'):
                 tests = [relative_path]
             else:
                 sublime.error_message(
                     'The current file is not a  *.sublime-syntax, *.tmLanguage '
-                    'or syntax_test* file')
+                    'or syntax_test_* file')
                 return
         else:
-            tests = sublime.find_resources('syntax_test*')
+            tests = sublime.find_resources('syntax_test_*')
 
         show_panel_on_build(self.window)
 
@@ -114,14 +119,18 @@ class ProfileSyntaxDefinitionCommand(sublime_plugin.WindowCommand):
         source = view.substr(sublime.Region(0, view.size()))
         syntax = view.settings().get('syntax')
 
-        total = 0.0
-        for _ in range(0, 10):
-            total += sublime_api.profile_syntax_definition(source, syntax)
-        avg = total / 10.0
+        num_runs = 10
 
-        output = 'Syntax "{}" took an average of {:,.1f}ms over 10 runs\n' \
-            '[Finished]'
-        append(self.output_view, output.format(syntax, avg * 1000.0))
+        data = [sublime_api.profile_syntax_definition(source, syntax) for _ in range(num_runs)]
+
+        mean_ms = statistics.mean(data) * 1000.0
+        stdev_ms = statistics.stdev(data) * 1000.0
+
+        append(
+            self.output_view,
+            f'Syntax "{syntax}" took an average of {mean_ms:,.1f}ms ±{stdev_ms:,.1f}ms over {num_runs} runs\n'
+            f'    minimum: {min(data) * 1000.0:,.1f}ms, maximum: {max(data) * 1000.0:,.1f}ms\n'
+            '[Finished]')
 
 
 class SyntaxDefinitionCompatibilityCommand(sublime_plugin.WindowCommand):
@@ -272,10 +281,15 @@ def package_relative_path(view):
     packages_path = sublime.packages_path()
     data_dir = os.path.dirname(packages_path) + os.sep
 
+    alt_data_dir = os.path.dirname(os.path.dirname(__file__)) + os.sep
+
     path = view.file_name()
     file_name = os.path.basename(path)
     if path.startswith(data_dir):
         relative_path = os_to_resource_path('Packages' + path[len(packages_path):])
+
+    elif path.startswith(alt_data_dir):
+        relative_path = os_to_resource_path('Packages' + path[len(alt_data_dir) - 1:])
 
     else:
         # Detect symlinked files that are opened from outside the Packages dir
@@ -293,11 +307,11 @@ def package_relative_path(view):
         # of the Packages repository.
         if relative_path:
             try:
-                loader_version = sublime.load_resource(relative_path)
+                loader_version = sublime.load_binary_resource(relative_path)
             except IOError:
                 relative_path = None
             else:
-                with open(path, 'r', encoding='utf-8', newline='') as f:
+                with open(path, 'rb') as f:
                     fs_version = f.read()
                 if fs_version != loader_version:
                     relative_path = None

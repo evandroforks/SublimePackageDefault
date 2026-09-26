@@ -1,4 +1,3 @@
-import sublime
 import sublime_plugin
 
 
@@ -32,17 +31,6 @@ def assign_cells(num_panes, max_columns):
     return cells
 
 
-def move_sheets(window, src_group, dst_group):
-    sheets = window.sheets_in_group(src_group)
-    transient = window.transient_sheet_in_group(src_group)
-
-    for i in range(len(sheets)):
-        window.set_sheet_index(sheets[i], dst_group, i)
-
-    if transient is not None:
-        window.set_sheet_index(transient, dst_group, -1)
-
-
 def num_sheets_in_group_including_transient(window, group):
     num = len(window.sheets_in_group(group))
     if window.transient_sheet_in_group(group) is not None:
@@ -54,7 +42,7 @@ class NewPaneCommand(sublime_plugin.WindowCommand):
     def new_pane(self, window, move_sheet, max_columns):
         cur_sheet = window.active_sheet()
 
-        layout = window.get_layout()
+        layout = window.layout()
         num_panes = len(layout["cells"])
 
         cur_index = window.active_group()
@@ -90,7 +78,9 @@ class NewPaneCommand(sublime_plugin.WindowCommand):
 
         # Move all the sheets so the new pane is created in the correct location
         for i in reversed(range(0, num_panes - cur_index - 1)):
-            move_sheets(window, cur_index + i + 1, cur_index + i + 2)
+            current_selection = window.selected_sheets_in_group(cur_index + i + 1)
+            window.move_sheets_to_group(window.sheets_in_group(cur_index + i + 1), cur_index + i + 2, select=False)
+            window.select_sheets(current_selection)
 
         if move_sheet:
             transient = window.transient_sheet_in_group(cur_index)
@@ -98,16 +88,11 @@ class NewPaneCommand(sublime_plugin.WindowCommand):
                 # transient sheets may only be moved to index -1
                 window.set_sheet_index(cur_sheet, cur_index + 1, -1)
             else:
-                window.set_sheet_index(cur_sheet, cur_index + 1, 0)
-
-            if num_sheets_in_group_including_transient(window, cur_index) == 0:
-                window.focus_group(cur_index)
-                window.new_file(sublime.TRANSIENT)
-
-            window.focus_group(cur_index + 1)
+                selected_sheets = window.selected_sheets_in_group(cur_index)
+                window.move_sheets_to_group(selected_sheets, cur_index + 1)
+                window.focus_sheet(cur_sheet)
         else:
-            window.focus_group(cur_index + 1)
-            window.new_file(sublime.TRANSIENT)
+            window.focus_group(cur_index)
 
     def run(self, move=True):
         max_columns = self.window.template_settings().get('max_columns', MAX_COLUMNS)
@@ -116,7 +101,7 @@ class NewPaneCommand(sublime_plugin.WindowCommand):
 
 class ClosePaneCommand(sublime_plugin.WindowCommand):
     def close_pane(self, window, idx, max_columns):
-        layout = window.get_layout()
+        layout = window.layout()
         num_panes = len(layout["cells"])
         selected_sheet = window.active_sheet_in_group(idx)
 
@@ -124,7 +109,9 @@ class ClosePaneCommand(sublime_plugin.WindowCommand):
             return
 
         for i in range(idx, window.num_groups()):
-            move_sheets(window, i, i - 1)
+            current_selection = window.selected_sheets_in_group(i)
+            window.move_sheets_to_group(window.sheets_in_group(i), i - 1)
+            window.select_sheets(current_selection)
 
         rows = layout["rows"]
         cols = layout["cols"]
@@ -171,7 +158,7 @@ def is_automatic_layout(window):
     if last_automatic_layout is None:
         return False
 
-    if window.get_layout()['cells'] != last_automatic_layout:
+    if window.layout()['cells'] != last_automatic_layout:
         window.settings().erase('last_automatic_layout')
         return False
 
@@ -195,6 +182,10 @@ class CloseTransient(sublime_plugin.WindowCommand):
             return False
         # Active pane contains other sheets. Run close command instead.
         if len(self.window.sheets_in_group(group)) != 0:
+            return False
+
+        num_panes = len(self.window.layout()["cells"])
+        if num_panes == 1:
             return False
 
         self.window.run_command('close_pane', {'group': group})
@@ -236,7 +227,7 @@ class SetMaxColumns(sublime_plugin.WindowCommand):
             self.window.template_settings().set('max_columns', max_columns)
 
             # Update the layout
-            layout = self.window.get_layout()
+            layout = self.window.layout()
             num_panes = len(layout["cells"])
 
             num_rows, num_cols = rows_cols_for_panes(num_panes, max_columns)

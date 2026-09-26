@@ -90,7 +90,7 @@ def to_yaml(val, start_block_on_newline=False, indent=0):
     elif isinstance(val, str):
         if needs_yaml_quoting(val):
             if "\n" in val:
-                assert(start_block_on_newline)
+                assert start_block_on_newline
                 if start_block_on_newline:
                     if val[-1] == "\n":
                         out += '|\n'
@@ -120,8 +120,7 @@ def build_scope_map():
     syntax_by_scope = {}
     for f in sublime.find_resources("*.tmLanguage"):
         try:
-            s = sublime.load_resource(f)
-            l = plistlib.readPlistFromBytes(s.encode("utf-8"))
+            l = plistlib.loads(sublime.load_resource(f))
             if "scopeName" in l:
                 fname = os.path.splitext(f)[0] + ".sublime-syntax"
                 syntax_by_scope[l["scopeName"]] = os.path.basename(fname)
@@ -151,7 +150,7 @@ def is_external_syntax(key):
 
 
 def format_external_syntax(key):
-    assert(is_external_syntax(key))
+    assert is_external_syntax(key)
 
     if '#' in key:
         syntax, rule = key.split('#')
@@ -320,7 +319,7 @@ def make_context(patterns, repository):
                 raise Exception("unknown include: " + key)
             else:
                 # looks like an external include
-                # assert(is_external_syntax(key))
+                # assert is_external_syntax(key)
                 # ctx.append({"include-syntax": key})
                 ctx.append({"include": format_external_syntax(key)})
 
@@ -336,7 +335,7 @@ def convert(fname):
     else:
         with open(fname, 'r', encoding='utf-8') as f:
             s = f.read()
-    l = plistlib.readPlistFromBytes(s.encode("utf-8"))
+    l = plistlib.loads(s)
 
     if "repository" in l:
         repository = l["repository"]
@@ -353,7 +352,7 @@ def convert(fname):
     contexts = {"main": make_context(l["patterns"], repository)}
 
     for key, value in repository.items():
-        assert(key != "main")
+        assert key != "main"
 
         contexts[key] = make_context(value, repository)
 
@@ -524,7 +523,7 @@ if __name__ == "__main__":
             text = to_yaml(data)
             # verify that to_yaml produces valid yaml for this object
             if 'yaml' in sys.modules:
-                assert(data == yaml.load(text))
+                assert data == yaml.load(text)
 
             with open(outfile, "w", encoding="utf-8") as f:
                 # to_yaml will leave some trailing whitespace, remove it

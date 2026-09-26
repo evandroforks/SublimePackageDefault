@@ -1,0 +1,87 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/syntax.html
+name: Syntax Test Results
+hidden: true
+scope: text.syntax-tests
+contexts:
+  main:
+    # Error location
+    - match: ^([^:\n]*[/\\]syntax_test_[^:\n]*)(?:(:)([0-9]+))?(?:(:)([0-9]+))?(\n)
+      scope: meta.path.syntax-tests
+      captures:
+        1: entity.name.filename.syntax-tests
+        2: punctuation.separator.sequence.syntax-tests
+        3: constant.numeric.line-number.syntax-tests
+        4: punctuation.separator.sequence.syntax-tests
+        5: constant.numeric.column-number.syntax-tests
+        6: meta.fold.begin.syntax-tests
+      # note: parsing details in separate context increases performance by about 17%
+      push: violation-details
+
+    # Summary
+    - match: ^(FAILED(:)) (\d+) of (\d+) assertions in (\d+) files failed\n?
+      scope: meta.summary.failure.syntax-tests message.error.syntax-tests
+      captures:
+        1: markup.heading.syntax-tests
+        2: punctuation.separator.syntax-tests
+        3: constant.numeric.syntax-tests
+        4: constant.numeric.syntax-tests
+        5: constant.numeric.syntax-tests
+    - match: ^(Success(:)) (\d+) assertions in (\d+) files passed\n?
+      scope: meta.summary.success.syntax-tests message.info.syntax-tests
+      captures:
+        1: markup.heading.syntax-tests
+        2: punctuation.separator.syntax-tests
+        3: constant.numeric.syntax-tests
+        4: constant.numeric.syntax-tests
+
+  violation-details:
+    # Messages
+    - match: ^(error(:)) .*\n
+      scope: message.error.syntax-tests
+      captures:
+        1: markup.heading.syntax-tests
+        2: punctuation.separator.syntax-tests
+    - match: ^(note(:)) .*\n
+      scope: message.info.syntax-tests
+      captures:
+        1: markup.heading.syntax-tests
+        2: punctuation.separator.syntax-tests
+
+    # Source line
+    - match: ^( *([0-9]+) (\|)) .*
+      captures:
+        1: meta.gutter.syntax-tests
+        2: constant.numeric.line-number.syntax-tests
+        3: punctuation.separator.gutter.syntax-tests
+
+    # Message line
+    - match: ^( *(\|)) ([ ^@-]+)(.*)
+      captures:
+        1: meta.gutter.syntax-tests
+        2: punctuation.separator.gutter.syntax-tests
+        3: punctuation.definition.syntax-tests
+        4: comment.line.syntax-tests
+
+    # Actual block
+    - match: ^(actual(:))\n
+      scope: meta.separator.syntax-tests
+      captures:
+        1: markup.heading.syntax-tests
+        2: punctuation.separator.syntax-tests
+      push: actual-block
+
+    - match: ^\n?
+      scope: meta.fold.end.syntax-tests
+      pop: 1
+
+  actual-block:
+    - match: ^( *(\|))([ ^@-]+)(.*)
+      captures:
+        1: meta.gutter.syntax-tests
+        2: punctuation.separator.gutter.syntax-tests
+        3: punctuation.definition.syntax-tests
+        4: meta.actual.syntax-tests comment.line.syntax-tests
+    - match: ^
+      pop: 1

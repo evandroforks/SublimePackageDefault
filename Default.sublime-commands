@@ -1,9 +1,7 @@
 [
-	{ "caption": "Rename File", "command": "rename_file" },
-
 	{ "caption": "Arithmetic", "command": "arithmetic" },
 
-	{ "caption": "Wrap at Ruler", "command": "wrap_lines" },
+	{ "caption": "Wrap Paragraph", "command": "wrap_lines" },
 
 	{ "caption": "Word Wrap: Toggle", "command": "toggle_setting", "args": {"setting": "word_wrap"} },
 
@@ -11,11 +9,15 @@
 	{ "caption": "Convert Case: Upper Case", "command": "upper_case" },
 	{ "caption": "Convert Case: Lower Case", "command": "lower_case" },
 	{ "caption": "Convert Case: Swap Case", "command": "swap_case" },
+	{ "caption": "Convert Case: lowerCamelCase", "command": "convert_ident_case", "args": {"case": "title", "first_case": "lower"} },
+	{ "caption": "Convert Case: UpperCamelCase", "command": "convert_ident_case", "args": {"case": "title"} },
+	{ "caption": "Convert Case: snake_case", "command": "convert_ident_case", "args": {"separator": "_", "case": "lower"} },
+	{ "caption": "Convert Case: kebab-case", "command": "convert_ident_case", "args": {"separator": "-", "case": "lower"} },
 
 	{ "caption": "Toggle Comment", "command": "toggle_comment", "args": {"block": false} },
 	{ "caption": "Toggle Block Comment", "command": "toggle_comment", "args": {"block": true} },
 
-	{ "caption": "Bookmarks: Toggle", "command": "toggle_bookmark" },
+	{ "caption": "Bookmarks: Toggle", "command": "toggle_bookmark", "args": {"toggle_line": true } },
 	{ "caption": "Bookmarks: Select Next", "command": "next_bookmark" },
 	{ "caption": "Bookmarks: Select Previous", "command": "prev_bookmark" },
 	{ "caption": "Bookmarks: Clear All", "command": "clear_bookmarks" },
@@ -71,8 +73,17 @@
 			"default": "[\n\t$0\n]\n"
 		}
 	},
+	{
+		"caption": "Preferences: Mouse Bindings",
+		"command": "edit_settings", "args":
+		{
+			"base_file": "${packages}/Default/Default ($platform).sublime-mousemap",
+			"default": "[\n\t$0\n]\n"
+		}
+	},
 
 	{ "caption": "Install Package Control", "command": "install_package_control" },
+	{ "caption": "Enable Package Control", "command": "enable_package_control" },
 
 	{ "caption": "UI: Select Color Scheme", "command": "select_color_scheme" },
 	{ "caption": "UI: Select Theme", "command": "select_theme" },
@@ -81,15 +92,23 @@
 
 	{ "caption": "File: Save All", "command": "save_all" },
 	{ "caption": "File: Revert", "command": "revert" },
+	{ "caption": "File: Reopen File as Image", "command": "force_reopen_as", "args": {"type": "image"},  },
+	{ "caption": "File: Reopen File as Text", "command": "force_reopen_as", "args": {"type": "text"},  },
 	{ "caption": "File: New View into File", "command": "clone_file" },
-	{ "caption": "File: Split View", "command": "clone_file", "args": {"add_to_selection": true} },
+	{ "caption": "File: Split View", "command": "clone_file", "args": {"add_to_selection": true, "retain_viewport_position": true} },
 	{ "caption": "File: Close All", "command": "close_all" },
+	{ "caption": "File: Rename File", "command": "rename_file" },
 	{ "caption": "File: Print", "command": "html_print" },
 
 	{ "caption": "Sublime Merge: Open Repository", "command": "sublime_merge_open_repo" },
 	{ "caption": "Sublime Merge: File History", "command": "sublime_merge_file_history" },
 	{ "caption": "Sublime Merge: Folder History", "command": "sublime_merge_folder_history" },
 	{ "caption": "Sublime Merge: Blame File", "command": "sublime_merge_blame_file" },
+
+	{ "caption": "Open in Browser", "command": "open_in_browser" },
+	{ "caption": "Open Containing Folder…", "command": "open_dir", "args": {"dir": "$file_path", "file": "$file_name"} },
+	{ "caption": "Open Terminal Here…", "command": "open_terminal", "args": {"dir": "$file_path"} },
+	{ "caption": "Copy File Path", "command": "copy_path" },
 
 	{ "caption": "HTML: Wrap Selection With Tag", "command": "insert_snippet", "args": { "name": "Packages/XML/Snippets/xml-long-tag.sublime-snippet" } },
 	{ "caption": "HTML: Encode Special Characters", "command": "encode_html_entities" },
@@ -103,6 +122,7 @@
 	{ "caption": "Selection: Select All", "command": "select_all" },
 	{ "caption": "Selection: Expand", "command": "expand_selection", "args": {"to": "smart"} },
 	{ "caption": "Selection: Expand to Line", "command": "expand_selection", "args": {"to": "line"} },
+	{ "caption": "Selection: Expand to Line Upward", "command": "expand_selection", "args": {"to": "line_prev"} },
 	{ "caption": "Selection: Expand to Word", "command": "find_under_expand" },
 	{ "caption": "Selection: Expand to Block", "command": "expand_selection_to_paragraph" },
 	{ "caption": "Selection: Expand to Paragraph", "command": "expand_selection_to_paragraph", "args": {"markup_aware": true} },

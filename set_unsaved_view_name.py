@@ -34,9 +34,10 @@ class SetUnsavedViewName(sublime_plugin.EventListener):
         cur_name = view.settings().get('auto_name')
         view_name = view.name()
 
-        # Only set the name for plain text files
-        syntax = view.settings().get('syntax')
-        if syntax != 'Packages/Text/Plain text.tmLanguage':
+        wants_name_for_current_syntax = view.settings().get(
+            'set_unsaved_view_name_for_syntax', default=False)
+
+        if not wants_name_for_current_syntax:
             if cur_name:
                 # Undo any previous name that was set
                 view.settings().erase('auto_name')

@@ -90,6 +90,14 @@ def filter_current_symbol(view, point, symbol, locations):
     return new_locations
 
 
+def scroll_to(row, col, view):
+    pt = view.text_point(row - 1, col - 1)
+    view.sel().clear()
+    view.sel().add(sublime.Region(pt))
+    view.show(pt, True)
+    view.run_command('add_jump_record', {'selection': pt})
+
+
 def navigate_to_symbol(
         view,
         symbol,
@@ -110,19 +118,20 @@ def navigate_to_symbol(
 
     def save_selections(view):
         if view.id() not in open_file_states:
-            open_file_states[view.id()] = ([r for r in view.sel()], view.viewport_position())
+            open_file_states[view.id()] = ([r for r in view.sel()], view.viewport_position(), view.layout_extent())
 
     def restore_selections(view):
         if view.is_valid():
-            selections, viewport_pos = open_file_states[view.id()]
+            selections, viewport_pos, initial_layout_extent = \
+                open_file_states[view.id()]
             view.sel().clear()
             view.add_regions('jump_ignore_selection', selections)
             view.sel().add_all(selections)
-            view.set_viewport_position(viewport_pos)
+            if initial_layout_extent == view.layout_extent():
+                view.set_viewport_position(viewport_pos)
 
     def select_entry(window, locations, idx, event):
-
-        nonlocal clear_to_right, side_by_side, replace
+        nonlocal clear_to_right, replace
 
         if idx >= 0:
             for view_id in open_file_states:
@@ -172,19 +181,42 @@ def navigate_to_symbol(
                     replace,
                     clear_to_right)
         else:
+            if event and event.get("key", None) and event["key"] == "escape":
+                if view.is_valid():
+                    window.focus_view(view)
+                    view.show(view.sel()[0])
+                # When in side-by-side mode close the current highlighted
+                # sheet upon canceling if the sheet is semi-transient otherwise
+                # deselect
+                if side_by_side:
+                    if highlighted_view.sheet().is_semi_transient():
+                        highlighted_view.close()
+                else:
+                    window.promote_sheet(highlighted_view.sheet())
+
+                window.select_sheets(prev_selected)
+            else:
+                highlighted_sheet = highlighted_view.sheet()
+                active_group = window.active_group()
+
+                if highlighted_sheet.group() != active_group:
+                    window.select_sheets(prev_selected)
+
+                    if highlighted_sheet.is_transient():
+                        sublime.set_timeout(lambda: highlighted_sheet.close(), 0)
+                    else:
+                        window.promote_sheet(highlighted_sheet)
+
+                    window.focus_group(active_group)
+                else:
+                    window.promote_sheet(highlighted_sheet)
+
+                # Don't jump when clicking on text area of current view
+                if view.is_valid() and view.sheet() == highlighted_sheet:
+                    return
+
             for view_id in open_file_states:
                 restore_selections(sublime.View(view_id))
-
-            if window.active_view() != highlighted_view:
-                window.select_sheets(prev_selected)
-
-                if highlighted_view.sheet().is_semi_transient():
-                    highlighted_view.close()
-                elif view.is_valid():
-                    window.focus_view(view)
-
-            elif highlighted_view.sheet().is_transient():
-                window.select_sheets(prev_selected)
 
     def highlight_entry(window, locations, idx):
         nonlocal highlighted_view
@@ -202,9 +234,16 @@ def navigate_to_symbol(
 
             else:
                 if highlighted_view.is_valid():
-                    # Replacing the MRU is done relative to the current highlighted sheet
-                    window.focus_view(highlighted_view)
-                    flags |= sublime.REPLACE_MRU | sublime.SEMI_TRANSIENT
+                    # Scroll within current file if location path is the same as
+                    # the current highlighted view path, returning early before
+                    # the sheet is promoted during a call to Window.open_file
+                    if locations[idx].path == highlighted_view.file_name():
+                        scroll_to(locations[idx].row, locations[idx].col, highlighted_view)
+                        return
+                    else:
+                        # Replacing the MRU is done relative to the current highlighted sheet
+                        window.focus_view(highlighted_view)
+                        flags |= sublime.REPLACE_MRU | sublime.SEMI_TRANSIENT
                 else:
                     # highlighted_view is no longer valid
                     flags |= sublime.ADD_TO_SELECTION | sublime.SEMI_TRANSIENT
@@ -254,7 +293,7 @@ class GotoDefinition(sublime_plugin.WindowCommand):
             return
 
         if not symbol:
-            # Ensure that events are processed correctly as goto_definition command can be run from a menubar item. 
+            # Ensure that events are processed correctly as goto_definition command can be run from a menubar item.
             # Event may contain "modifier_keys" but not "x" and "y", in which case fallback to current selection.
             if event and "x" in event and "y" in event:
                 pt = v.window_to_text((event["x"], event["y"]))
@@ -263,8 +302,10 @@ class GotoDefinition(sublime_plugin.WindowCommand):
                     if 'primary' in modifiers:
                         side_by_side = True
                         clear_to_right = True
-            else:
+            elif len(v.sel()) > 0:
                 pt = v.sel()[0]
+            else:
+                pt = -1
 
             symbol, locations = symbol_at_point(v, pt)
         else:
@@ -323,7 +364,7 @@ class OpenSymbolDefinition(sublime_plugin.WindowCommand):
                 selected_sheets = self.window.selected_sheets_in_group(prefocus_group)
 
         if event:
-            if 'primary' in event['modifier_keys']:
+            if event['button'] == 3 or 'primary' in event['modifier_keys']:
                 new_tab = True
                 clear_to_right = True
             elif 'shift' in event['modifier_keys']:
@@ -337,13 +378,9 @@ class OpenSymbolDefinition(sublime_plugin.WindowCommand):
             view.preserve_auto_complete_on_focus_lost()
 
         # Make sure we use the current view if possible
-        if not new_tab and path[:path.find(':')] == view.file_name():
+        if not new_tab and path[:path.find(':')] == view.file_name() and event and 'alt' not in event['modifier_keys']:
             row, col = map(int, path[path.find(':') + 1:].split(':'))
-            pt = view.text_point(row - 1, col - 1)
-            view.sel().clear()
-            view.sel().add(sublime.Region(pt))
-            view.show(pt, True)
-            view.run_command('add_jump_record', {'selection': pt})
+            scroll_to(row, col, view)
         else:
             if event and 'alt' not in event['modifier_keys'] \
                     and len(selected_sheets) > 1 \
@@ -351,6 +388,8 @@ class OpenSymbolDefinition(sublime_plugin.WindowCommand):
                 if focus_view is not None and active_view.id() == focus_view:
                     prefocus = None
                 flags |= sublime.REPLACE_MRU | sublime.SEMI_TRANSIENT
+            elif event and 'alt' in event['modifier_keys'] and not new_tab:
+                flags |= sublime.FORCE_CLONE
 
             if prefocus:
                 self.window.focus_view(prefocus)
@@ -360,7 +399,7 @@ class OpenSymbolDefinition(sublime_plugin.WindowCommand):
                 if clear_to_right:
                     flags |= sublime.CLEAR_TO_RIGHT
 
-            self.window.open_file(path, flags)
+            self.window.open_file(path, flags, prefocus_group)
 
         if hide_popup:
             view.hide_popup()
@@ -606,6 +645,11 @@ class ShowDefinitions(sublime_plugin.EventListener):
         if not locations and not ref_locations:
             return
 
+        max_refs = view.settings().get("show_definitions_references_limit", 4086)
+        num_ref_locations = len(ref_locations)
+        if len(ref_locations) > max_refs and max_refs != 0:
+            ref_locations = ref_locations[:max_refs]
+
         # Don't add a jump point if the selection intersects the symbol at all
         save_point = point
         region = view.expand_by_class(
@@ -622,18 +666,25 @@ class ShowDefinitions(sublime_plugin.EventListener):
 
         sheet = view.sheet()
         group = sheet.group()
-        selected_sheets = view.window().selected_sheets_in_group(group)
+        if group is not None:
+            selected_sheets = view.window().selected_sheets_in_group(group)
+        else:
+            selected_sheets = []
+
+        relative_to_focused = view.settings().get("open_popup_definitions_relative_to_focused_view")
+        open_tab = "Open Tab to Right" + (" of View" if not relative_to_focused else " of Focused View")
 
         primary = 'Cmd' if sys.platform == 'darwin' else 'Ctrl'
-        title = primary + "+Click to Open Tab to Right"
+        title = primary + "+Click to " + open_tab
         if len(selected_sheets) > 1:
             if sheet != selected_sheets[-1]:
-                title += "\nShift+Click to Append Tab"
-            title += "\nAlt+Click to Replace All Tabs"
+                title += "\nShift+Click to Append Tab to Current Selection"
+            title += "\nAlt+Click to Replace All Tabs in Current Selection"
 
         link_markup = ('<span class="{class_name}" title="{name}">{letter}</span>'
                        '<a href="{href}" title="{title}">{location}</a>&nbsp;'
-                       '<a class="icon" href="{new_tab_href}" title="Open Tab to Right">◨</a>&nbsp;'
+                       '<a class="icon" href="{new_tab_href}" '
+                       'title="Open Tab to Right of Current Selection">◨</a>&nbsp;'
                        '<span class="syntax">{syntax}</span>')
 
         links = '<br>'.join(
@@ -676,10 +727,14 @@ class ShowDefinitions(sublime_plugin.EventListener):
         if len(ref_locations) > 0:
             plural = 's' if len(ref_links) != 1 else ''
 
+            ref_limit = ''
+            if num_ref_locations != len(ref_locations):
+                ref_limit = f'<br>{num_ref_locations - len(ref_locations)} more references not shown.'
+
             ref_section = """
                 <h1>Reference%s%s</h1>
-                <p>%s</p>
-            """ % (plural, symbol_name, ref_links)
+                <p>%s%s</p>
+            """ % (plural, symbol_name, ref_links, ref_limit)
             if len(def_section) != 0:
                 ref_section = "<br>" + ref_section
         else:

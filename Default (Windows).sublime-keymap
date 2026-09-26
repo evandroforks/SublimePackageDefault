@@ -2,7 +2,7 @@
 	{ "keys": ["ctrl+shift+n"], "command": "new_window" },
 	{ "keys": ["ctrl+shift+w"], "command": "close_window" },
 	{ "keys": ["ctrl+o"], "command": "prompt_open_file" },
-	{ "keys": ["ctrl+shift+t"], "command": "reopen_last_file" },
+	{ "keys": ["ctrl+shift+t"], "command": "reopen_last_file", "args": {"source": "window"} },
 	{ "keys": ["alt+o"], "command": "switch_file", "args": {"extensions": ["cpp", "cxx", "cc", "c", "hpp", "hxx", "hh", "h", "ipp", "inl", "m", "mm"]} },
 	{ "keys": ["alt+shift+o"], "command": "switch_file", "args": {"extensions": ["cpp", "cxx", "cc", "c", "hpp", "hxx", "hh", "h", "ipp", "inl", "m", "mm"], "side_by_side": true} },
 	{ "keys": ["ctrl+n"], "command": "new_file" },
@@ -22,23 +22,12 @@
 
 	{ "keys": ["backspace"], "command": "left_delete" },
 	{ "keys": ["shift+backspace"], "command": "left_delete" },
-	{ "keys": ["ctrl+shift+backspace"], "command": "left_delete" },
 	{ "keys": ["delete"], "command": "right_delete" },
 	{ "keys": ["enter"], "command": "insert", "args": {"characters": "\n"} },
-	{ "keys": ["enter"], "command": "select", "context":
-		[
-			{ "key": "overlay_has_focus", "operator": "equal", "operand": true }
-		]
-	},
 	{ "keys": ["shift+enter"], "command": "insert", "args": {"characters": "\n"} },
 	{ "keys": ["keypad_enter"], "command": "insert", "args": {"characters": "\n"} },
-	{ "keys": ["keypad_enter"], "command": "select", "context":
-		[
-			{ "key": "overlay_has_focus", "operator": "equal", "operand": true }
-		]
-	},
 	{ "keys": ["shift+keypad_enter"], "command": "insert", "args": {"characters": "\n"} },
-	
+
 	{ "keys": ["ctrl+enter"], "command": "select", "args": { "extend": true, "clear_to_right": true }, "context":
 		[
 			{ "key": "overlay_has_focus", "operator": "equal", "operand": true },
@@ -181,7 +170,7 @@
 	},
 
 	{ "keys": ["tab"], "command": "insert", "args": {"characters": "\t"} },
-	{ "keys": ["tab"], "command": "auto_complete", "args": {"mini": true, "default": "\t"},
+	{ "keys": ["tab"], "command": "auto_complete", "args": {"mini": true, "default": "\t",  "commit_single": true},
 		"context":
 		[
 			{ "key": "auto_complete_visible", "operand": false },
@@ -190,6 +179,17 @@
 			{ "key": "preceding_text", "operator": "regex_match", "operand": ".*\\w", "match_all": true },
 		]
 	},
+
+	{ "keys": ["tab"], "command": "auto_complete", "args": {"snippets_only": true, "default": "\t"},
+		"context":
+		[
+			{ "key": "auto_complete_visible", "operand": false },
+			{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
+			{ "key": "setting.tab_completion", "operator": "equal", "operand": false },
+			{ "key": "preceding_text", "operator": "regex_match", "operand": ".*\\w", "match_all": true },
+		]
+	},
+
 	{ "keys": ["tab"], "command": "expand_snippet", "context":
 		[{ "key": "has_snippet" }, ]
 	},
@@ -206,7 +206,7 @@
 	},
 	{ "keys": ["tab"], "command": "move", "args": {"by": "lines", "forward": true}, "context":
 		[
-		 	{ "key": "overlay_has_focus", "operator": "equal", "operand": true }
+			{ "key": "overlay_has_focus", "operator": "equal", "operand": true }
 		]
 	},
 	{ "keys": ["tab"], "command": "next_field", "context":
@@ -234,11 +234,13 @@
 	},
 
 	{ "keys": ["ctrl+]"], "command": "indent" },
+	{ "keys": ["ctrl+k", "ctrl+]"], "command": "reindent", "args": {"single_line": true} },
 	{ "keys": ["ctrl+["], "command": "unindent" },
 
 	{ "keys": ["insert"], "command": "toggle_overwrite" },
 
 	{ "keys": ["ctrl+l"], "command": "expand_selection", "args": {"to": "line"} },
+	{ "keys": ["alt+l"], "command": "expand_selection", "args": {"to": "line_prev"} },
 	{ "keys": ["ctrl+d"], "command": "find_under_expand" },
 	{ "keys": ["ctrl+k", "ctrl+d"], "command": "find_under_expand_skip" },
 	{ "keys": ["ctrl+shift+space"], "command": "expand_selection", "args": {"to": "scope"} },
@@ -283,6 +285,7 @@
 
 	{ "keys": ["ctrl+p"], "command": "show_overlay", "args": {"overlay": "goto", "show_files": true} },
 	{ "keys": ["ctrl+shift+p"], "command": "show_overlay", "args": {"overlay": "command_palette"} },
+	{ "keys": ["alt+shift+p"], "command": "prompt_select_workspace" },
 	{ "keys": ["ctrl+r"], "command": "show_overlay", "args": {"overlay": "goto", "text": "@"} },
 	{ "keys": ["ctrl+g"], "command": "show_overlay", "args": {"overlay": "goto", "text": ":"} },
 	{ "keys": ["ctrl+;"], "command": "show_overlay", "args": {"overlay": "goto", "text": "#"} },
@@ -347,6 +350,11 @@
 	{ "keys": ["ctrl+`"], "command": "show_panel", "args": {"panel": "console", "toggle": true} },
 
 	{ "keys": ["ctrl+space"], "command": "auto_complete" },
+	{ "keys": ["ctrl+space"], "command": "move", "args": {"by": "lines", "forward": true}, "context":
+		[
+			{ "key": "auto_complete_primed", "operator": "equal", "operand": true },
+		]
+	},
 
 	{ "keys": ["ctrl+alt+shift+p"], "command": "show_scope_name" },
 
@@ -697,8 +705,7 @@
 	{ "keys": ["alt+6"], "command": "select_by_index", "args": { "index": 5 } },
 	{ "keys": ["alt+7"], "command": "select_by_index", "args": { "index": 6 } },
 	{ "keys": ["alt+8"], "command": "select_by_index", "args": { "index": 7 } },
-	{ "keys": ["alt+9"], "command": "select_by_index", "args": { "index": 8 } },
-	{ "keys": ["alt+0"], "command": "select_by_index", "args": { "index": 9 } },
+	{ "keys": ["alt+9"], "command": "select_last_tab" },
 
 	{ "keys": ["ctrl+j", "ctrl+up"], "command": "unselect_others" },
 	{ "keys": ["ctrl+j", "ctrl+left"], "command": "unselect_to_left" },
@@ -741,7 +748,7 @@
 
 	{ "keys": ["f2"], "command": "next_bookmark" },
 	{ "keys": ["shift+f2"], "command": "prev_bookmark" },
-	{ "keys": ["ctrl+f2"], "command": "toggle_bookmark" },
+	{ "keys": ["ctrl+f2"], "command": "toggle_bookmark", "args": {"toggle_line": true } },
 	{ "keys": ["ctrl+shift+f2"], "command": "clear_bookmarks" },
 	{ "keys": ["alt+f2"], "command": "select_all_bookmarks" },
 
@@ -804,7 +811,7 @@
 	{ "keys": ["alt+a"], "command": "toggle_preserve_case", "context":
 		[{"key": "panel_type", "operand": "find"}, {"key": "panel_has_focus"}],
 	},
-	
+
 	{ "keys": ["enter"], "command": "select", "context":
 		[
 			{ "key": "panel_has_focus", "operator": "equal", "operand": true },
@@ -881,8 +888,9 @@
 	{ "keys": ["keypad_enter"], "command": "hide_panel", "context":
 		[{"key": "panel", "operand": "incremental_find"}, {"key": "panel_has_focus"}]
 	},
-	{ "keys": ["shift+keypad_enter"], "command": "find_prev", "context":
-		[{"key": "panel", "operand": "incremental_find"}, {"key": "panel_has_focus"}]
+	{ "keys": ["shift+keypad_enter"], "command": "chain", "args": {
+		"commands": [{"command": "find_prev"}, {"command": "hide_panel"}]},
+		"context": [{"key": "panel", "operand": "incremental_find"}, {"key": "panel_has_focus"}]
 	},
 	{ "keys": ["alt+keypad_enter"], "command": "find_all", "args": {"close_panel": true},
 		"context": [{"key": "panel", "operand": "incremental_find"}, {"key": "panel_has_focus"}]
@@ -890,8 +898,9 @@
 	{ "keys": ["enter"], "command": "hide_panel", "context":
 		[{"key": "panel", "operand": "incremental_find"}, {"key": "panel_has_focus"}]
 	},
-	{ "keys": ["shift+enter"], "command": "find_prev", "context":
-		[{"key": "panel", "operand": "incremental_find"}, {"key": "panel_has_focus"}]
+	{ "keys": ["shift+enter"], "command": "chain", "args": {
+		"commands": [{"command": "find_prev"}, {"command": "hide_panel"}]},
+		"context": [{"key": "panel", "operand": "incremental_find"}, {"key": "panel_has_focus"}]
 	},
 	{ "keys": ["alt+enter"], "command": "find_all", "args": {"close_panel": true},
 		"context": [{"key": "panel", "operand": "incremental_find"}, {"key": "panel_has_focus"}]

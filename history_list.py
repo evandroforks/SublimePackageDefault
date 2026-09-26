@@ -165,7 +165,12 @@ class JumpHistory:
             cur_sel = selection
 
         else:
-            cur_sel = list(view.sel())
+            # Sanity limit on the size of the selection. Otherwise performance
+            # degrades with many selections.
+            if len(view.sel()) <= 10000:
+                cur_sel = list(view.sel())
+            else:
+                cur_sel = [view.sel()[0]]
             to_ignore = view.get_regions('jump_ignore_selection')
             if to_ignore:
                 view.erase_regions('jump_ignore_selection')
@@ -456,8 +461,6 @@ def _history_for_window(window):
     :return:
         A JumpHistory object
     """
-
-    global jump_history_dict
 
     if not window:
         return JumpHistory()
